@@ -118,54 +118,416 @@ svg { display: block; flex-shrink: 0; }
 /* ========================================
    6. Homepage — OWNER: DAFFA
 ======================================== */
-.home-page .page-header { margin-bottom: 16px; }
-.home-categories { display: grid; gap: 12px; }
-
-.home-category-card {
-  position: relative;
-  display: grid;
-  gap: 6px;
-  padding: 24px 56px 24px 24px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+.home-page {
+  max-width: 420px;
+  margin: -20px auto 0;
+  gap: 20px;
 }
 
-.home-category-card:hover { border-color: var(--color-primary); }
-.home-category-name { font-size: 1.125rem; font-weight: 600; }
-.home-category-count { color: var(--color-text-secondary); font-size: 0.875rem; }
-.home-category-arrow { position: absolute; top: 24px; right: 24px; color: var(--color-primary); }
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 700 30px/1.2 Georgia, "Times New Roman", serif;
+  letter-spacing: -1px;
+}
+
+.home-brand-mark {
+  display: block;
+  width: 32px;
+  height: 24px;
+  position: relative;
+}
+
+.home-brand-mark::before, .home-brand-mark::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.home-brand-mark::before {
+  left: 0;
+}
+
+.home-brand-mark::after {
+  right: 0;
+  opacity: .55;
+}
+
+.home-profile {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f0efeb;
+  color: #444;
+}
+
+.home-filters {
+  display: grid;
+  grid-template-columns: .7fr .85fr 1.1fr 1.4fr;
+  gap: 8px;
+  margin: 4px 0 -2px;
+}
+
+.home-filters button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 24px;
+  background: #f0efeb;
+  color: #353535;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+
+.home-filters button[aria-pressed="true"] {
+  background: var(--color-primary);
+  color: white;
+}
+
+.home-filters button:hover:not([aria-pressed="true"]) {
+  background: #e8e5e1;
+}
+
+.home-entities {
+  display: grid;
+  gap: 30px;
+}
+
+.home-entity-group {
+  display: grid;
+  gap: 12px;
+}
+
+.home-entity-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-entity-heading h2 {
+  font: 700 20px/1.3 Georgia, "Times New Roman", serif;
+  letter-spacing: -.4px;
+}
+
+.home-entity-heading span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-filters button {
+    transition: none;
+  }
+}
 
 /* ========================================
    7. Categories — OWNER: DAFFA
 ======================================== */
-.category-entities { display: grid; gap: 12px; }
+.category-page {
+  max-width: 420px;
+  margin: -28px auto 0;
+  gap: 23px;
+}
+
+.category-toolbar {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+}
+
+.category-back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -12px;
+  border-radius: 50%;
+}
+
+.category-back:hover {
+  background: #f0eeea;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: -6px 0 5px;
+}
+
+.category-symbol {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fce2dc;
+  color: var(--color-primary);
+}
+
+.category-symbol svg {
+  width: 36px;
+  height: 36px;
+  stroke-width: 2.2;
+}
+
+.category-header h1 {
+  font: 700 34px/1.15 Georgia, "Times New Roman", serif;
+  letter-spacing: -1px;
+}
+
+.category-header p {
+  margin-top: 4px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.category-entities {
+  display: grid;
+  gap: 12px;
+}
 
 .entity-card {
   display: grid;
-  gap: 8px;
-  padding: 24px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+  grid-template-columns: 112px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 16px;
+  padding-right: 12px;
+  min-height: 108px;
+  border: 1px solid #eeeae5;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: background .18s, border-color .18s;
 }
 
-.entity-card:hover { border-color: var(--color-primary); }
-.entity-card p { color: var(--color-text-secondary); font-size: 0.875rem; }
+.entity-card:hover {
+  background: white;
+  border-color: #dccfc4;
+}
+
+.entity-card-image {
+  width: 112px;
+  height: 108px;
+  object-fit: cover;
+  border-radius: 13px;
+}
+
+.entity-card-copy {
+  min-width: 0;
+}
+
+.entity-card-copy h2 {
+  font: 700 21px/1.15 Georgia, "Times New Roman", serif;
+  letter-spacing: -.5px;
+}
+
+.entity-card-copy p {
+  margin-top: 5px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.entity-card-evidence {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.entity-card-evidence svg {
+  width: 17px;
+  height: 17px;
+  color: #555;
+}
+
+.entity-card-chevron {
+  width: 18px;
+  height: 18px;
+  color: #555;
+}
+
+@media (max-width: 380px) {
+  .entity-card {
+    grid-template-columns: 94px minmax(0, 1fr) 16px;
+    gap: 12px;
+    padding-right: 8px;
+    min-height: 98px;
+  }
+  .entity-card-image {
+    width: 94px;
+    height: 98px;
+  }
+  .entity-card-copy h2 {
+    font-size: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entity-card {
+    transition: none;
+  }
+}
 
 /* ========================================
    8. Entity Detail — OWNER: DAFFA
 ======================================== */
-.entity-detail-card {
-  display: grid;
-  gap: 12px;
-  padding: 24px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+.entity-detail {
+  position: relative;
+  display: block;
+  width: calc(100% + 48px);
+  max-width: 480px;
+  margin: -48px -24px -36px;
 }
 
-.entity-detail-card p { color: var(--color-text-secondary); }
+.entity-detail-hero {
+  display: block;
+  width: 100%;
+  height: 390px;
+  object-fit: cover;
+}
+
+.entity-detail-back {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: white;
+  background: #00000024;
+}
+
+.entity-detail-back:hover {
+  background: #00000055;
+}
+
+.entity-detail-sheet {
+  position: relative;
+  min-height: 380px;
+  margin-top: -28px;
+  padding: 52px 28px 48px;
+  border-radius: 28px 28px 0 0;
+  background: var(--color-background);
+}
+
+.entity-detail-handle {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 47px;
+  height: 4px;
+  border-radius: 4px;
+  background: #bdbbb7;
+}
+
+.entity-detail-header h1 {
+  font: 700 40px/1.1 Georgia, "Times New Roman", serif;
+  letter-spacing: -1.5px;
+}
+
+.entity-detail-header p {
+  margin-top: 6px;
+  color: var(--color-text-secondary);
+  font-size: 17px;
+}
+
+.entity-detail-intention {
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: 22px;
+  background: #fceee8;
+}
+
+.entity-detail-intention h2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--color-primary);
+  font: 700 19px/1.3 Georgia, "Times New Roman", serif;
+}
+
+.entity-detail-intention h2 span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fbd7ce;
+  flex-shrink: 0;
+}
+
+.entity-detail-intention p {
+  margin-top: 15px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #6f7374;
+}
+
+.entity-detail--empty .entity-detail-sheet {
+  margin-top: 0;
+  padding-top: 90px;
+}
+
+.entity-detail--empty .entity-detail-back {
+  color: var(--color-text);
+  background: #eeeae5;
+  z-index: 1;
+}
+
+@media (min-width: 528px) {
+  .entity-detail {
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .entity-detail-hero {
+    border-radius: 22px 22px 0 0;
+    height: 430px;
+  }
+}
+
+@media (min-width: 640px) {
+  .entity-detail {
+    margin-top: -44px;
+  }
+}
+
+@media (max-width: 380px) {
+  .entity-detail-hero {
+    height: 340px;
+  }
+  .entity-detail-sheet {
+    padding: 48px 24px 36px;
+  }
+  .entity-detail-header h1 {
+    font-size: 36px;
+  }
+  .entity-detail-intention {
+    padding: 20px;
+  }
+  .entity-detail-intention p {
+    font-size: 17px;
+  }
+}
 
 /* ========================================
    9. Check-in — OWNER: ICA
