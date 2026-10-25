@@ -1,0 +1,59 @@
+{
+  "source_file": "IMG_8919.PNG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a Google search result for men's blue cardigans, featuring various products and their brands.",
+    "entities": [
+      {
+        "name": "Navy Merino Lapel Cardigan",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": "Trenery",
+        "location": null,
+        "attributes": {
+          "color": "navy"
+        }
+      },
+      {
+        "name": "Mastering Men's Cardigan",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": "OPUMO",
+        "location": null,
+        "attributes": {
+          "color": "blue"
+        }
+      },
+      {
+        "name": "How to Wear Cardigans for Men",
+        "type": "content",
+        "category": "fashion advice",
+        "subcategory": null,
+        "brand": "Stitch Fix",
+        "location": null,
+        "attributes": {}
+      },
+      {
+        "name": "Oxford Benedict Wool Cardigan",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": "Oxford Shop",
+        "location": null,
+        "attributes": {
+          "price": "$59.00",
+          "color": "navy"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

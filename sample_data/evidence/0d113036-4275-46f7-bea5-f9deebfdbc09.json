@@ -1,0 +1,40 @@
+{
+  "source_file": "0d113036-4275-46f7-bea5-f9deebfdbc09.JPG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays various models of Saucony running shoes along with their prices. It includes the Endorphin Pro 5 and Endorphin Speed 4 models.",
+    "entities": [
+      {
+        "name": "Endorphin Pro 5",
+        "type": "product",
+        "category": "footwear",
+        "subcategory": null,
+        "brand": "Saucony",
+        "location": null,
+        "attributes": {
+          "price": "$379.00",
+          "color": "gray"
+        }
+      },
+      {
+        "name": "Endorphin Speed 4",
+        "type": "product",
+        "category": "footwear",
+        "subcategory": null,
+        "brand": "Saucony",
+        "location": null,
+        "attributes": {
+          "price": "$179.99",
+          "color": "blue"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

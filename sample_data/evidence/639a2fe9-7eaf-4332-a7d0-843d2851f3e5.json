@@ -1,0 +1,32 @@
+{
+  "source_file": "639a2fe9-7eaf-4332-a7d0-843d2851f3e5.JPG",
+  "extraction": {
+    "domain": "event",
+    "summary": "The screenshot announces a pop-up event introducing Indonesian brands in Melbourne. It includes details such as the date, time, and location of the event.",
+    "entities": [
+      {
+        "name": "suara",
+        "type": "event",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Stay Soft Market, Collingwood Yards",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "date": "17 October",
+          "time": "2 - 9 PM"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

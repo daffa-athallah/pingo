@@ -1,0 +1,33 @@
+{
+  "source_file": "IMG_8922.PNG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot features a late-night halal burger spot in Melbourne CBD called OMB Burger, highlighting a promotion. It indicates the price is under $10.",
+    "entities": [
+      {
+        "name": "OMB Burger",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne CBD",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "price": "under $10",
+          "halal": "true",
+          "late_night": "true"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

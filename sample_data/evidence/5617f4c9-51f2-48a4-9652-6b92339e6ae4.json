@@ -1,0 +1,27 @@
+{
+  "source_file": "5617f4c9-51f2-48a4-9652-6b92339e6ae4.JPG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a product listing for a women's running crop top from the brand Bandit. It features a red and pink pattern and is labeled as a 'Vanisher™ V-Neck Race Crop - Growing Grid - Poppy.'",
+    "entities": [
+      {
+        "name": "Vanisher™ V-Neck Race Crop - Growing Grid - Poppy",
+        "type": "product",
+        "category": "apparel",
+        "subcategory": null,
+        "brand": "Bandit",
+        "location": null,
+        "attributes": {
+          "color": "red and pink"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

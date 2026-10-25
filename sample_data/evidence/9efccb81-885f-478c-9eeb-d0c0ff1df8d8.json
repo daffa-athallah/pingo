@@ -1,0 +1,33 @@
+{
+  "source_file": "9efccb81-885f-478c-9eeb-d0c0ff1df8d8.JPG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot displays an order confirmation for a Spud Surprise Bag from Spud Co in Melbourne CBD, scheduled for collection on 8 October 2026.",
+    "entities": [
+      {
+        "name": "Spud Surprise Bag",
+        "type": "product",
+        "category": null,
+        "subcategory": null,
+        "brand": "Spud Co",
+        "location": {
+          "location_name": "Melbourne CBD",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "price": "$4.99",
+          "date": "8 Oct 2026",
+          "collection_time": "7:45 pm - 8:00 pm"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

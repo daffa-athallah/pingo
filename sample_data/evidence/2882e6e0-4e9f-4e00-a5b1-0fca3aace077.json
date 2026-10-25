@@ -1,0 +1,25 @@
+{
+  "source_file": "2882e6e0-4e9f-4e00-a5b1-0fca3aace077.JPG",
+  "extraction": {
+    "domain": "health",
+    "summary": "The screenshot features a TikTok live video where a person is reviewing the Centellian 24 360° Shot PdRn Lifting Eye Cream, with text overlay indicating it is 'fairly-rated'. The user also shares insights on their skin type and a quick elimination round.",
+    "entities": [
+      {
+        "name": "Centellian 24 360° Shot PdRn Lifting Eye Cream",
+        "type": "product",
+        "category": "skincare",
+        "subcategory": null,
+        "brand": "Centellian 24",
+        "location": null,
+        "attributes": {}
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "source_file": "4d974422-581e-4836-82da-c0d3258d530c.JPG",
+  "extraction": {
+    "domain": "beauty",
+    "summary": "The screenshot displays a bottle of Medicube's Red Body Peeling Shot Cleanser being held by a person. It includes text suggesting that the product is not for the weak.",
+    "entities": [
+      {
+        "name": "Medicube Red Body Peeling Shot Cleanser",
+        "type": "product",
+        "category": "cleansing",
+        "subcategory": null,
+        "brand": "Medicube",
+        "location": null,
+        "attributes": {
+          "size": "110 g / 3.88 oz"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

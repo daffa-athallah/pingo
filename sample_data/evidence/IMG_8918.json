@@ -1,0 +1,65 @@
+{
+  "source_file": "IMG_8918.PNG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays various men's cardigans available for purchase, showcasing different styles and brands. Some cardigans are featured alongside their prices.",
+    "entities": [
+      {
+        "name": "Mens Lambswool V Neck",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": "WoolOvers",
+        "location": null,
+        "attributes": {
+          "price": "$135.00"
+        }
+      },
+      {
+        "name": "Men's Chunky Cardigans",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": "Peter Christian",
+        "location": null,
+        "attributes": {}
+      },
+      {
+        "name": "Navy Merino Lapel Cardigan",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": "Trenery",
+        "location": null,
+        "attributes": {}
+      },
+      {
+        "name": "Chunky Knit Cardigan",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": null,
+        "location": null,
+        "attributes": {}
+      },
+      {
+        "name": "Men's Cardigan",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "cardigan",
+        "brand": null,
+        "location": null,
+        "attributes": {
+          "price": "€48.00"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

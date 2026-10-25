@@ -1,0 +1,28 @@
+{
+  "source_file": "IMG_8913.PNG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a product listing for the Jordan Air Jordan 3 'Valentine's Day' sneakers in pink, available for purchase on Farfetch.",
+    "entities": [
+      {
+        "name": "Jordan Air Jordan 3 'Valentine's Day' Sneakers",
+        "type": "product",
+        "category": "footwear",
+        "subcategory": null,
+        "brand": "Nike",
+        "location": null,
+        "attributes": {
+          "price": "$613.00",
+          "color": "pink"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

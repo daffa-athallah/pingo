@@ -1,0 +1,28 @@
+{
+  "source_file": "dd9670cc-e6df-4a30-bad5-fc64ef87ef9a.JPG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot features a display of Palmolive body wash products, including the Vanilla scent, with a user comment praising its affordability and effectiveness. The user mentions they have never purchased it for over $10.",
+    "entities": [
+      {
+        "name": "Palmolive",
+        "type": "product",
+        "category": "body wash",
+        "subcategory": null,
+        "brand": "Palmolive",
+        "location": null,
+        "attributes": {
+          "size": "750 mL",
+          "scent": "vanilla"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

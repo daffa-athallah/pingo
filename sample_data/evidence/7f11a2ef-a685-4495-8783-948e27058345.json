@@ -1,0 +1,67 @@
+{
+  "source_file": "7f11a2ef-a685-4495-8783-948e27058345.JPG",
+  "extraction": {
+    "domain": "health",
+    "summary": "The screenshot displays a user's profile with upcoming and previous class schedules at a fitness center. It includes details about class types, times, and the instructor.",
+    "entities": [
+      {
+        "name": "ENGINE. SUSTAIN",
+        "type": "class",
+        "category": "fitness",
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne CBD",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "date": "Sep 25",
+          "time": "9:00 am",
+          "duration": "50 min"
+        }
+      },
+      {
+        "name": "LIFT (FULLBODY)",
+        "type": "class",
+        "category": "fitness",
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne CBD",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "date": "Sep 21",
+          "time": "5:30 pm",
+          "duration": "50 min"
+        }
+      },
+      {
+        "name": "BASE (HYBRID)",
+        "type": "class",
+        "category": "fitness",
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne CBD",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "date": "Sep 22",
+          "time": "7:00 am",
+          "duration": "50 min"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

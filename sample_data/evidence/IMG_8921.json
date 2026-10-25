@@ -1,0 +1,146 @@
+{
+  "source_file": "IMG_8921.PNG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot displays a visual guide to cheeseburgers in Melbourne, organized in a matrix based on affordability and indulgence. It features various burger spots with their names and positions on the matrix.",
+    "entities": [
+      {
+        "name": "Easey’s",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Charred",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Fat Jaks",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Gimlet",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Five Guys",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Juanita Peaches",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Slowpoke",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Betty’s Burgers",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Elmo’s",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Maison Batard",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

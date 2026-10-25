@@ -1,0 +1,49 @@
+{
+  "source_file": "IMG_8912.PNG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot shows a review about Elmo's Hamburger Restaurant in Melbourne, comparing it to Chard Burger. It includes a user's opinion and a description of the two burger places.",
+    "entities": [
+      {
+        "name": "Elmo's Hamburger Restaurant",
+        "type": "place",
+        "category": "restaurant",
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {}
+      },
+      {
+        "name": "Chard Burger",
+        "type": "place",
+        "category": "restaurant",
+        "subcategory": null,
+        "brand": null,
+        "location": null,
+        "attributes": {}
+      },
+      {
+        "name": "Zane",
+        "type": "user",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": null,
+        "attributes": {
+          "date": "2025-11-18"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

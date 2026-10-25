@@ -1,0 +1,31 @@
+{
+  "source_file": "IMG_8920.PNG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot features a burger described as one of the world's best, specifically highlighting a burger named 'Charrd' located in Melbourne.",
+    "entities": [
+      {
+        "name": "Charrd",
+        "type": "burger",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Melbourne",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "ranking": "14th best"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

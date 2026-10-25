@@ -1,0 +1,27 @@
+{
+  "source_file": "IMG_8915.PNG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a product listing for the Women's Air Jordan 3 'Treat Yourself' in 'Washed Coral' color. It includes an image of the shoe and additional details.",
+    "entities": [
+      {
+        "name": "Women's Air Jordan 3 'Treat Yourself' 'Washed Coral'",
+        "type": "product",
+        "category": "footwear",
+        "subcategory": null,
+        "brand": "Nike",
+        "location": null,
+        "attributes": {
+          "color": "washed coral"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

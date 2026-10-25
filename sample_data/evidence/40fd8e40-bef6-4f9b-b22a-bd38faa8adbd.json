@@ -1,0 +1,37 @@
+{
+  "source_file": "40fd8e40-bef6-4f9b-b22a-bd38faa8adbd.JPG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a search for 'elf soft glam satin foundation' along with an advertisement for Rimmel's Lasting Finish foundation. Two individuals are demonstrating the elf foundation in a video format.",
+    "entities": [
+      {
+        "name": "elf Soft Glam Satin Foundation",
+        "type": "product",
+        "category": "cosmetics",
+        "subcategory": null,
+        "brand": "elf",
+        "location": null,
+        "attributes": {}
+      },
+      {
+        "name": "Rimmel Lasting Finish",
+        "type": "product",
+        "category": "cosmetics",
+        "subcategory": null,
+        "brand": "Rimmel",
+        "location": null,
+        "attributes": {
+          "price": "half price",
+          "size": "30 ml"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

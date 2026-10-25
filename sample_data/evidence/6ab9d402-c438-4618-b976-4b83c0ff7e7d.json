@@ -1,0 +1,32 @@
+{
+  "source_file": "6ab9d402-c438-4618-b976-4b83c0ff7e7d.JPG",
+  "extraction": {
+    "domain": "travel",
+    "summary": "The screenshot features a recommendation for Alfred Nicholas Garden in the Dandenongs, highlighting its picturesque pathways and ornamental bridges. It mentions the location's accessibility from the CBD and that there is no entry fee.",
+    "entities": [
+      {
+        "name": "Alfred Nicholas Garden",
+        "type": "place",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Dandenongs",
+          "city": "Dandenong",
+          "country": null
+        },
+        "attributes": {
+          "price": "0 AUD pp",
+          "distance": "~1 hr from CBD"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

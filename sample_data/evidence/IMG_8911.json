@@ -1,0 +1,32 @@
+{
+  "source_file": "IMG_8911.PNG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot promotes Elmo's Hamburger Restaurant in Fitzroy North, Melbourne, highlighting their smashed burgers and shakes. It includes a personal review mentioning the taste and upcoming menu items.",
+    "entities": [
+      {
+        "name": "Elmo's Hamburger Restaurant",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "Fitzroy North",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "menu_items": "smashed burgers, shakes",
+          "special": "truffle burger releasing soon"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

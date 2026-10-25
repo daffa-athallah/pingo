@@ -1,0 +1,28 @@
+{
+  "source_file": "1ab3f13b-fe07-4bf0-8aff-5ad40bee050d.JPG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a product page for an Ube Cake from Angela's Bakery, including pricing and size options.",
+    "entities": [
+      {
+        "name": "Ube Cake",
+        "type": "product",
+        "category": "food",
+        "subcategory": null,
+        "brand": "Angela's Bakery",
+        "location": null,
+        "attributes": {
+          "price": "$59.00 AUD",
+          "size": "4 inch, 6 inch, 8 inch"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

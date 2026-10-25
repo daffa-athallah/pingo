@@ -1,0 +1,32 @@
+{
+  "source_file": "c5cd6b80-5bb4-4b12-b4fb-5e24bda832d1.JPG",
+  "extraction": {
+    "domain": "food",
+    "summary": "The screenshot displays information about Yamamoto Udon Izakaya in Melbourne, including its location and opening hours. It features a video related to the food served at the restaurant.",
+    "entities": [
+      {
+        "name": "Yamamoto Udon Izakaya",
+        "type": "restaurant",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "QV Square",
+          "city": "Melbourne",
+          "country": "Australia"
+        },
+        "attributes": {
+          "address": "Shop QS029, Level 2, QV Square, Melbourne VIC 3000",
+          "opening_hours": "Tuesday: 11:30am - 3pm, 5:30pm - 9:30pm; Wednesday: 11:30am - 3pm, 5:30pm - 9:30pm"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

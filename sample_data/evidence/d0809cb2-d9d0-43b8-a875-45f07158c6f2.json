@@ -1,0 +1,82 @@
+{
+  "source_file": "d0809cb2-d9d0-43b8-a875-45f07158c6f2.JPG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a selection of clothing items with their names and prices. The items include various tops and pants, along with their respective prices in Indonesian Rupiah.",
+    "entities": [
+      {
+        "name": "OMBAL LONG TOP",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "top",
+        "brand": "Kallarona",
+        "location": null,
+        "attributes": {
+          "price": "IDR 889K"
+        }
+      },
+      {
+        "name": "OMBAL TOP",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "top",
+        "brand": "Kallarona",
+        "location": null,
+        "attributes": {
+          "price": "IDR 729K"
+        }
+      },
+      {
+        "name": "LA VAGUE TOP",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "top",
+        "brand": "Kallarona",
+        "location": null,
+        "attributes": {
+          "price": "IDR 689K"
+        }
+      },
+      {
+        "name": "DOUBLE TOP",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "top",
+        "brand": "Kallarona",
+        "location": null,
+        "attributes": {
+          "price": "IDR 749K"
+        }
+      },
+      {
+        "name": "LAUTAN TOP",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "top",
+        "brand": "Kallarona",
+        "location": null,
+        "attributes": {
+          "price": "IDR 849K"
+        }
+      },
+      {
+        "name": "GAUZELLE PANTS",
+        "type": "product",
+        "category": "clothing",
+        "subcategory": "pants",
+        "brand": "Kallarona",
+        "location": null,
+        "attributes": {
+          "price": "IDR 899K"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

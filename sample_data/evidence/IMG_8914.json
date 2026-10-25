@@ -1,0 +1,28 @@
+{
+  "source_file": "IMG_8914.PNG",
+  "extraction": {
+    "domain": "shopping",
+    "summary": "The screenshot displays a promotional post for the Air Jordan 3 OG 'Neo Pink' sneakers, announcing their release date.",
+    "entities": [
+      {
+        "name": "Air Jordan 3 OG 'Neo Pink'",
+        "type": "product",
+        "category": "footwear",
+        "subcategory": null,
+        "brand": "Air Jordan",
+        "location": null,
+        "attributes": {
+          "date": "March 6th",
+          "color": "pink"
+        }
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

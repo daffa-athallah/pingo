@@ -1,0 +1,29 @@
+{
+  "source_file": "7f71af42-744f-465b-8bc1-d56be9530339.JPG",
+  "extraction": {
+    "domain": "event",
+    "summary": "The screenshot shows a social media post about an event at 'no vacancy gallery' located on level 3 of QV. The post includes a notification about vitamins and suggests a cozy lofi music vibe.",
+    "entities": [
+      {
+        "name": "no vacancy gallery",
+        "type": "venue",
+        "category": null,
+        "subcategory": null,
+        "brand": null,
+        "location": {
+          "location_name": "QV",
+          "city": null,
+          "country": null
+        },
+        "attributes": {}
+      }
+    ],
+    "sensitive": false,
+    "confidence": "high"
+  },
+  "receipt": {
+    "requested_model": "gpt-4o-mini",
+    "routed_model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}
