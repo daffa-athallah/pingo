@@ -1,0 +1,13 @@
+.git
+.DS_Store
+**/.env
+**/.env.*
+**/.venv
+**/.venv/**
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+backend/runtime
+zetaris-platform
+screenshot

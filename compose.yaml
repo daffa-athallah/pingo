@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      SAMPLE_MODE: "true"
+    ports:
+      - "127.0.0.1:${RECALL_BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_CHECKIN_DEMO: "true"
+    ports:
+      - "127.0.0.1:${RECALL_FRONTEND_PORT:-5175}:80"
+    depends_on:
+      backend:
+        condition: service_healthy

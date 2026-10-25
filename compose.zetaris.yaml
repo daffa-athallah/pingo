@@ -1,0 +1,28 @@
+# Real mode override. Sponsor services remain on the Mac host.
+# Set container URLs in the environment; never use host localhost inside Docker.
+services:
+  backend:
+    user: "${RECALL_UID:-1000}:${RECALL_GID:-1000}"
+    environment:
+      SAMPLE_MODE: "false"
+      JAVA_HOME: /usr/lib/jvm/default-java
+      ZETARIS_JDBC_URL: ${ZETARIS_JDBC_URL:-jdbc:zetaris:lightning@host.docker.internal:10000}
+      ZETARIS_JDBC_JAR: /drivers/zetaris.jar
+      ZETARIS_USERNAME: ${ZETARIS_USERNAME:?configure in a local env file}
+      ZETARIS_PASSWORD: ${ZETARIS_PASSWORD:?configure in a local env file}
+      METERLESS_BASE_URL: ${METERLESS_BASE_URL:-http://host.docker.internal:8088/v1}
+      METERLESS_API_KEY: ${METERLESS_API_KEY:-}
+      METERLESS_VISION_MODEL: ${METERLESS_VISION_MODEL:-gpt-4o-mini}
+      METERLESS_REASONING_MODEL: ${METERLESS_REASONING_MODEL:-nvidia/nemotron-3-ultra-550b-a55b}
+    volumes:
+      - type: bind
+        source: ${ZETARIS_JDBC_JAR:?set the existing driver JAR path}
+        target: /drivers/zetaris.jar
+        read_only: true
+        bind:
+          create_host_path: false
+      - ./backend/runtime:/app/backend/runtime:ro
+  frontend:
+    build:
+      args:
+        VITE_CHECKIN_DEMO: "false"
