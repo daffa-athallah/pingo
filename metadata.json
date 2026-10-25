@@ -1,0 +1,28 @@
+{
+  "name": "Recall",
+  "sponsor_technology": {
+    "nvidia": {
+      "role": "Screenshot understanding verified through a developer-only direct test; production use planned behind Nightshift",
+      "candidate_model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "verified_model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "direct_api_usage": "Developer smoke test only; never the production agent path",
+      "text_verification": "passed_exact_marker",
+      "image_verification": "passed_local_image_and_validated_json",
+      "reported_response_model": "private/nvidia/nemotron-3.5-super-120b-a12b",
+      "verification_date": "2026-10-25",
+      "image_test": {
+        "path": "screenshot/0d113036-4275-46f7-bea5-f9deebfdbc09.JPG",
+        "sha256": "8a5834eca198ab4655e8d26b96c1607ab80e9fe5f3b7cc1366a5331b4f5bb879",
+        "filename_sent_to_model": false,
+        "raw_result_stored": false
+      }
+    },
+    "meterless_nightshift": {
+      "role": "Required production AI provider and routing path",
+      "intended_path": "Recall agent -> ModelGateway -> Nightshift -> NVIDIA Nemotron",
+      "adapter_status": "implemented_offline_tests_passed",
+      "nvidia_routing_verification": "blocked_missing_nightshift_configuration",
+      "production_nvidia_usage": "not_yet_verified"
+    }
+  }
+}

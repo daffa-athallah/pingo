@@ -104,3 +104,9 @@ When screenshot references arrive, update the relevant owner's pages and CSS sec
 4. Use bottom navigation to go Home → Check-in → Home.
 5. Open `/entity/test` directly and confirm the safe detail placeholder.
 6. Open a known fixture (for example `/entity/food-ramen-a`) and an unknown route; verify detail content and the redirect respectively.
+
+## NVIDIA / Nightshift verification setup
+
+Developer-only NVIDIA smoke tests live in [`backend/`](backend/README.md). The intended production path is **Recall agent → ModelGateway → Meterless Nightshift → NVIDIA Nemotron**. Direct NVIDIA calls are exclusively for verifying the local development credential and text/image capability. Provider credentials for production belong in Nightshift.
+
+Direct text and actual-image inference passed on 2026-10-25 using `nvidia/nemotron-3.5-super-vl-120b-a12b`. NVIDIA reported the internal response alias `private/nvidia/nemotron-3.5-super-120b-a12b`; both IDs are recorded in [`metadata.json`](metadata.json). The Nightshift production adapter is implemented and covered by offline tests, but routing through our Nightshift instance is **not yet verified** because its URL, token, and route are not configured locally. No agents, FastAPI server, or Zetaris integration were added. See the backend README for setup, exact test commands, and remaining gates.
