@@ -170,10 +170,108 @@ svg { display: block; flex-shrink: 0; }
 /* ========================================
    9. Check-in — OWNER: ICA
 ======================================== */
-.checkin-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+.checkin-shell { max-width: 480px; }
+.checkin-shell .app-main { padding: max(26px, env(safe-area-inset-top)) 24px calc(112px + env(safe-area-inset-bottom)); }
+.checkin-page { --checkin-muted: #6f6c69; }
+.checkin-page ::selection { background: var(--color-primary-soft); color: var(--color-text); }
+.checkin-topbar { display: flex; align-items: center; justify-content: space-between; min-height: 44px; margin-bottom: 28px; }
+.checkin-brand { display: inline-flex; align-items: center; gap: 10px; font: bold 28px / 1 Georgia, 'Times New Roman', serif; letter-spacing: -0.035em; }
+.checkin-brand-mark { display: flex; width: 33px; }
+.checkin-brand-mark span { display: block; flex: 0 0 21px; height: 21px; border-radius: 50%; background: var(--color-primary); }
+.checkin-brand-mark span + span { margin-left: -9px; background: #f58c95; opacity: 0.8; }
+.checkin-text-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 6px; border: 0; background: transparent; color: #cb1c2d; font-weight: 600; cursor: pointer; }
+.checkin-text-button:hover { text-decoration: underline; text-underline-offset: 4px; }
+.checkin-intro { position: relative; padding-top: 30px; margin: 0 8px 26px; }
+.checkin-page h1 { font: 600 clamp(2.5rem, 9vw, 3rem) / 1.1 Georgia, 'Times New Roman', serif; letter-spacing: -0.04em; text-wrap: balance; }
+.checkin-intro h1 { width: fit-content; }
+.checkin-intro > p { margin-top: 10px; font-size: 18px; line-height: 1.35; color: var(--checkin-muted); }
+.checkin-progress { position: absolute; top: 0; right: 0; width: 122px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.checkin-progress-bars { display: flex; gap: 6px; margin-top: 6px; }
+.checkin-progress-bars > span { height: 6px; flex: 1; min-width: 0; border-radius: 6px; background: #e9e7e3; transition: background-color 180ms ease-out; }
+.checkin-progress-bars .checkin-progress-current { background: var(--color-primary); }
+.checkin-progress-bars .checkin-progress-skipped { background: #ded9d3; }
+.checkin-card { padding: 24px 28px 22px; border-radius: 28px; background: var(--color-surface); box-shadow: 0 9px 36px rgba(62, 45, 32, 0.055); animation: checkin-arrive 180ms ease-out; }
+.checkin-category { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; color: #cb1c2d; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; }
+.checkin-category-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); }
+.checkin-summary { font-size: 20px; font-weight: 450; line-height: 1.35; letter-spacing: -0.02em; text-wrap: pretty; }
+.checkin-previews { display: flex; align-items: center; justify-content: center; padding: 28px 0 18px; margin: 0 -12px; }
+.checkin-previews img { width: 36%; max-width: 128px; height: 144px; object-fit: cover; border: 6px solid white; border-radius: 15px; background: #eee9e1; box-shadow: 0 6px 18px rgba(46, 32, 19, 0.13); }
+.checkin-previews img:nth-child(1) { transform: rotate(-8deg); z-index: 1; }
+.checkin-previews img:nth-child(2) { margin-left: -12px; transform: rotate(1deg); }
+.checkin-previews img:nth-child(3) { margin-left: -10px; transform: rotate(9deg); }
+.checkin-question { margin: 18px 0 0; color: var(--checkin-muted); font-size: 14px; line-height: 1.45; text-align: center; }
+.checkin-previews + .checkin-question { margin-top: 8px; }
+.checkin-response-actions { display: flex; justify-content: space-evenly; gap: 28px; margin: 22px 0; }
+.checkin-response { display: grid; place-items: center; width: 88px; height: 88px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; transition: transform 150ms ease-out, background-color 150ms ease-out; }
+.checkin-response svg { width: 42px; height: 42px; stroke-width: 1.8; }
+.checkin-response-no { background: var(--color-primary-soft); color: var(--color-primary); }
+.checkin-response-yes { background: var(--color-primary); color: white; }
+.checkin-response-no:hover { background: #f9d7da; transform: translateY(-2px); }
+.checkin-response-yes:hover, .checkin-primary:hover { background: #ca1d2d; }
+.checkin-response-yes:hover { transform: translateY(-2px); }
+.checkin-response:active { transform: scale(0.95); }
+.checkin-more { display: flex; align-items: center; justify-content: center; gap: 12px; width: min(100%, 220px); min-height: 46px; margin: 0 auto; padding: 10px 18px; border: 0; border-radius: 50px; background: #f4f2ee; color: var(--color-text); font-size: 14px; font-weight: 600; cursor: pointer; }
+.checkin-more svg { width: 21px; height: 21px; }
+.checkin-more:hover { background: #eae7e1; }
+.checkin-page button:disabled { opacity: 0.5; cursor: default; transform: none; }
+.checkin-page .checkin-selected:disabled { opacity: 0.85; }
+.checkin-clarification { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--color-border); font-size: 14px; }
+.checkin-clarification > p { margin-bottom: 18px; color: var(--checkin-muted); }
+.checkin-clarification fieldset { display: grid; gap: 8px; margin: 0 0 16px; padding: 0; border: 0; min-width: 0; }
+.checkin-clarification legend { margin-bottom: 12px; font-weight: 600; }
+.checkin-option { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 12px; cursor: pointer; }
+.checkin-option:hover { border-color: #d66b74; }
+.checkin-option-selected { background: #fff7f7; border-color: var(--color-primary); }
+.checkin-option input { accent-color: var(--color-primary); width: 16px; height: 16px; flex-shrink: 0; margin: 0; }
+.checkin-comment { display: block; margin-top: 12px; font-size: 13px; }
+.checkin-comment span { color: var(--checkin-muted); }
+.checkin-comment textarea { display: block; width: 100%; resize: vertical; margin-top: 8px; padding: 12px; border: 1px solid var(--color-border); border-radius: 12px; background: #faf9f6; color: var(--color-text); caret-color: var(--color-primary); }
+.checkin-comment textarea::placeholder { color: #75706a; }
+.checkin-primary { display: flex; justify-content: center; align-items: center; min-height: 48px; width: 100%; padding: 12px 20px; border: 0; border-radius: 50px; background: var(--color-primary); color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
+.checkin-error { margin-top: 20px; color: #a81d2b; font-size: 14px; text-align: center; }
+.checkin-saving { margin-top: 16px; color: var(--checkin-muted); font-size: 13px; text-align: center; }
+.checkin-result { display: grid; justify-items: center; gap: 18px; padding: 72px 12px 48px; text-align: center; animation: checkin-arrive 180ms ease-out; }
+.checkin-result p { max-width: 30ch; color: var(--checkin-muted); }
+.checkin-result-icon { display: grid; place-items: center; width: 76px; height: 76px; margin-bottom: 12px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); }
+.checkin-result-icon svg { width: 32px; height: 32px; }
+.checkin-result .checkin-primary { width: fit-content; margin-top: 14px; padding-inline: 32px; }
+.checkin-result .checkin-result-detail { font-size: 14px; }
+.checkin-load-error { display: grid; justify-items: center; gap: 12px; }
+.checkin-demo { margin-top: 20px; color: var(--checkin-muted); font-size: 11px; text-align: center; }
+.checkin-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.checkin-nav-badge { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 4px; border-radius: 20px; background: var(--color-primary); color: white; font-size: 11px; font-weight: 700; line-height: 1; }
+.checkin-shell .bottom-nav { width: min(100%, 480px); padding: 10px 36px calc(10px + env(safe-area-inset-bottom)); border-color: #efede8; background: #faf9f6; }
+.checkin-shell .bottom-nav-link { position: relative; flex-direction: column; gap: 4px; min-height: 56px; color: #6f6c69; font-size: 12px; font-weight: 500; }
+.checkin-shell .bottom-nav-link svg { width: 26px; height: 26px; }
+.checkin-shell .bottom-nav-link.is-active { background: transparent; color: #cb1c2d; }
+.checkin-shell .checkin-nav-badge { position: absolute; top: -2px; left: calc(50% + 11px); }
+@keyframes checkin-arrive { from { transform: translateY(4px); } to { transform: translateY(0); } }
+@media (min-width: 640px) {
+  .checkin-shell .app-main { padding-top: 46px; }
+}
+@media (max-width: 639px) {
+  .checkin-topbar { margin-bottom: 16px; }
+  .checkin-intro { padding-top: 22px; margin-bottom: 22px; }
+  .checkin-card { padding-top: 22px; padding-bottom: 20px; }
+  .checkin-previews { padding-top: 22px; padding-bottom: 14px; }
+  .checkin-previews img { height: 128px; }
+  .checkin-question { font-size: 13px; }
+  .checkin-response-actions { margin-block: 18px; }
+  .checkin-response { width: 84px; height: 84px; }
+}
+@media (max-width: 374px) {
+  .checkin-shell .app-main { padding-inline: 16px; }
+  .checkin-card { padding-inline: 22px; }
+  .checkin-intro { margin-inline: 4px; }
+  .checkin-intro > p { font-size: 16px; }
+  .checkin-progress { width: 100px; }
+  .checkin-summary { font-size: 18px; }
+  .checkin-previews img { height: 124px; border-width: 5px; }
+  .checkin-response { width: 78px; height: 78px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .checkin-card, .checkin-result { animation: none; }
+  .checkin-page *, .checkin-page *::before, .checkin-page *::after { transition: none; }
 }
 
 /* ========================================

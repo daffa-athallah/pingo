@@ -63,13 +63,13 @@ The empty asset and public directories contain `.gitkeep` files so they survive 
 | Route | Behavior |
 | --- | --- |
 | `/` | Homepage skeleton with Food, Shopping, and Travel category cards |
-| `/check-in` | Ica's Check-in placeholder |
+| `/check-in` | Ica's question flow with responses, clarification, and pending count |
 | `/category/:category` | Reusable category page for `food`, `shopping`, or `travel` |
 | `/entity/:entityId` | Entity placeholder using fixture data when available |
 
 Unknown routes and unsupported categories redirect to `/`. Unknown entity IDs, including `/entity/test`, render a safe detail placeholder.
 
-`src/data/mockData.ts` holds three development entities: Ramen A (Carlton, 5 screenshots), Zara Brown Jacket (3 screenshots), and TeamLab Tokyo (2 screenshots). Homepage counts reflect fixture entities, not screenshots. Category entries link to their entity detail pages. No backend calls are made. `src/services/api.ts` reserves the future API location; an optional `VITE_API_BASE_URL` can be set in an ignored `.env.local` file later.
+`src/data/mockData.ts` holds three development entities: Ramen A (Carlton, 5 screenshots), Zara Brown Jacket (3 screenshots), and TeamLab Tokyo (2 screenshots). Homepage counts reflect fixture entities, not screenshots. Category entries link to their entity detail pages. Check-in uses browser demo data in development without `VITE_API_BASE_URL`, or when `VITE_CHECKIN_DEMO=true`; otherwise it calls the configured API. Production uses API mode by default. No backend is implemented here. See the [Check-in documentation](frontend/src/pages/checkin/README.md) for configuration and the API contract.
 
 Production hosting will need an SPA fallback to `index.html` for direct links and refreshes on nested routes. Vite's development and preview servers already handle this.
 
@@ -94,7 +94,7 @@ All styling belongs in the **single** `src/styles/global.css`, imported once by 
 
 Coordinate changes to shared files: CSS tokens/base/layout/components/navigation/responsive sections, `router/`, `components/`, `types/`, `data/`, and `services/`. Keep page classes scoped with `home-`, `category-`, `entity-`, and `checkin-` prefixes. The two developers can evolve their page files and CSS sections independently without changing the router or shell.
 
-When screenshot references arrive, update the relevant owner's pages and CSS sections while retaining the routes, folder structure, and shared types where possible. Homepage and Check-in are intentionally placeholders; no authentication, uploads, notifications, calendar, location, backend, or agents are implemented.
+When screenshot references arrive, update the relevant owner's pages and CSS sections while retaining the routes, folder structure, and shared types where possible. Homepage remains a placeholder; Check-in implements the question flow. No authentication, uploads, notifications, calendar, location, backend, or agents are implemented.
 
 ## Manual navigation check
 
