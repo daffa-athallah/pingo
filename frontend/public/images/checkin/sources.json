@@ -1,0 +1,21 @@
+{
+  "purpose": "Illustrative clothing previews for sample Check-in questions; these are not user screenshots.",
+  "retrieved": "2026-10-25",
+  "images": [
+    {
+      "file": "brown-blazer.jpg",
+      "source": "https://www2.hm.com/fr_fr/productpage.1261020002.html",
+      "origin": "https://image.hm.com/assets/hm/71/53/71532af205028ca232ecc554e8dbb2124f5781a2.jpg?imwidth=384"
+    },
+    {
+      "file": "brown-shirt.jpg",
+      "source": "https://www2.hm.com/zh_asia3/productpage.0780149002.html",
+      "origin": "https://image.hm.com/assets/hm/b7/70/b7704570c8505ae9fbc9738bf9e59a2c6ba7fdff.jpg?imwidth=384"
+    },
+    {
+      "file": "brown-outfit.png",
+      "source": "https://www.arcanefox.com/collections/mens-leather-blazers",
+      "origin": "https://www.arcanefox.com/cdn/shop/files/custom-mens-suede-leather-blazer-in-dark-brown-arcane-fox.png?v=1702032370&width=384"
+    }
+  ]
+}

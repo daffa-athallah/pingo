@@ -1,5 +1,6 @@
 import AppRouter from './router/AppRouter'
+import { CheckInProvider } from './pages/checkin/CheckInProvider'
 
 export default function App() {
-  return <AppRouter />
+  return <CheckInProvider><AppRouter /></CheckInProvider>
 }

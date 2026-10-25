@@ -1,7 +1,9 @@
 import { NavLink, useLocation } from 'react-router-dom'
+import { useCheckIns } from '../../pages/checkin/CheckInProvider'
 
 export default function BottomNav() {
   const { pathname } = useLocation()
+  const { pendingCount, loading, loadError } = useCheckIns()
   const inHome = pathname === '/' || pathname.startsWith('/category/') || pathname.startsWith('/entity/')
 
   return (
@@ -18,6 +20,7 @@ export default function BottomNav() {
           <path d="m8 12 3 3 5-6" />
         </svg>
         Check-in
+        {!loading && !loadError && pendingCount > 0 && <span className="checkin-nav-badge" aria-label={`${pendingCount} pending questions`}>{pendingCount}</span>}
       </NavLink>
     </nav>
   )

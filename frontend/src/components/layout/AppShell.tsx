@@ -12,7 +12,7 @@ export default function AppShell() {
   }, [pathname])
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${pathname === '/check-in' ? ' checkin-shell' : ''}`}>
       <a className="skip-link" href="#main-content">Skip to content</a>
       <main className="app-main" id="main-content" ref={mainRef} tabIndex={-1}>
         <Outlet />
