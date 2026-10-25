@@ -118,3 +118,35 @@ The 18 tests cover the NVIDIA smoke protocol and Nightshift gateway. All HTTP ca
 - [NVIDIA model card](https://build.nvidia.com/nvidia/nemotron-3.5-super-vl-120b-a12b/modelcard)
 - [NVIDIA local-media data URL examples](https://catalog.ngc.nvidia.com/orgs/nim/nvidia/models/nemotron-3.5-super-vl-120b-a12b/-)
 - [Meterless integration contract](https://www.meterless.ai/engines.html)
+
+## Evidence Agent (perception only)
+
+`app/agents/evidence.py` turns one screenshot into structured evidence (domain, summary, entities with attributes and a structured `location`, `sensitive`, `confidence`) through Nightshift using `METERLESS_VISION_MODEL` (currently `gpt-4o-mini`, verified via the Nightshift receipt: provider `openai`). It never infers user intent. Reasoning agents (Open Loop, Context, Critic) will use `METERLESS_REASONING_MODEL`, currently `nvidia/nemotron-3-ultra-550b-a55b` (receipt-verified provider `nvidia`). Model IDs must be advertised by Nightshift; there is no direct provider fallback.
+
+```sh
+backend/.venv/bin/python backend/scripts/test_evidence.py screenshot/IMG_8922.PNG   # add --show-result to view content
+```
+
+## Open Loop Agent
+
+`app/agents/open_loop.py` decides CREATE / ATTACH / REVISE / RESOLVE / IGNORE / LEAVE_UNRESOLVED for new evidence using `METERLESS_REASONING_MODEL` through Nightshift. It depends only on the `LoopRepository` protocol (`app/repositories/base.py`; records in `app/domain/models.py`). `InMemoryLoopRepository` is the offline fake; the Zetaris implementation is separate work. Live smoke (synthetic evidence, verifies receipt provider is `nvidia`): `backend/.venv/bin/python backend/scripts/test_open_loop.py`.
+
+## Entity identity and location (MVP)
+
+`entity_id` is a deterministic hash: shopping = domain + brand + name; food/travel (and other domains) = domain + name + city, case/whitespace-normalized. `type`, `category`, `subcategory` and `location_name` are mutable descriptive metadata, not identity. There is no fuzzy matching or entity resolution. `location_name` is an area descriptor (Carlton, Shibuya) and is nulled if it only repeats the entity name.
+
+## Sensitive content (hackathon MVP policy, not the final privacy model)
+
+Supported domains are food, shopping and travel. When the Evidence Agent flags a screenshot `sensitive` (for example credentials, OTPs, payment secrets), the bridge stores the flag but no entity attributes, and the Open Loop Agent returns IGNORE locally without calling any model. Other sensitive categories are not separately classified in this MVP; this is not a claim about how Recall will treat sensitive data in the finished product.
+
+## Context Agent
+
+`app/agents/context.py` asks "does something happening now make an existing unfinished intention relevant?" using `METERLESS_REASONING_MODEL`. Inputs: active (OPEN/ACTIVE) loops, their entities, and `ContextEvent`s of type CALENDAR, LOCATION or TIME (`REAL_WORLD_EVENT` is reserved, not implemented). Output: MATCH / NO_MATCH / NEEDS_VERIFICATION with only supplied ids. It never mutates state and never decides to notify; the Critic Agent will. Live smoke (synthetic data, verifies provider `nvidia`): `backend/.venv/bin/python backend/scripts/test_context.py`.
+
+## Critic Agent
+
+`app/agents/critic.py` is the final gate ("is this worth bothering the user about?") using `METERLESS_REASONING_MODEL`. A Context MATCH never surfaces on its own. Decisions: SURFACE, STAY_SILENT, ASK, REQUEST_REVISION, VERIFY_CONTEXT, each with a `next_step` (OUTPUT_LAYER, STOP, CHECK_IN, OPEN_LOOP_AGENT, CONTEXT_AGENT); no recursion is orchestrated yet. Deterministic short-circuits (no model call): Context NO_MATCH, Context NEEDS_VERIFICATION, non-OPEN/ACTIVE loop, no evidence, sensitive evidence. `decision.trace()` returns a `TraceEvent` for the future demo panel. Live smoke (synthetic data, verifies provider `nvidia`): `backend/.venv/bin/python backend/scripts/test_critic.py`.
+
+## Orchestrator
+
+`app/orchestration/recall.py` (`RecallOrchestrator`) is not an agent and makes no model decisions. `ingest_screenshot(path)` runs Evidence -> ingestion -> Open Loop and ends STORED (Context/Critic are not run). `evaluate_context(events)` runs Context -> Critic; Critic `REQUEST_REVISION` re-calls the Open Loop Agent once with a typed `RevisionRequest` and re-runs the Critic once; Critic `VERIFY_CONTEXT` (or Context `NEEDS_VERIFICATION`) calls a `ContextVerifier` once, then re-runs Context and Critic. Bounds: at most 1 revision, 1 verification, 1 retry per failed agent call. Failures end in STAY_SILENT or FAILED_SAFE, never SURFACE. `RunResult.trace_events` / `trace_jsonl()` give the structured, auditable trace (with sanitized model receipts). Live smoke: `backend/.venv/bin/python backend/scripts/test_orchestrator.py [--jsonl PATH]`.

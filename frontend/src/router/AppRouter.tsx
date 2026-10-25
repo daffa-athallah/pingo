@@ -4,6 +4,7 @@ import HomePage from '../pages/home/HomePage'
 import CheckInPage from '../pages/checkin/CheckInPage'
 import CategoryPage from '../pages/category/CategoryPage'
 import EntityDetailPage from '../pages/entity/EntityDetailPage'
+import AgentActivity from '../features/agent-activity/AgentActivity'
 
 export default function AppRouter() {
   return (
@@ -14,6 +15,7 @@ export default function AppRouter() {
           <Route path="check-in" element={<CheckInPage />} />
           <Route path="category/:category" element={<CategoryPage />} />
           <Route path="entity/:entityId" element={<EntityDetailPage />} />
+          <Route path="agent-activity" element={<AgentActivity />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

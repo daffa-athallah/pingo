@@ -93,10 +93,28 @@ class GatewayTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(ModelGatewayError, 'forbidden'):
             ModelGateway(base_url='https://integrate.api.nvidia.com/v1', api_key='not-a-real-key')
 
-    def test_bare_nvidia_model_id_is_not_guessed_as_nightshift_route(self):
-        with self.assertRaisesRegex(ModelGatewayError, 'discovered'):
-            ModelGateway(base_url='http://localhost:8088', api_key='not-a-real-key',
-                         model='nvidia/nemotron-3.5-super-vl-120b-a12b')
+    def test_model_settings_reject_urls_and_whitespace(self):
+        for bad in ('https://integrate.api.nvidia.com/v1', 'two words'):
+            with self.subTest(bad=bad), self.assertRaisesRegex(ModelGatewayError, 'exact model IDs'):
+                ModelGateway(base_url='http://localhost:8088', api_key='not-a-real-key', vision_model=bad)
+
+    async def test_per_call_model_is_checked_against_discovery(self):
+        sent = []
+        def handler(request):
+            if request.method == 'GET':
+                return self.models('nvidia/nemotron-3-ultra-550b-a55b')
+            sent.append(json.loads(request.content)['model'])
+            return httpx.Response(200, json={'id': 't', 'object': 'chat.completion', 'created': 0,
+                'model': 'nvidia/nemotron-3-ultra-550b-a55b', 'choices': [{'index': 0, 'finish_reason': 'stop',
+                'message': {'role': 'assistant', 'content': 'ok'}}]})
+        async with await self.gateway(handler, model=None) as gateway:
+            msg = [{'role': 'user', 'content': 'hi'}]
+            self.assertEqual(await gateway.complete(msg, model='nvidia/nemotron-3-ultra-550b-a55b'), 'ok')
+            with self.assertRaisesRegex(ModelGatewayError, 'not advertised'):
+                await gateway.complete(msg, model='gpt-4o-mini')
+            with self.assertRaisesRegex(ModelGatewayError, 'Missing model'):
+                await gateway.complete(msg)
+        self.assertEqual(sent, ['nvidia/nemotron-3-ultra-550b-a55b'])
 
     def test_base_url_normalization(self):
         for url in ['http://localhost:8088', 'http://localhost:8088/v1/',
@@ -107,6 +125,14 @@ class GatewayTests(unittest.IsolatedAsyncioTestCase):
         for url in ['https://user:secret@localhost/v1', 'http://localhost/v1?key=secret']:
             with self.subTest(url=url), self.assertRaises(ModelGatewayError):
                 normalize_base_url(url)
+
+
+class ReasoningStripTests(unittest.TestCase):
+    def test_strips_leaked_reasoning_but_keeps_exact_answer(self):
+        from backend.app.adapters.nightshift import strip_reasoning
+        self.assertEqual(strip_reasoning('thinking...</think>NIGHTSHIFT_OK'), 'NIGHTSHIFT_OK')
+        self.assertEqual(strip_reasoning('NIGHTSHIFT_OK'), 'NIGHTSHIFT_OK')
+        self.assertNotEqual(strip_reasoning('thinking</think>nope'), 'NIGHTSHIFT_OK')
 
 
 if __name__ == '__main__':

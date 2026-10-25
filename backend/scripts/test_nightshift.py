@@ -30,6 +30,9 @@ async def run(args) -> int:
             print('[PASS] Nightshift discovery works; choose a route and configure NVIDIA pinning in Nightshift.')
             return 0
         result = await gateway.complete([{'role': 'user', 'content': 'Respond with exactly: NIGHTSHIFT_OK'}])
+        routing = gateway.last_routing
+        print(f'[INFO] requested route: {gateway.model}')
+        print('[INFO] routing evidence: ' + ', '.join(f'{k}={v}' for k, v in routing.items()))
         if result != 'NIGHTSHIFT_OK':
             raise ModelGatewayError('Nightshift text did not match the required marker.')
         print('[PASS] Nightshift text inference works')
