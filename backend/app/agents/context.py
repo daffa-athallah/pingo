@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from enum import Enum
 import json
 import re
+import uuid
 from typing import Callable, Mapping, Sequence
 
 from backend.app.adapters.nightshift import ModelGateway, ModelGatewayError
@@ -18,7 +19,7 @@ from backend.app.domain import models as m
 from backend.app.repositories.base import LoopRepository
 
 MAX_REASON_CHARS = 400
-MAX_LOOPS = 10
+MAX_LOOPS = 30  # every active loop must be able to match; a recency window silently hid older intentions
 MAX_ENTITIES_PER_LOOP = 10
 SUPPORTED_TRIGGERS = {m.ContextType.CALENDAR, m.ContextType.LOCATION, m.ContextType.TIME}
 ACTIVE_STATUSES = {m.LoopStatus.OPEN, m.LoopStatus.ACTIVE}
@@ -155,6 +156,7 @@ class ContextAgent:
         if not model:
             raise ModelGatewayError('Missing METERLESS_REASONING_MODEL; choose a Nemotron model advertised by Nightshift.')
         payload = {
+            'request_id': uuid.uuid4().hex,  # defeats Nightshift's loose response cache: every call must be a fresh model call
             'now': self._now(),
             'candidate_open_loops': [{**_clean(l), 'entities': [_clean(e) for e in entities_by_loop.get(l.loop_id, [])[:MAX_ENTITIES_PER_LOOP]]}
                                      for l in active],

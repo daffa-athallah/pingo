@@ -19,6 +19,7 @@ from real_env import ROOT, real_repository
 from process_open_loops import load_ledger
 from backend.app.adapters.nightshift import ModelGateway, ModelGatewayError
 from backend.app.adapters.zetaris import ZetarisError
+from backend.app.agents.context import MAX_LOOPS
 from backend.app.bootstrap import build_orchestrator
 from backend.app.domain.models import ContextEvent, ContextType, LoopStatus
 from backend.app.domain.trace import TraceEvent
@@ -83,11 +84,11 @@ async def run(args) -> int:
         place = next((e for e in entities if e.city), None)
         city = place.city if place else None
         country = place.country if place else None
-        window = [l.loop_id for l in repo.get_active_open_loops(limit=10)]
+        window = [l.loop_id for l in repo.get_active_open_loops(limit=MAX_LOOPS)]
         print(f'[LOOP] {loop.loop_id} "{loop.title}" status={loop.status.value} conf={loop.confidence}')
         print(f'[LOOP] entities={[e.name for e in entities]} in Context Agent window: {loop_id in window}')
         if loop_id not in window:
-            raise ZetarisError('Selected loop is outside the Context Agent window (10 most recently updated active loops).')
+            raise ZetarisError('Selected loop is outside the Context Agent window (most recently updated active loops).')
         scenarios = {
             'A_relevant': ContextEvent('ctx_ctrl_a', ContextType.CALENDAR, args.relevant_title, at(19), args.suburb, city, country),
             'B_restraint': ContextEvent('ctx_ctrl_b', ContextType.CALENDAR, args.restraint_title, at(17, 30), args.suburb, city, country),

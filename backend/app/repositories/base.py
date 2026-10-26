@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Protocol, Sequence
 
-from backend.app.domain.models import Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
+from backend.app.domain.models import CheckIn, Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
 
 
 class LoopRepository(Protocol):
@@ -46,3 +46,13 @@ class LoopRepository(Protocol):
                          updated_at: str | None = None) -> OpenLoop: ...
 
     def link_loop_entity(self, link: LoopEntity) -> None: ...
+
+
+class CheckInStore(Protocol):
+    """Daily Check-in questions and answers. Kept apart from LoopRepository so the agent protocol is unchanged."""
+
+    def save_check_in(self, check_in: CheckIn) -> None: ...
+
+    def get_check_in(self, check_in_id: str) -> CheckIn | None: ...
+
+    def get_check_ins(self, *, day: str | None = None, status: str | None = None) -> list[CheckIn]: ...

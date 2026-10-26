@@ -20,6 +20,10 @@ class LocalPolicy(unittest.TestCase):
         for domain in ('food', 'shopping', 'travel'):
             self.assertIsNone(pol.eligibility(evidence(domain=domain)))
 
+    def test_reprocess_generation_changes_the_loop_id(self):
+        self.assertEqual(pol.loop_id_for('ev_1'), pol.loop_id_for('ev_1', 0))
+        self.assertNotEqual(pol.loop_id_for('ev_1'), pol.loop_id_for('ev_1', 1))
+
     def test_loop_id_is_deterministic_per_evidence(self):
         self.assertEqual(pol.loop_id_for('ev_1'), pol.loop_id_for('ev_1'))
         self.assertNotEqual(pol.loop_id_for('ev_1'), pol.loop_id_for('ev_2'))

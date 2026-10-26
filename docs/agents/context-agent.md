@@ -8,7 +8,7 @@ Code: [`backend/app/agents/context.py`](../../backend/app/agents/context.py).
 
 ## Input and output
 
-| Input | Active loops (`OPEN`/`ACTIVE`, at most 10 most recently updated) with their entities; `ContextEvent`s |
+| Input | Active loops (`OPEN`/`ACTIVE`, at most 30 most recently updated) with their entities; `ContextEvent`s |
 | --- | --- |
 | Supported context | `CALENDAR`, `LOCATION`, `TIME` |
 | Unsupported | `REAL_WORLD_EVENT` exists in the model as a reserved type. No retrieval is implemented, and the agent rejects it as a trigger |

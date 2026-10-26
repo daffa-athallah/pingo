@@ -24,6 +24,7 @@ from real_env import ROOT, real_repository
 from backend.app.adapters.nightshift import ModelGateway, ModelGatewayError
 from backend.app.adapters.zetaris import ZetarisError
 from backend.app.agents.open_loop import OpenLoopAgent, OpenLoopError
+from backend.app.domain.models import LoopStatus
 from backend.app.domain.trace import TraceEvent
 
 # Product domains for this hackathon. 'travel' is the canonical destination domain the Evidence Agent emits.
@@ -37,8 +38,10 @@ def now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
 
-def loop_id_for(evidence_id: str) -> str:
-    return 'loop_' + hashlib.sha256(evidence_id.encode()).hexdigest()[:12]
+def loop_id_for(evidence_id: str, generation: int = 0) -> str:
+    """Stable per Evidence. A reprocess bumps the generation so a retired loop's links are never inherited."""
+    key = evidence_id if generation == 0 else f'{evidence_id}#{generation}'
+    return 'loop_' + hashlib.sha256(key.encode()).hexdigest()[:12]
 
 
 def load_ledger() -> dict:
@@ -79,6 +82,22 @@ async def process(args) -> int:
     with real_repository() as repo:
         all_evidence = repo.list_evidence()
         todo = [e for e in all_evidence if args.only is None or e.evidence_id in args.only]
+        generations: dict[str, int] = {}
+        if args.reprocess:
+            if not args.only:
+                raise ZetarisError('--reprocess requires --only with explicit Evidence IDs.')
+            RUNTIME.mkdir(parents=True, exist_ok=True)
+            (RUNTIME / f'ledger.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")}.json').write_text(json.dumps(ledger, indent=2, sort_keys=True))
+            for evidence in todo:
+                entry = ledger.pop(evidence.evidence_id, None)
+                generations[evidence.evidence_id] = (entry or {}).get('generation', 0) + 1
+                # Only a loop this Evidence itself created is retired. Evidence is never touched, and the loop is INVALIDATED
+                # (hidden from retrieval and surfacing) rather than deleted, so history stays inspectable.
+                if entry and entry.get('outcome') == 'CREATE' and entry.get('loop_id') == loop_id_for(evidence.evidence_id, entry.get('generation', 0)):
+                    with repo.unit_of_work():
+                        repo.update_open_loop(entry['loop_id'], status=LoopStatus.INVALIDATED, updated_at=now())
+                    print(f'[RESET] {evidence.evidence_id}: invalidated {entry["loop_id"]} "{entry.get("proposed_title")}"')
+            save_ledger(ledger)
         trace('ZETARIS', 'LOAD', f'Loaded {len(all_evidence)} Evidence records from Zetaris.', [], 'OPEN_LOOP')
         print(f'[INFO] {len(all_evidence)} Evidence in Zetaris; {len(ledger)} already in ledger')
         async with ModelGateway.from_env() as gateway:
@@ -110,7 +129,8 @@ async def process(args) -> int:
                 if args.dry_run:
                     print(f'[PLAN] {eid} domain={evidence.domain} entities={len(entities)} related_evidence={len(related)}')
                     continue
-                agent_ids['next'] = loop_id_for(eid)
+                generation = generations.get(eid, 0)
+                agent_ids['next'] = loop_id_for(eid, generation)
                 decision, receipt, error = None, None, None
                 for attempt in range(2):  # one call plus at most one retry, as in the orchestrator
                     gateway.last_routing = {}
@@ -132,7 +152,7 @@ async def process(args) -> int:
                 counts[kind] += 1
                 trace('OPEN_LOOP', kind, decision.concise_reason, refs, 'STOP', f'loop:{loop.loop_id}' if loop else None, receipt)
                 ledger[eid] = {
-                    'outcome': kind, 'domain': evidence.domain, 'loop_id': loop.loop_id if loop else None,
+                    'outcome': kind, 'domain': evidence.domain, 'generation': generation, 'loop_id': loop.loop_id if loop else None,
                     'target_loop_id': decision.target_loop_id, 'proposed_title': decision.proposed_title,
                     'confidence': decision.confidence, 'concise_reason': decision.concise_reason,
                     'supporting_evidence_ids': decision.supporting_evidence_ids,
@@ -155,6 +175,7 @@ def main() -> int:
     parser.add_argument('--env-file', type=Path, action='append', default=[])
     parser.add_argument('--limit', type=int, help='maximum model calls this run (for step-wise inspection)')
     parser.add_argument('--only', nargs='+', help='restrict to these Evidence IDs')
+    parser.add_argument('--reprocess', action='store_true', help='with --only: retire the loops these Evidence records created, then reason over them again')
     parser.add_argument('--dry-run', action='store_true', help='read Zetaris and show the plan; no model calls, no writes')
     args = parser.parse_args()
     try:

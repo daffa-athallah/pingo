@@ -41,12 +41,22 @@ Recall agent → `ModelGateway` → Meterless Nightshift → NVIDIA Nemotron 3 U
 
 Local policy, applied before any model call: sensitive Evidence and domains outside `food`, `shopping`, `travel` are skipped. Original Evidence is never changed.
 
-Result on the 30 imported screenshots: 22 reasoned over, 8 skipped locally (health 3, event 3, beauty 1, social 1) → 17 `CREATE`, 5 `ATTACH`, 0 `REVISE`/`RESOLVE`/`IGNORE`/`LEAVE_UNRESOLVED`, 17 Open Loops stored. Sanitized example:
+Result on the 30 imported screenshots: 22 reasoned over, 8 skipped locally (health 3, event 3, beauty 1, social 1). Final ledger: 17 `CREATE`, 4 `ATTACH`, 1 `IGNORE`, giving 17 active Open Loops. Sanitized example:
 
 ```
-loop_23a804535d76  "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)"
-domain food · status ACTIVE · confidence 0.85 · 4 supporting Evidence records (1 CREATE + 3 ATTACH)
+loop_62822173fdc0  "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)"
+domain food · status ACTIVE · confidence 0.85 · 3 supporting Evidence records (1 CREATE + 2 ATTACH)
 uncertainty: could be browsing, saving for later, comparing options, or planning a visit; no action confirmed.
 ```
 
-Known limits seen in the real output (not tuned away): three separate Air Jordan 3 sneaker screenshots stayed three loops rather than being merged, and an already-collected order (Spud Surprise Bag, 8 Oct 2026) was recorded as a loop instead of being resolved.
+## What a real-data review changed
+
+A first run recorded an already-collected order as a loop, and some decisions turned out to be stale replies from Nightshift's response cache. Causes and fixes:
+
+- **No sense of today.** The input now has `now`, and the prompt says completed or past-dated things are not unfinished intentions (they are `IGNORE`d, or `RESOLVE` a matching loop).
+- **Candidates were bare.** Candidate loops now carry entity names, brand and category, so the model can recognise the same item.
+- **Merge only the same item.** Another screenshot of the exact product or venue is an `ATTACH`. A different variant (another colourway of a shoe) is a different item and gets its own loop; a later duplicate review, and ultimately the person via Check-in, decides about look-alikes. `REVISE` is for one clearly broader intention, not for joining look-alikes.
+- **ID validation.** The validator rejected entity IDs from candidate loops even though they were in the input. It now accepts IDs the model was actually shown; invented IDs are still rejected.
+- **Cache.** Each payload carries a unique `request_id` so every call is a fresh model call.
+
+`process_open_loops.py --reprocess --only <evidence ids>` retires the loops those records created (status `INVALIDATED`, never deleted; the previous ledger is backed up) and reasons over them again with a new loop ID, so a retired loop's links are never inherited.

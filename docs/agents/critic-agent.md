@@ -34,6 +34,10 @@ The prompt tells the Critic to compare the loop title with the Evidence first. I
 
 A decision carries a concise reason (at most 400 characters), cited Evidence IDs, cited context IDs and, where relevant, a question, revision request or verification request. No chain-of-thought is requested, stored or returned.
 
+## Duplicate review
+
+Separate from the surfacing decision, the Critic can judge look-alike Open Loops (`review_duplicates`). It is still read-only: it answers `MERGE` (exact same item), `ASK` (only the person can settle it) or `KEEP_SEPARATE` for each candidate pair it is given, and every pair must be answered. A different colourway, size, model, dish or place is never a `MERGE`. Merging itself, and the Check-in question for an `ASK`, are done by deterministic code (see [agent orchestration](../architecture/agent-orchestration.md#loop-consolidation-and-daily-check-in)).
+
 ## Model routing
 
 Agent → `ModelGateway` → Meterless Nightshift → NVIDIA Nemotron 3 Ultra. No direct fallback.

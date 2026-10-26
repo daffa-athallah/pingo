@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Sequence
 
-from backend.app.domain.models import Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
+from backend.app.domain.models import CheckIn, Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
 
 
 class InMemoryLoopRepository:
@@ -14,6 +14,7 @@ class InMemoryLoopRepository:
         self.evidence_entities: list[EvidenceEntity] = []
         self.loops: dict[str, OpenLoop] = {}
         self.loop_entities: list[LoopEntity] = []
+        self.check_ins: dict[str, CheckIn] = {}
 
     def save_evidence(self, evidence: Evidence, entities: Sequence[Entity], links: Sequence[EvidenceEntity]) -> None:
         self.evidence[evidence.evidence_id] = evidence
@@ -76,3 +77,13 @@ class InMemoryLoopRepository:
         if not any((l.loop_id, l.entity_id, l.relationship) == (link.loop_id, link.entity_id, link.relationship)
                    for l in self.loop_entities):
             self.loop_entities.append(link)
+
+    def save_check_in(self, check_in: CheckIn) -> None:
+        self.check_ins[check_in.check_in_id] = check_in
+
+    def get_check_in(self, check_in_id: str) -> CheckIn | None:
+        return self.check_ins.get(check_in_id)
+
+    def get_check_ins(self, *, day=None, status=None) -> list[CheckIn]:
+        return sorted((c for c in self.check_ins.values() if (day is None or c.day == day) and (status is None or c.status == status)),
+                      key=lambda c: (c.created_at, c.check_in_id))

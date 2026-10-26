@@ -23,6 +23,7 @@ class SqlHarness:
           CREATE TABLE evidence_entities (evidence_id TEXT, entity_id TEXT, relationship TEXT, confidence REAL, PRIMARY KEY(evidence_id,entity_id,relationship));
           CREATE TABLE open_loops (loop_id TEXT PRIMARY KEY, title TEXT, domain TEXT, status TEXT, confidence REAL, created_at TEXT, updated_at TEXT);
           CREATE TABLE loop_entities (loop_id TEXT, entity_id TEXT, relationship TEXT, confidence REAL, PRIMARY KEY(loop_id,entity_id,relationship));
+          CREATE TABLE check_ins (check_in_id TEXT PRIMARY KEY, day TEXT, kind TEXT, loop_id TEXT, other_loop_id TEXT, question_json TEXT, status TEXT, created_at TEXT, response TEXT, comment TEXT, answered_at TEXT);
           CREATE TABLE context_events (context_id TEXT PRIMARY KEY, context_type TEXT, title TEXT, occurs_at TEXT, location_name TEXT, city TEXT, country TEXT, metadata_json TEXT);
         ''')
         self.failures = []

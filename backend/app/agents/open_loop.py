@@ -71,6 +71,12 @@ inconsistent with the evidence. Reconsider that loop only: answer REVISE with ta
 or LEAVE_UNRESOLVED if the interpretation cannot be settled. Do not CREATE a duplicate loop and do not simply restate the old title.
 
 Rules:
+- Candidate loops list their entity names. Merge only the SAME item: another screenshot of the exact product, venue or place a candidate loop already
+  covers is an ATTACH. A different variant of the same family (another colourway, size or model of a shoe line; another dish elsewhere) is a different
+  item and gets its own CREATE, because the person may want it separately. When two items might be the same but you cannot tell, CREATE separately;
+  a later review decides whether to merge them. Use REVISE only when the evidence clearly shows one broader intention, never to join look-alikes.
+- The input has `now`. Something already completed, or whose date has passed (a collected order, a past event), is not an unfinished intention:
+  answer IGNORE, or RESOLVE the matching candidate loop.
 - Do not infer beyond the evidence. "Interested in this brown jacket" is fine; "Buy this jacket tomorrow" is not.
 - Titles are short, hedged, specific to the entities seen, and never state a plan, date, or amount the evidence does not show.
 - Cite only evidence_ids and entity_ids that appear in the input.
@@ -175,7 +181,10 @@ class OpenLoopAgent:
                 raise OpenLoopError('The loop to revise does not exist.')
             loops = [target, *loops]
         loop_links = self.repository.get_loop_entities([l.loop_id for l in loops])
+        linked = {e.entity_id: e for e in self.repository.get_entities(sorted({k.entity_id for k in loop_links}))}
         payload = {
+            'request_id': uuid.uuid4().hex,  # defeats Nightshift's loose response cache: every call must be a fresh model call
+            'now': self._now(),
             'new_evidence': _clean(evidence),
             'new_entities': [_clean(e) for e in entities],
             'related_evidence': [_clean(e) for e in related_evidence],
@@ -183,7 +192,9 @@ class OpenLoopAgent:
             **({'revision_request': {'target_loop_id': revision.target_loop_id, 'request': revision.request,
                                      'reviewer_reason': revision.critic_reason}} if revision else {}),
             'candidate_open_loops': [{**_clean(l), 'status': l.status.value,
-                                      'entities': [_clean(k) for k in loop_links if k.loop_id == l.loop_id]} for l in loops],
+                                      'entities': [{**_clean(k), **({'name': linked[k.entity_id].name, 'brand': linked[k.entity_id].brand,
+                                                                      'category': linked[k.entity_id].category} if k.entity_id in linked else {})}
+                                                   for k in loop_links if k.loop_id == l.loop_id]} for l in loops],
         }
         content = await self.gateway.complete([
             {'role': 'system', 'content': SYSTEM_PROMPT},
@@ -193,7 +204,8 @@ class OpenLoopAgent:
             content,
             loop_ids={l.loop_id for l in loops},
             evidence_ids={evidence.evidence_id} | {e.evidence_id for e in related_evidence},
-            entity_ids=set(entity_ids) | {e.entity_id for e in related_entities},
+            # Only IDs the model was actually shown: new entities, related entities and the entities of candidate loops.
+            entity_ids=set(entity_ids) | {e.entity_id for e in related_entities} | set(linked),
             revision_target=revision.target_loop_id if revision else None)
 
     def apply(self, decision: LoopDecision) -> m.OpenLoop | None:

@@ -18,7 +18,7 @@ from threading import RLock
 from typing import Sequence
 
 from backend.app.adapters.zetaris import ZetarisError
-from backend.app.domain.models import ContextEvent, ContextType, Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
+from backend.app.domain.models import CheckIn, ContextEvent, ContextType, Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
 
 _FIELDS = {
     'evidence': ('evidence_id', 'source', 'domain', 'summary', 'timestamp', 'sensitive', 'confidence', 'image_ref'),
@@ -27,10 +27,11 @@ _FIELDS = {
     'open_loops': ('loop_id', 'title', 'domain', 'status', 'confidence', 'created_at', 'updated_at'),
     'loop_entities': ('loop_id', 'entity_id', 'relationship', 'confidence'),
     'context_events': ('context_id', 'context_type', 'title', 'occurs_at', 'location_name', 'city', 'country', 'metadata_json'),
+    'check_ins': ('check_in_id', 'day', 'kind', 'loop_id', 'other_loop_id', 'question_json', 'status', 'created_at', 'response', 'comment', 'answered_at'),
 }
 _KEYS = {'evidence': ('evidence_id',), 'entities': ('entity_id',),
          'evidence_entities': ('evidence_id', 'entity_id', 'relationship'), 'open_loops': ('loop_id',),
-         'loop_entities': ('loop_id', 'entity_id', 'relationship'), 'context_events': ('context_id',)}
+         'loop_entities': ('loop_id', 'entity_id', 'relationship'), 'context_events': ('context_id',), 'check_ins': ('check_in_id',)}
 
 
 class EvidenceConflict(ZetarisError):
@@ -337,3 +338,30 @@ class ZetarisRepository:
         with self._lock:
             rows = self.connection.query(f'SELECT {self._fields("context_events")} FROM {self._table("context_events")} ORDER BY context_id')
             return [ContextEvent(row[0], ContextType(row[1]), *row[2:-1], metadata=json.loads(row[-1])) for row in rows]
+
+    def save_check_in(self, check_in: CheckIn) -> None:
+        values = asdict(check_in)
+        values['question_json'] = json.dumps(values.pop('question'), sort_keys=True, ensure_ascii=False, separators=(',', ':'))
+        with self.unit_of_work():
+            self._change('check_ins', tuple(values[field] for field in _FIELDS['check_ins']))
+
+    @staticmethod
+    def _check_in(row) -> CheckIn:
+        check_in_id, day, kind, loop_id, other, question_json, status, created_at, response, comment, answered_at = row
+        return CheckIn(check_in_id, day, kind, loop_id, other, json.loads(question_json), status, created_at, response, comment, answered_at)
+
+    def get_check_in(self, check_in_id: str) -> CheckIn | None:
+        with self._lock:
+            row = self._row('check_ins', [check_in_id])
+            return self._check_in(row) if row else None
+
+    def get_check_ins(self, *, day: str | None = None, status: str | None = None) -> list[CheckIn]:
+        with self._lock:
+            clauses, args = [], []
+            for column, value in (('day', day), ('status', status)):
+                if value is not None:
+                    clauses.append(f'`{column}` = ?')
+                    args.append(value)
+            where = (' WHERE ' + ' AND '.join(clauses)) if clauses else ''
+            rows = self.connection.query(f'SELECT {self._fields("check_ins")} FROM {self._table("check_ins")}{where} ORDER BY created_at, check_in_id', args)
+            return [self._check_in(row) for row in rows]

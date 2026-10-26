@@ -85,3 +85,19 @@ class ContextEvent:
     city: str | None = None
     country: str | None = None
     metadata: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class CheckIn:
+    """A question for the person, scoped to one calendar day. The answer, never a model, settles it."""
+    check_in_id: str
+    day: str                      # YYYY-MM-DD the question is for; unanswered questions do not carry over
+    kind: str                     # 'MERGE_LOOPS'
+    loop_id: str                  # the loop that would be kept
+    other_loop_id: str | None     # the loop that would be folded into it
+    question: dict                # the CheckInQuestion payload as served to the client (images are added at serve time)
+    status: str                   # PENDING | ANSWERED
+    created_at: str
+    response: str | None = None
+    comment: str | None = None
+    answered_at: str | None = None
