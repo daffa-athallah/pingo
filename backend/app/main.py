@@ -20,6 +20,7 @@ from backend.app.adapters.zetaris import ZetarisError
 from backend.app.bootstrap import app_mode, open_repository
 from backend.app.context_api import router as context_router
 from backend.app.demo_workspace import SnapshotError, read_snapshot, seed, workspace_info
+from backend.app.hmem import HMemClient, HMemError, seed_from_repository
 from backend.app.orchestration.consolidation import apply_merge, short
 from backend.app.runs import RunStore, summary
 from backend.app.runs_api import router as runs_router, workspace_runs
@@ -31,6 +32,13 @@ VIEW_TTL_SECONDS = 60
 SUPPORTED_DOMAINS = {'food', 'shopping', 'travel'}
 TIMEZONE = ZoneInfo(os.environ.get('RECALL_TIMEZONE', 'Australia/Melbourne'))
 CHECK_IN_RESPONSES = {'same', 'different', 'related', 'other'}
+
+
+def _seed_memory(client, repository) -> None:
+    try:
+        seed_from_repository(client, repository)
+    except HMemError:
+        pass  # memory is an aid, never a dependency: the app runs and reports it as unavailable
 
 
 def _paths(mode: str) -> tuple[Path, Path]:
@@ -58,6 +66,11 @@ async def lifespan(app):
         app.state.on_data_changed = lambda: _refresh_views(repository)
         app.state.sample = None
         app.state.demo_info = workspace_info() if mode == 'demo' else None
+        # The H-MEM memory engine is optional and explicit: RECALL_HMEM_URL names the sidecar (engines/hmem/server.ts). Without it nothing changes.
+        hmem_url = os.environ.get('RECALL_HMEM_URL', '').strip()
+        app.state.hmem = HMemClient(hmem_url) if hmem_url and mode != 'sample' else None
+        if app.state.hmem is not None:
+            Thread(target=lambda: _seed_memory(app.state.hmem, repository), daemon=True).start()
         if mode == 'sample':
             from backend.app.sample import run_sample
             app.state.sample = await run_sample(repository)
@@ -97,7 +110,27 @@ def health(request: Request):
     state = request.app.state
     return {'status': 'ok', 'mode': state.mode, 'workspace': state.workspace, 'repository': type(state.repository).__name__,
             'external_models_used': False if state.mode == 'sample' else None,
-            **({'demo_workspace': state.demo_info} if state.demo_info else {})}
+            **({'demo_workspace': state.demo_info} if state.demo_info else {}), 'hmem': _hmem_status(state.hmem)}
+
+
+def _hmem_status(client) -> dict:
+    if client is None:
+        return {'enabled': False}
+    status = client.health()
+    return {'enabled': True, 'reachable': status is not None, 'records': (status or {}).get('records'), 'ledger_entries': (status or {}).get('ledger'),
+            'engine': 'Meterless H-MEM (reference implementation)'}
+
+
+@app.get('/api/memory/ledger')
+def memory_ledger(request: Request, limit: int = 50, memory_id: str | None = None):
+    """The H-MEM audit ledger: every memory created, read, updated or given feedback, append-only."""
+    client = request.app.state.hmem
+    if client is None:
+        raise HTTPException(status_code=404, detail='H-MEM is not enabled (RECALL_HMEM_URL is not set).')
+    try:
+        return client.ledger(limit=min(max(limit, 1), 500), memory_id=memory_id)
+    except HMemError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from None
 
 
 def entity_view(repository, entity):
@@ -383,6 +416,12 @@ async def reset_demo_workspace(request: Request):
         except SnapshotError as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from None
         state.runs.clear()
+        if state.hmem is not None:
+            try:
+                state.hmem.reset()
+                seed_from_repository(state.hmem, state.repository)
+            except HMemError:
+                pass
         if state.uploads_dir.is_dir():
             for path in state.uploads_dir.iterdir():
                 if path.is_file():

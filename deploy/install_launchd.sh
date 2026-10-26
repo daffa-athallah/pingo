@@ -6,7 +6,7 @@
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 AGENTS="$HOME/Library/LaunchAgents"
-LABELS="com.recall.backend com.recall.caffeinate com.recall.colima com.recall.daily-checkins"
+LABELS="com.recall.hmem com.recall.backend com.recall.caffeinate com.recall.colima com.recall.daily-checkins"
 DOMAIN="gui/$(id -u)"
 
 case "${1:-}" in

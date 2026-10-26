@@ -22,6 +22,7 @@ from fastapi.responses import JSONResponse
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.bootstrap import build_orchestrator, sample_mode
 from backend.app.context_api import _gateway
+from backend.app.hmem import HMemRepository
 from backend.app.observe import ObservedGateway, ObservedRepository, UploadObserver, loop_state
 from backend.app.orchestration.recall import FinalAction
 
@@ -96,7 +97,10 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                           input_refs=[f'image:{path.name}'], next_step='EVIDENCE')
         async with state.write_lock:
             async with _gateway() as gateway:
-                orchestrator = build_orchestrator(ObservedGateway(gateway, observer), ObservedRepository(repository, observer))
+                observed = ObservedRepository(repository, observer)
+                # H-MEM wraps OUTSIDE the observer, so the Evidence is stored (and reported) before memory is asked about it.
+                agent_repository = HMemRepository(observed, state.hmem, listener=observer.memory_event) if getattr(state, 'hmem', None) else observed
+                orchestrator = build_orchestrator(ObservedGateway(gateway, observer), agent_repository)
                 observer.wrap_decide(orchestrator.open_loop_agent)
                 result = await orchestrator.ingest_screenshot(path)
             if result.evidence_id is None:  # nothing was stored: do not keep an orphan file

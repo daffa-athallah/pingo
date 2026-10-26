@@ -122,6 +122,8 @@ class UploadObserver:
         self._reset_retrieval()
         self.decision = None
         self.before: dict | None = None
+        self.memory_hits: dict[str, dict] = {}
+        self.memory_added: list[str] = []
 
     # ---- retrieval capture ---------------------------------------------------------------------------------
     def _reset_retrieval(self) -> None:
@@ -158,8 +160,33 @@ class UploadObserver:
     def _retrieval_detail(self) -> dict:
         candidates = [{**c, 'entities': [self.entity_names[i] for i in self.loop_links.get(c['loop_id'], []) if i in self.entity_names]}
                       for c in self.candidates]
-        return {'related_evidence': list(self.related_evidence.values()), 'related_entities': [{'entity_id': k, 'name': v} for k, v in self.related_entities.items()],
+        related = [{**item, 'via': 'entities+h-mem' if item['evidence_id'] in self.memory_hits else 'entities'} for item in self.related_evidence.values()]
+        for evidence_id in self.memory_added:
+            hit = self.memory_hits.get(evidence_id)
+            if hit and evidence_id not in self.related_evidence:
+                related.append({'evidence_id': evidence_id, 'domain': None, 'summary': hit['content'][:SNIPPET], 'has_image': None,
+                                'via': 'h-mem', 'relevance': hit['relevance']})
+        return {'related_evidence': related, 'memory_added': len(self.memory_added), 'related_entities': [{'entity_id': k, 'name': v} for k, v in self.related_entities.items()],
                 'candidate_loops': candidates, 'sensitive_evidence_withheld': self.hidden_evidence}
+
+    # ---- H-MEM (memory engine) ----------------------------------------------------------------------------
+    @safe
+    def memory_event(self, kind: str, payload: dict) -> None:
+        refs = [f'evidence:{self.evidence_id}'] if self.evidence_id else []
+        if kind == 'query':
+            self.memory_hits = {h['evidence_id']: h for h in payload['hits']}
+            self.recorder.emit('H-MEM', 'QUERY', f"Asked H-MEM what it remembers about this screenshot: {len(payload['hits'])} related "
+                               f"{'memory' if len(payload['hits']) == 1 else 'memories'} above the {payload['threshold']} threshold.",
+                               input_refs=refs, next_step='H-MEM', detail=payload)
+        elif kind == 'stored':
+            self.recorder.emit('H-MEM', 'STORE', f"Remembered this screenshot as {payload['layer']} memory {payload['memory_id']} "
+                               f"(confidence {payload['confidence']}, with provenance and a ledger entry).", input_refs=refs, next_step='OPEN_LOOP',
+                               output_ref=f"memory:{payload['memory_id']}", detail=payload)
+        elif kind == 'merged':
+            self.memory_added = list(payload['evidence_ids'])
+        elif kind == 'unavailable':
+            self.recorder.emit('H-MEM', 'UNAVAILABLE', 'H-MEM could not be reached; retrieval used shared entities only.', input_refs=refs,
+                               next_step='OPEN_LOOP', detail=payload)
 
     # ---- model calls ---------------------------------------------------------------------------------------
     @safe
@@ -173,7 +200,8 @@ class UploadObserver:
             detail = self._retrieval_detail()
             self.capturing = False
             self.recorder.emit('OPEN_LOOP', 'RETRIEVE',
-                               f"Gathered {len(detail['related_evidence'])} related Evidence records, {len(detail['related_entities'])} related entities "
+                               f"Gathered {len(detail['related_evidence'])} related Evidence records ({detail['memory_added']} found only through H-MEM), "
+                               f"{len(detail['related_entities'])} related entities "
                                f"and {len(detail['candidate_loops'])} candidate loops from {self.store_label}.",
                                input_refs=[f'evidence:{self.evidence_id}'], next_step='OPEN_LOOP', detail=detail)
             self.recorder.emit('OPEN_LOOP', 'DECIDING', 'Open Loop Agent is deciding what this means for the saved intentions.',

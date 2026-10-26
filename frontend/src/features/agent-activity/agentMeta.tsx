@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 import type { Receipt } from './types'
 
-export type AgentKey = 'SOURCE' | 'EVIDENCE' | 'ZETARIS' | 'OPEN_LOOP' | 'CONTEXT' | 'VERIFIER' | 'CRITIC' | 'RESULT' | 'OTHER'
+export type AgentKey = 'SOURCE' | 'EVIDENCE' | 'ZETARIS' | 'MEMORY' | 'OPEN_LOOP' | 'CONTEXT' | 'VERIFIER' | 'CRITIC' | 'RESULT' | 'OTHER'
 
 export interface AgentMeta {
   label: string
@@ -13,6 +13,7 @@ export const AGENTS: Record<AgentKey, AgentMeta> = {
   SOURCE: { label: 'Input', role: 'Input', question: 'What triggered this run?' },
   EVIDENCE: { label: 'Evidence', role: 'Perception', question: 'What am I looking at?' },
   ZETARIS: { label: 'Zetaris', role: 'Shared state', question: 'What does Recall already know?' },
+  MEMORY: { label: 'H-MEM', role: 'Memory', question: 'What do I already remember about this?' },
   OPEN_LOOP: { label: 'Open Loop', role: 'Intention', question: 'What is this person still trying to do?' },
   CONTEXT: { label: 'Context', role: 'Relevance', question: 'Does something happening now make this relevant?' },
   VERIFIER: { label: 'Verifier', role: 'Verification', question: 'Is this context actually true right now?' },
@@ -23,7 +24,7 @@ export const AGENTS: Record<AgentKey, AgentMeta> = {
 
 /** Position in the architecture. A hop to a lower rank is a return, e.g. Critic → Open Loop. */
 export const RANK: Record<AgentKey, number> = {
-  SOURCE: 0, EVIDENCE: 1, ZETARIS: 2, OPEN_LOOP: 3, CONTEXT: 4, VERIFIER: 4.5, CRITIC: 5, RESULT: 6, OTHER: -1,
+  SOURCE: 0, EVIDENCE: 1, ZETARIS: 2, MEMORY: 2.5, OPEN_LOOP: 3, CONTEXT: 4, VERIFIER: 4.5, CRITIC: 5, RESULT: 6, OTHER: -1,
 }
 
 export function agentKey(agent: string): AgentKey {
@@ -31,6 +32,7 @@ export function agentKey(agent: string): AgentKey {
     case 'EVIDENCE': return 'EVIDENCE'
     case 'INGESTION': case 'ZETARIS': case 'REPOSITORY': return 'ZETARIS'
     case 'UPLOAD': return 'SOURCE'
+    case 'H-MEM': return 'MEMORY'
     case 'OPEN_LOOP': return 'OPEN_LOOP'
     case 'CONTEXT': return 'CONTEXT'
     case 'VERIFIER': return 'VERIFIER'
@@ -44,7 +46,7 @@ export const isZetarisPlaceholder = (agent: string) => agent === 'INGESTION'
 
 const NEXT_LABELS: Record<string, string> = {
   INGESTION: 'Zetaris', OPEN_LOOP: 'Open Loop', CONTEXT: 'Context', CRITIC: 'Critic', VERIFIER: 'Context verifier',
-  OUTPUT: 'Output', CHECK_IN: 'Check-in', STOP: 'End of run', ZETARIS: 'Zetaris', REPOSITORY: 'Demo workspace', EVIDENCE: 'Evidence', STATE: 'Loop state',
+  OUTPUT: 'Output', CHECK_IN: 'Check-in', STOP: 'End of run', ZETARIS: 'Zetaris', REPOSITORY: 'Demo workspace', 'H-MEM': 'H-MEM', EVIDENCE: 'Evidence', STATE: 'Loop state',
 }
 export const nextLabel = (next: string | null) => (next ? NEXT_LABELS[next] ?? next : null)
 
@@ -91,6 +93,8 @@ export function AgentIcon({ agent, size = 20, quiet = false }: { agent: AgentKey
       return <svg {...props}><path d="M12 3v18M7 21h10" /><path d="M5 6.5h14" /><path d="m5 6.5-3 7a3 3 0 0 0 6 0Zm14 0-3 7a3 3 0 0 0 6 0Z" /></svg>
     case 'ZETARIS':
       return <svg {...props}><ellipse cx="12" cy="6" rx="7.5" ry="3" /><path d="M4.5 6v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6M4.5 12v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6" /></svg>
+    case 'MEMORY':
+      return <svg {...props}><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /><circle cx="12" cy="12" r="3.2" /><circle cx="5.2" cy="5.2" r="1.6" /><circle cx="18.8" cy="5.2" r="1.6" /><circle cx="5.2" cy="18.8" r="1.6" /><circle cx="18.8" cy="18.8" r="1.6" /><path d="m6.4 6.4 3.3 3.3M17.6 6.4l-3.3 3.3M6.4 17.6l3.3-3.3M17.6 17.6l-3.3-3.3" /></svg>
     case 'VERIFIER':
       return <svg {...props}><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8 7.5 9.5 4.4-1.5 7.5-4.9 7.5-9.5V6Z" /><path d="m8.8 12 2.2 2.2 4.2-4.4" /></svg>
     case 'SOURCE':

@@ -6,6 +6,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 export PYTHONUNBUFFERED=1
 # Any *.ts.net origin may call the API (tailnet only: `tailscale serve`, never Funnel). Override by exporting your own value.
 export RECALL_CORS_ORIGIN_REGEX="${RECALL_CORS_ORIGIN_REGEX:-https://.*\.ts\.net(:[0-9]+)?}"
+# The Meterless H-MEM memory engine (engines/hmem, started by com.recall.hmem). Without it the backend still runs and reports memory as unavailable.
+export RECALL_HMEM_URL="${RECALL_HMEM_URL:-http://127.0.0.1:8300}"
 until /usr/bin/nc -z localhost 10000 2>/dev/null; do
   echo "$(date '+%F %T') waiting for Zetaris on :10000 (colima start; docker compose up -d)"; sleep 5
 done

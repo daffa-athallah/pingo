@@ -49,8 +49,12 @@ def describe(event: dict) -> str:
     extra = ''
     if event['action'] == 'EXTRACT' and not detail.get('sensitive'):
         extra = f" | {detail.get('summary', '')[:90]} | entities={[e['name'] for e in detail.get('entities', [])]}"
+    elif event['agent'] == 'H-MEM' and event['action'] == 'QUERY':
+        extra = ' | ' + ('; '.join(f"score {h['relevance']:.2f} [{h['layer']}] {h['content'][:60]}" for h in detail['hits']) or 'no memory above the threshold')
+    elif event['agent'] == 'H-MEM' and event['action'] == 'STORE':
+        extra = f" | {detail['memory_id']} tier={detail['layer']} confidence={detail['confidence']} refs={detail['provenance']['refs']}"
     elif event['action'] == 'RETRIEVE':
-        extra = (f" | related evidence={[e['evidence_id'][-6:] for e in detail['related_evidence']]} candidate loops="
+        extra = (f" | related evidence={[(e['evidence_id'][-6:], e.get('via')) for e in detail['related_evidence']]} candidate loops="
                  f"{[c['title'][:40] for c in detail['candidate_loops']]}")
     elif event['agent'] == 'OPEN_LOOP' and 'confidence' in detail:
         extra = (f" | confidence={detail['confidence']} target={detail['target_loop_id']} supporting evidence={len(detail['supporting_evidence_ids'])}"

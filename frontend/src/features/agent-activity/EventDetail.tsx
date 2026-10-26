@@ -41,6 +41,39 @@ export default function EventDetail({ event }: { event: TraceEvent }) {
     )
   }
 
+  if (key === 'H-MEM:QUERY') {
+    const hits = list(d.hits)
+    return (
+      <>
+        <p className="aa-note">Meterless H-MEM ranks its memories by meaning, keywords, tags, domain and entities, times each memory's confidence. Only hits above {num(d.threshold)} count.</p>
+        <Section title="Asked">{<p className="aa-reason">{text(d.query)}</p>}</Section>
+        <Section title={`What it remembered (${hits.length})`}>
+          {hits.length ? <ul className="aa-list">{hits.map((h) => (
+            <li key={String(h.memory_id)}>{text(h.content)}<small>score {num(h.relevance)} · {text(h.layer)} memory · confidence {num(h.confidence)} · evidence {String(h.evidence_id)}</small></li>))}</ul>
+            : <p className="aa-note">Nothing above the threshold: this looks new.</p>}
+        </Section>
+        <Section title="Why these"><p className="aa-note">{text(bag(d.trace).retrievalReason)}</p></Section>
+      </>
+    )
+  }
+
+  if (key === 'H-MEM:STORE') {
+    return (
+      <Section title="Remembered">
+        <dl className="aa-kv">
+          <dt>memory</dt><dd>{text(d.memory_id)}</dd><dt>tier</dt><dd>{text(d.layer)}</dd><dt>confidence</dt><dd>{num(d.confidence)}</dd>
+          <dt>domain</dt><dd>{text(d.domain)}</dd><dt>source</dt><dd>{text(d.source)}</dd>
+          <dt>provenance</dt><dd>{text(bag(d.provenance).label)} ({strings(bag(d.provenance).refs).join(', ')})</dd>
+        </dl>
+        <p className="aa-note">Every memory carries its source, provenance and confidence, and each change is written to H-MEM's append-only audit ledger.</p>
+      </Section>
+    )
+  }
+
+  if (key === 'H-MEM:UNAVAILABLE') {
+    return <Section title="Memory unavailable"><p className="aa-note">{text(d.reason)} The run continued with the shared-entity retrieval alone.</p></Section>
+  }
+
   if (event.action === 'STORE') {
     return (
       <Section title="Stored">
@@ -62,7 +95,7 @@ export default function EventDetail({ event }: { event: TraceEvent }) {
       <>
         <p className="aa-note">Exactly what the Open Loop Agent was given to decide with, read from the repository.</p>
         <Section title={`Related Evidence (${evidence.length})`}>
-          {evidence.length ? <ul className="aa-list">{evidence.map((e) => <li key={String(e.evidence_id)}>{text(e.summary)}<small>{String(e.evidence_id)}</small></li>)}</ul>
+          {evidence.length ? <ul className="aa-list">{evidence.map((e) => <li key={String(e.evidence_id)}>{text(e.summary)}<small>{String(e.evidence_id)}{e.via ? ` · found via ${String(e.via).replace('+', ' + ')}` : ''}</small></li>)}</ul>
             : <p className="aa-note">None: no earlier screenshot shares an entity with this one.</p>}
         </Section>
         <Section title={`Related entities (${entities.length})`}>{entities.length ? <Chips items={entities.map((e) => String(e.name))} /> : <p className="aa-note">None.</p>}</Section>

@@ -127,6 +127,12 @@ def check_backend() -> None:
     if health.get('mode') != 'real' or health.get('repository') != 'ZetarisRepository':
         return report('FAIL', 'Backend mode', f"{health.get('mode')}/{health.get('repository')}", 'restart the backend without SAMPLE_MODE')
     report('PASS', 'Backend API', 'real mode, ZetarisRepository')
+    hmem = health.get('hmem') or {}
+    if hmem.get('enabled'):
+        report('PASS' if hmem.get('reachable') else 'FAIL', 'H-MEM memory engine', f"{hmem.get('records')} memories, {hmem.get('ledger_entries')} ledger entries"
+               if hmem.get('reachable') else 'enabled but not reachable', 'launchctl kickstart -k gui/$(id -u)/com.recall.hmem   (needs Node 22.18+)')
+    else:
+        report('WARN', 'H-MEM memory engine', 'not enabled (RECALL_HMEM_URL is not set)', 'deploy/install_launchd.sh install')
     status, body = http(API + '/open-loops', 90)
     loops = json.loads(body) if status == 200 else []
     report('PASS' if loops else 'FAIL', 'Open Loops via API', f'{len(loops)} loops', 'backend cannot read Zetaris; check the Zetaris checks above')
