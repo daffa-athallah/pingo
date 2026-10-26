@@ -21,6 +21,8 @@ from backend.app.adapters.zetaris import ZetarisError
 from backend.app.domain.models import CheckIn, ContextEvent, ContextType, Entity, Evidence, EvidenceEntity, LoopEntity, LoopStatus, OpenLoop
 
 _FIELDS = {
+    'context_evaluations': ('evaluation_id', 'created_at', 'payload_json'),
+    'notifications': ('notification_id', 'loop_id', 'created_at', 'payload_json'),
     'evidence': ('evidence_id', 'source', 'domain', 'summary', 'timestamp', 'sensitive', 'confidence', 'image_ref'),
     'entities': ('entity_id', 'entity_type', 'domain', 'name', 'category', 'subcategory', 'brand', 'location_name', 'city', 'country', 'metadata_json'),
     'evidence_entities': ('evidence_id', 'entity_id', 'relationship', 'confidence'),
@@ -30,6 +32,7 @@ _FIELDS = {
     'check_ins': ('check_in_id', 'day', 'kind', 'loop_id', 'other_loop_id', 'question_json', 'status', 'created_at', 'response', 'comment', 'answered_at'),
 }
 _KEYS = {'evidence': ('evidence_id',), 'entities': ('entity_id',),
+         'context_evaluations': ('evaluation_id',), 'notifications': ('notification_id',),
          'evidence_entities': ('evidence_id', 'entity_id', 'relationship'), 'open_loops': ('loop_id',),
          'loop_entities': ('loop_id', 'entity_id', 'relationship'), 'context_events': ('context_id',), 'check_ins': ('check_in_id',)}
 
@@ -365,3 +368,31 @@ class ZetarisRepository:
             where = (' WHERE ' + ' AND '.join(clauses)) if clauses else ''
             rows = self.connection.query(f'SELECT {self._fields("check_ins")} FROM {self._table("check_ins")}{where} ORDER BY created_at, check_in_id', args)
             return [self._check_in(row) for row in rows]
+
+    def save_context_evaluation(self, evaluation) -> None:
+        with self.unit_of_work():
+            self._change('context_evaluations', (evaluation.evaluation_id, evaluation.created_at,
+                         json.dumps(evaluation.payload, sort_keys=True, separators=(',', ':'))))
+
+    def get_context_evaluation(self, evaluation_id):
+        from backend.app.repositories.context_store import ContextEvaluation
+        with self._lock:
+            row = self._row('context_evaluations', [evaluation_id])
+            return ContextEvaluation(row[0], row[1], json.loads(row[2])) if row else None
+
+    def save_notification(self, notification) -> None:
+        with self.unit_of_work():
+            self._change('notifications', (notification.notification_id, notification.loop_id, notification.created_at,
+                         json.dumps(notification.payload, sort_keys=True, separators=(',', ':'))))
+
+    def get_notification(self, notification_id):
+        from backend.app.repositories.context_store import Notification
+        with self._lock:
+            row = self._row('notifications', [notification_id])
+            return Notification(row[0], row[1], row[2], json.loads(row[3])) if row else None
+
+    def list_notifications(self):
+        from backend.app.repositories.context_store import Notification
+        with self._lock:
+            rows = self.connection.query(f'SELECT {self._fields("notifications")} FROM {self._table("notifications")} ORDER BY created_at DESC')
+            return [Notification(row[0], row[1], row[2], json.loads(row[3])) for row in rows]

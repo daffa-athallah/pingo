@@ -105,3 +105,55 @@ export interface SavedRunResponse {
 export function getRuns(signal?: AbortSignal): Promise<SavedRunResponse[]> {
   return get('/runs', signal)
 }
+
+export interface ContextInput {
+  context_id: string
+  source: 'SIMULATED' | 'BROWSER' | 'CALENDAR'
+  type: 'LOCATION' | 'CALENDAR' | 'TIME'
+  timestamp: string
+  timezone: string
+  title?: string
+  location?: { latitude?: number; longitude?: number; accuracy_meters?: number; name?: string; city?: string; country?: string }
+  start_time?: string
+  end_time?: string
+  description?: string
+}
+export interface ContextEvaluation {
+  evaluation_id: string
+  state: 'COMPLETED' | 'FAILED_SAFE' | 'RUNNING'
+  source: string[]
+  now?: string
+  submitted_context?: unknown[]
+  candidates?: { loop_id: string; title: string; eligible: boolean; exclusion: string | null; geography: { entity_id: string; match: string; distance_meters: number | null }[] }[]
+  result?: RunResult
+  notification_id: string | null
+  delivery: string
+  replayed?: boolean
+  error?: string
+}
+export type NoticeAction = 'DELIVERED' | 'READ' | 'DISMISS' | 'DONE' | 'SNOOZE' | 'NOT_RELEVANT' | 'JUST_INSPIRATION'
+export interface PingoNotification {
+  notification_id: string
+  loop_id: string
+  created_at: string
+  payload: {
+    title: string; message: string; reason: string; run_id: string; sources: string[]; trigger_types: string[]
+    delivery_status: 'APPROVED' | 'DELIVERED'; read: boolean; dismissed: boolean; feedback: string | null
+    entities: { entity_id: string; name: string }[]
+    evidence: { evidence_id: string; summary: string; image_url: string | null }[]
+  }
+}
+async function post<T>(path: string, body: unknown, timeout: number): Promise<T> {
+  const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${path}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeout),
+  })
+  if (!response.ok) {
+    const data: { detail?: unknown } = await response.json().catch(() => ({}))
+    throw new Error(typeof data.detail === 'string' ? data.detail : `Request failed (${response.status}). Check the fields and try again.`)
+  }
+  return response.json() as Promise<T>
+}
+export const evaluateContext = (events: ContextInput[], now: string) => post<ContextEvaluation>('/context-simulator/evaluate', { events, now }, 600000)
+export const getNotifications = (signal?: AbortSignal) => get<PingoNotification[]>('/notifications', signal)
+export const getNotification = (id: string, signal?: AbortSignal) => get<PingoNotification>(`/notifications/${encodeURIComponent(id)}`, signal)
+export const actOnNotification = (id: string, action: NoticeAction) => post<PingoNotification>(`/notifications/${encodeURIComponent(id)}/actions`, { action }, 30000)

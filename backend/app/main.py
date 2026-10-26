@@ -46,6 +46,8 @@ async def lifespan(app):
     with open_repository() as repository:
         uploads, run_dir = _paths(mode)
         app.state.repository = repository
+        from backend.app.context.service import ContextService
+        app.state.context_service = ContextService(repository)
         app.state.mode = mode
         app.state.workspace = {'real': 'canonical', 'demo': 'demo', 'sample': 'sample'}[mode]
         app.state.uploads_dir = uploads
@@ -76,7 +78,8 @@ app = FastAPI(title='Recall data API', lifespan=lifespan)
 #   RECALL_CORS_ORIGINS=https://my-mac.tailnet.ts.net,https://ica-mac.tailnet.ts.net:5173
 #   RECALL_CORS_ORIGIN_REGEX=https://.*\\.ts\\.net(:\\d+)?   (optional)
 _ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5175', 'http://127.0.0.1:5175',
-            *[o.strip().rstrip('/') for o in os.environ.get('RECALL_CORS_ORIGINS', '').split(',') if o.strip()]]
+            *[o.strip().rstrip('/') for o in os.environ.get('RECALL_CORS_ORIGINS', '').split(',') if o.strip()],
+            *[o.strip().rstrip('/') for o in os.environ.get('PINGO_FRONTEND_ORIGINS', '').split(',') if o.strip()]]
 app.add_middleware(CORSMiddleware, allow_origins=_ORIGINS, allow_origin_regex=os.environ.get('RECALL_CORS_ORIGIN_REGEX') or None,
                    allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
 app.include_router(context_router)
@@ -387,3 +390,8 @@ async def reset_demo_workspace(request: Request):
         _refresh_views(state.repository)
     return {'ok': True, 'demo_workspace': workspace_info(), 'evidence': len(state.repository.list_evidence()),
             'active_loops': len(state.repository.get_active_open_loops(limit=1000))}
+
+
+# Context simulation and notifications (additive routes; agent and orchestrator contracts are unchanged).
+from backend.app.context.routes import router as notifications_router  # noqa: E402
+app.include_router(notifications_router)
