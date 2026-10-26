@@ -29,7 +29,8 @@ export const RANK: Record<AgentKey, number> = {
 export function agentKey(agent: string): AgentKey {
   switch (agent) {
     case 'EVIDENCE': return 'EVIDENCE'
-    case 'INGESTION': case 'ZETARIS': return 'ZETARIS'
+    case 'INGESTION': case 'ZETARIS': case 'REPOSITORY': return 'ZETARIS'
+    case 'UPLOAD': return 'SOURCE'
     case 'OPEN_LOOP': return 'OPEN_LOOP'
     case 'CONTEXT': return 'CONTEXT'
     case 'VERIFIER': return 'VERIFIER'
@@ -43,7 +44,7 @@ export const isZetarisPlaceholder = (agent: string) => agent === 'INGESTION'
 
 const NEXT_LABELS: Record<string, string> = {
   INGESTION: 'Zetaris', OPEN_LOOP: 'Open Loop', CONTEXT: 'Context', CRITIC: 'Critic', VERIFIER: 'Context verifier',
-  OUTPUT: 'Output', CHECK_IN: 'Check-in', STOP: 'End of run', ZETARIS: 'Zetaris',
+  OUTPUT: 'Output', CHECK_IN: 'Check-in', STOP: 'End of run', ZETARIS: 'Zetaris', REPOSITORY: 'Demo workspace', EVIDENCE: 'Evidence', STATE: 'Loop state',
 }
 export const nextLabel = (next: string | null) => (next ? NEXT_LABELS[next] ?? next : null)
 

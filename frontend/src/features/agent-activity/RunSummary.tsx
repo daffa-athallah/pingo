@@ -1,7 +1,7 @@
 import { shortId } from './traceAdapter'
 import type { Timeline } from './traceAdapter'
 
-const LABELS: Record<string, string> = { SURFACE: 'Surfaced', STAY_SILENT: 'Stayed silent', ASK: 'Asked', FAILED_SAFE: 'Stopped safely', STORED: 'Stored' }
+const LABELS: Record<string, string> = { SURFACE: 'Surfaced', STAY_SILENT: 'Stayed silent', ASK: 'Asked', FAILED_SAFE: 'Stopped safely', STORED: 'Stored', RUNNING: 'In progress' }
 
 export default function RunSummary({ timeline }: { timeline: Timeline }) {
   const { summary } = timeline

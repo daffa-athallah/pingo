@@ -1,0 +1,24 @@
+/* Demo upload page. Self-contained: only the shared colour tokens from global.css are used. */
+.demo-page { display: grid; gap: 18px; align-content: start; padding-bottom: 96px; }
+.demo-page h1 { font-size: 1.75rem; }
+.demo-badge { margin-top: 8px; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: 0.8125rem; line-height: 1.45; }
+.demo-badge.is-demo { color: var(--color-primary); background: var(--color-primary-soft); border-color: var(--color-primary-soft); font-weight: 600; }
+.demo-badge.is-warn { border-style: dashed; color: var(--color-text); }
+.demo-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.demo-button { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--color-primary); color: #fff; font: 600 0.9375rem inherit; cursor: pointer; }
+.demo-button input { display: none; }
+.demo-button.is-quiet { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.demo-button.is-disabled, .demo-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.demo-error { color: #b3261e; font-size: 0.875rem; }
+.demo-steps { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.demo-steps li { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); font-size: 0.8125rem; line-height: 1.45; animation: demo-in 240ms ease-out; }
+.demo-step-agent { color: var(--color-text-secondary); font-size: 0.6875rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.demo-step-action { font-weight: 700; }
+.demo-step-receipt { color: var(--color-text-secondary); font: 500 0.75rem ui-monospace, SFMono-Regular, Menlo, monospace; }
+.demo-working { display: flex !important; align-items: center; gap: 10px; color: var(--color-text-secondary); }
+.demo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); animation: demo-pulse 1s ease-in-out infinite; }
+.demo-outcome { display: grid; gap: 8px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--color-primary-soft); font-size: 0.9375rem; line-height: 1.5; }
+.demo-links { display: flex; gap: 18px; font-weight: 600; }
+@keyframes demo-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes demo-pulse { 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .demo-steps li, .demo-dot { animation: none; } }

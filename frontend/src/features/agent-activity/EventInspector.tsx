@@ -1,4 +1,5 @@
 import { AGENTS, AgentIcon, nextLabel, receiptSummary } from './agentMeta'
+import EventDetail from './EventDetail'
 import { refParts } from './traceAdapter'
 import type { TimelineNode } from './traceAdapter'
 
@@ -19,7 +20,8 @@ function Refs({ refs }: { refs: string[] }) {
   )
 }
 
-export default function EventInspector({ node, demo }: { node: TimelineNode | null; demo: boolean }) {
+/** `note` says when a trace is not a live run (scripted sample, hand-written illustration, recorded run). Null for a live run. */
+export default function EventInspector({ node, note }: { node: TimelineNode | null; note: string | null }) {
   if (!node) {
     return (
       <aside className="aa-inspector" aria-live="polite">
@@ -39,7 +41,7 @@ export default function EventInspector({ node, demo }: { node: TimelineNode | nu
       <header className={`aa-inspector-head${node.kind === 'result' && !['SURFACE', 'ASK'].includes(node.result!.run.final_action) ? ' is-quiet' : ''}`}>
         <span className="aa-node-icon"><AgentIcon agent={node.agent} quiet={node.kind === 'result' && !(['SURFACE', 'ASK'].includes(node.result!.run.final_action))} /></span>
         <div>
-          <p className="aa-inspector-eyebrow">{node.agent === 'ZETARIS' ? 'Zetaris · Shared state' : `${title} · ${meta.role}`}</p>
+          <p className="aa-inspector-eyebrow">{event?.agent === 'REPOSITORY' ? 'Demo workspace · Shared state (in-memory, not Zetaris)' : node.agent === 'ZETARIS' ? 'Zetaris · Shared state' : `${title} · ${meta.role}`}</p>
           <h2>{event ? event.action.replace('_', ' ') : node.kind === 'result' ? node.result!.run.final_action.replace('_', ' ') : node.title}</h2>
         </div>
       </header>
@@ -68,6 +70,7 @@ export default function EventInspector({ node, demo }: { node: TimelineNode | nu
         <section><h3>{node.kind === 'state' ? 'Read from shared state' : 'Details'}</h3><p className="aa-reason">{node.detail}</p></section>
       ) : null}
 
+      {event ? <EventDetail event={event} /> : null}
       {event && event.input_refs.length ? <section><h3>Inputs</h3><Refs refs={event.input_refs} /></section> : null}
       {event?.output_ref ? <section><h3>Output</h3><Refs refs={[event.output_ref]} /></section> : null}
 
@@ -87,7 +90,7 @@ export default function EventInspector({ node, demo }: { node: TimelineNode | nu
             <code>{receipt.rawRouted}</code>
           </details>
         </section>
-      ) : event && !placeholder && event.agent !== 'VERIFIER' ? (
+      ) : event && !placeholder && event.agent !== 'VERIFIER' && !['REPOSITORY', 'ZETARIS', 'UPLOAD'].includes(event.agent) && event.action !== 'STATE' && event.action !== 'RETRIEVE' && event.action !== 'DECIDING' ? (
         <section className="aa-routing"><h3>Routing</h3><p className="aa-note">No routing receipt was recorded for this step.</p></section>
       ) : null}
 
@@ -109,7 +112,7 @@ export default function EventInspector({ node, demo }: { node: TimelineNode | nu
       <footer className="aa-inspector-foot">
         {event?.timestamp ? <span>{time(event.timestamp)}</span> : null}
         {event?.run_id ? <span>{event.run_id}</span> : null}
-        {demo ? <span>demo trace</span> : null}
+        {note ? <span>{note}</span> : null}
       </footer>
     </aside>
   )

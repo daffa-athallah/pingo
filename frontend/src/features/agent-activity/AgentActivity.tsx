@@ -8,7 +8,7 @@ import { timelineKeyForMapNode } from './mapModel'
 import type { MapNodeId } from './mapModel'
 import { buildTimeline } from './traceAdapter'
 import { demoRuns } from './demoRuns'
-import type { Annotations, DemoRun, RunResult } from './types'
+import type { Annotations, DemoRun, RunProvenance, RunResult } from './types'
 import './agent-activity.css'
 
 const ARCHITECTURE = [
@@ -25,6 +25,8 @@ interface Props {
   demos?: DemoRun[]
   /** Live Zetaris counts. When present the footer reports the real connection instead of a placeholder. */
   zetaris?: { connected: boolean; evidence: number; entities: number; open_loops: number } | null
+  /** Says what the shared state is when it is not Zetaris (for example the resettable demo workspace). */
+  workspaceNote?: string
 }
 
 function usePrefersReducedMotion() {
@@ -52,15 +54,26 @@ function useMediaQuery(query: string) {
   return matches
 }
 
+// Never call anything a real run unless real models produced it.
+const PROVENANCE_BADGE: Record<RunProvenance, string> = {
+  live: 'Real run', scripted: 'Scripted sample', recorded: 'Recorded real run', illustration: 'Hand-written illustration',
+}
+const PROVENANCE_NOTE: Record<RunProvenance, string> = {
+  live: '', scripted: 'scripted sample: no model was called', recorded: 'recorded real run, replayed', illustration: 'hand-written illustration, not a run',
+}
+
 const STEP_MS: Record<string, number> = { input: 260, state: 260, event: 900, result: 800 }
 
-export default function AgentActivity({ runs, annotations, live = false, demos, zetaris }: Props) {
+export default function AgentActivity({ runs, annotations, live = false, demos, zetaris, workspaceNote }: Props) {
   const sets = demos && demos.length ? demos : demoRuns
   const reduced = usePrefersReducedMotion()
   const [params, setParams] = useSearchParams()
   const demoId = params.get('demo') ?? sets[0].id
   const setDemoId = (id: string) => setParams({ demo: id }, { replace: true })
   const demo: DemoRun | undefined = runs ? undefined : sets.find((d) => d.id === demoId) ?? sets[0]
+  const provenance: RunProvenance = demo?.provenance ?? 'illustration'
+  const running = Boolean(live || demo?.status === 'running')
+  const note = demo && provenance !== 'live' ? PROVENANCE_NOTE[provenance] : null
   const timeline = useMemo(() => buildTimeline(runs ?? demo!.runs, annotations ?? demo?.annotations), [runs, annotations, demo])
   const total = timeline.nodes.length
   const [visibleCount, setVisibleCount] = useState(reduced ? total : 1)
@@ -79,9 +92,9 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
   }, [reduced, total])
 
   useEffect(() => {
-    if (live) setPlaying(true)
+    if (running) setPlaying(true)
     else restart()
-  }, [timeline, restart, live])
+  }, [timeline, restart, running])
 
   useEffect(() => {
     if (!playing) return undefined
@@ -116,7 +129,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
       <header className="aa-header">
         <div className="aa-title-row">
           <h1>Agent Activity</h1>
-          {demo ? <span className={`aa-demo-badge${demos ? ' is-live' : ''}`}>{demos ? 'Real run' : 'Demo trace'}</span> : <span className="aa-demo-badge is-live">{live ? 'Live' : 'Run trace'}</span>}
+          {demo ? <span className={`aa-demo-badge is-${provenance}`}>{running ? `${PROVENANCE_BADGE[provenance]} · in progress` : PROVENANCE_BADGE[provenance]}</span> : <span className="aa-demo-badge is-live">{live ? 'Live' : 'Run trace'}</span>}
         </div>
         <p className="aa-tagline">No single model call decides what the user sees.</p>
         <ul className="aa-architecture" aria-label="Architecture">
@@ -131,7 +144,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
           ))}
         </div>
       ) : null}
-      {demo ? <p className="aa-blurb">{demo.blurb}</p> : null}
+      {demo ? <p className="aa-blurb">{demo.blurb}{provenance === 'illustration' ? ' These traces are written by hand and shipped with the frontend. No model produced them; run a real upload or evaluation to see a real one.' : ''}</p> : null}
 
       <div className="aa-toolbar">
         <RunSummary timeline={timeline} />
@@ -156,7 +169,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
           <ExecutionGraph timeline={timeline} visibleCount={visibleCount} selectedKey={selected?.key ?? null} onSelect={select} animate={!reduced} playing={playing} />
         )}
         <div className="aa-side" ref={inspectorRef}>
-          <EventInspector node={selected ?? null} demo={Boolean(demo) && !demos} />
+          <EventInspector node={selected ?? null} note={note} />
         </div>
       </div>
 
@@ -164,6 +177,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
         <p>No Recall without evidence. No interruption without context.</p>
         {zetaris?.connected
           ? <p>Connected to Zetaris: {zetaris.evidence} evidence, {zetaris.entities} entities, {zetaris.open_loops} open loops.</p>
+          : workspaceNote ? <p>{workspaceNote}</p>
           : <p>Zetaris integration is a placeholder in this view. Steps shown as shared state are not claimed as Zetaris queries.</p>}
       </footer>
     </div>

@@ -1,6 +1,6 @@
 import { agentKey, isZetarisPlaceholder, RANK } from './agentMeta'
 import type { AgentKey } from './agentMeta'
-import type { Annotations, FinalAction, RunResult, TraceEvent } from './types'
+import type { Annotations, FinalAction, FinishedRun, RunResult, TraceEvent } from './types'
 
 export type NodeKind = 'input' | 'state' | 'event' | 'result'
 export type Lane = 'main' | 'branch'
@@ -20,7 +20,7 @@ export interface TimelineNode {
   placeholder?: boolean
   /** Shown above the node when a later run continues the story. */
   breakBefore?: string
-  result?: { run: RunResult }
+  result?: { run: FinishedRun }
 }
 
 export interface TimelineEdge {
@@ -38,7 +38,7 @@ export interface Timeline {
     steps: number
     revisions: number
     verifications: number
-    finalAction: FinalAction
+    finalAction: FinalAction | 'RUNNING'
     last: RunResult
   }
 }
@@ -62,15 +62,18 @@ export function buildTimeline(runs: RunResult[], annotations: Annotations = {}):
   let step = 0
 
   runs.forEach((run, runIndex) => {
-    const events = run.trace_events
+    // Run bookkeeping (received / done) is the input node and the result node, not steps of their own.
+    const events = run.trace_events.filter((e) => e.agent !== 'RUN' && !(e.agent === 'UPLOAD' && e.action === 'RECEIVED'))
+    const received = run.trace_events.find((e) => e.agent === 'UPLOAD' && e.action === 'RECEIVED')
     const runNodes: TimelineNode[] = []
     const note = annotations.inputs?.[runIndex]
     const breakBefore = runIndex > 0 ? (run.run_type === 'CONTEXT_EVALUATION' ? 'Later, a context event arrives' : 'Next run') : undefined
 
     if (run.run_type === 'EVIDENCE_INGESTION') {
-      const image = events[0]?.input_refs.find((ref) => ref.startsWith('image:'))?.slice(6)
+      const image = (events[0] ?? received)?.input_refs.find((ref) => ref.startsWith('image:'))?.slice(6)
+      const bytes = typeof received?.detail?.bytes === 'number' ? ` · ${Math.max(1, Math.round(received.detail.bytes / 1024))} KB` : ''
       runNodes.push({ key: `r${runIndex}-input`, kind: 'input', agent: 'SOURCE', lane: 'main', runIndex, title: note?.title ?? 'Screenshot',
-        detail: note?.detail ?? image, breakBefore })
+        detail: note?.detail ?? (image ? image + bytes : undefined), breakBefore })
     } else {
       const ids = events.flatMap((e) => e.input_refs.filter((ref) => ref.startsWith('context:')).map((ref) => ref.slice(8)))
       runNodes.push({ key: `r${runIndex}-input`, kind: 'input', agent: 'SOURCE', lane: 'main', runIndex, title: note?.title ?? 'Context event',
@@ -87,8 +90,9 @@ export function buildTimeline(runs: RunResult[], annotations: Annotations = {}):
         title: event.agent, headline: annotations.headlines?.[`${runIndex}:${eventIndex}`], placeholder: isZetarisPlaceholder(event.agent) })
     })
 
-    if (runIndex === runs.length - 1) {
-      runNodes.push({ key: `r${runIndex}-result`, kind: 'result', agent: 'RESULT', lane: 'main', runIndex, title: run.final_action, result: { run } })
+    // A run still executing has no outcome yet; its result node appears when it finishes.
+    if (runIndex === runs.length - 1 && run.final_action) {
+      runNodes.push({ key: `r${runIndex}-result`, kind: 'result', agent: 'RESULT', lane: 'main', runIndex, title: run.final_action, result: { run: run as FinishedRun } })
     }
 
     // Lane + edge classification: any hop to an earlier pipeline stage is a return; the branch lane lasts
@@ -126,7 +130,7 @@ export function buildTimeline(runs: RunResult[], annotations: Annotations = {}):
       steps: step,
       revisions: runs.reduce((n, r) => n + r.revision_count, 0),
       verifications: runs.reduce((n, r) => n + r.verification_count, 0),
-      finalAction: last.final_action,
+      finalAction: last.final_action ?? 'RUNNING',
       last,
     },
   }

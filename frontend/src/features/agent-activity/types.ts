@@ -17,15 +17,25 @@ export interface TraceEvent {
   next_step: string | null
   output_ref: string | null
   receipt: Receipt | null
+  /** Position within the run (1-based). Present on runs recorded while they execute. */
+  seq?: number
+  /** Structured inputs, retrievals, decisions and state changes for this step. Never model reasoning. */
+  detail?: Record<string, unknown> | null
 }
 
 export type RunType = 'EVIDENCE_INGESTION' | 'CONTEXT_EVALUATION'
+/** Who produced a run: live = real models, scripted = the credential-free sample fixture, recorded = a captured real run replayed.
+ *  illustration = hand-written fixture shipped with the frontend; it is not a run at all. */
+export type Provenance = 'live' | 'scripted' | 'recorded'
+export type RunProvenance = Provenance | 'illustration'
+export type RunStatus = 'running' | 'done' | 'failed'
 export type FinalAction = 'STORED' | 'SURFACE' | 'STAY_SILENT' | 'ASK' | 'FAILED_SAFE'
 
 export interface RunResult {
   run_id: string
   run_type: RunType
-  final_action: FinalAction
+  /** null while the run is still executing */
+  final_action: FinalAction | null
   loop_id: string | null
   evidence_id: string | null
   message_payload: Record<string, unknown> | null
@@ -35,6 +45,9 @@ export interface RunResult {
   verification_count: number
   trace_events: TraceEvent[]
 }
+
+/** A run that has finished and therefore has a final decision. */
+export type FinishedRun = RunResult & { final_action: FinalAction }
 
 /** Presentation-only extras for fixtures. Live runs do not need them. */
 export interface Annotations {
@@ -52,4 +65,8 @@ export interface DemoRun {
   blurb: string
   runs: RunResult[]
   annotations: Annotations
+  /** Missing means the static illustrations in demoRuns.ts. */
+  provenance?: RunProvenance
+  status?: RunStatus
+  workspace?: string
 }
