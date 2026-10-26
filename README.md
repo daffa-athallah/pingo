@@ -42,14 +42,14 @@ curl http://localhost:8000/agent-events/run_sample_revision
 
 The API returns structured decisions, evidence references, concise reasons and receipts. It does not request or show chain of thought. [Complete API](docs/api.md).
 
-## Modes: how to turn sample mode off
+## Modes: switching between sample and live
 
-| You want | Do this | Needs |
-| --- | --- | --- |
-| Look around, offline (default) | `docker compose up --build` | Nothing. No keys. |
-| **Your own screenshot or calendar event, real models** | Put the lines below in a `.env` file at the repo root, then `docker compose up --build` again. The sample workspace stays in memory and is resettable; the **Try it** tab links to the upload page. | A Meterless Nightshift instance |
-| Same, without Docker | `backend/.env` with `METERLESS_*`, then `serve.py --demo` (port 8100, resettable) | Nightshift, Python |
-| Full system on real Zetaris data | `SAMPLE_MODE=false` via `compose.zetaris.yaml` or `serve.py --env-file backend/.env` | Zetaris + Nightshift |
+| Mode | Start | Open | Needs |
+| --- | --- | --- | --- |
+| **Sample** (default, offline) | `docker compose up --build` | http://localhost:5175 | Nothing. No keys. |
+| **Sample + your own input, real models** | Create `.env` at the repo root (below), then `docker compose up --build` again | http://localhost:5175, then **Try it → your own screenshot** (`/demo`) | A Meterless Nightshift instance |
+| **Demo** (no Docker; real models, resettable) | `backend/.env` with `METERLESS_*`, then the two commands below | http://localhost:5175/demo | Nightshift, Python, Node |
+| **Full** (real Zetaris data) | `docker compose -f compose.yaml -f compose.zetaris.yaml up --build` or `serve.py --env-file backend/.env` | http://localhost:5175 | Zetaris platform + Nightshift |
 
 ```sh
 # .env at the repo root (never committed). From Docker, a Nightshift on your machine is reached through host.docker.internal.
@@ -59,7 +59,15 @@ METERLESS_VISION_MODEL=gpt-4o-mini
 METERLESS_REASONING_MODEL=nvidia/nemotron-3-ultra-550b-a55b
 ```
 
-`SAMPLE_MODE=false` without Zetaris does **not** fall back to sample data: the backend reports that storage is unavailable. Run provenance is always shown (`recorded` for replays, `live` for real model calls).
+```sh
+# Demo mode without Docker: backend on 8100, frontend pointed at it
+backend/.venv/bin/python backend/scripts/serve.py --demo
+cd frontend && npm ci && VITE_API_BASE_URL=http://localhost:8100 npm run dev -- --host 127.0.0.1 --port 5175
+```
+
+**Back to sample:** delete (or rename) the root `.env` and run `docker compose up --build` again, or stop the demo servers. The page header says which mode you are in, and every run is labelled `recorded` (replayed capture) or `live` (real model calls). `POST /api/sample/reset` (sample) and `POST /api/demo/reset` (demo) restore the saved history.
+
+`SAMPLE_MODE=false` without Zetaris does **not** fall back to sample data: the backend reports that storage is unavailable.
 
 ## Run with Python
 
