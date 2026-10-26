@@ -90,7 +90,7 @@ Guarantees:
 - **Read-only.** An evaluation never changes stored loops, Evidence or Check-ins. If the Critic asks for a loop revision, the trace shows it and the change is discarded afterwards.
 - **Privacy gate.** Events whose title or place looks private (health, money, legal and similar, English and Indonesian) are dropped locally before any model sees them and listed in `skipped_events` without their title. It is a word list, not a classifier.
 - `message` is ready to show: the loop's short name and the Critic's own reason. No extra model call writes it. It is `null` unless the decision is `SURFACE` or `ASK`.
-- `provenance` says who answered: `live` (real models), `scripted` (the credential-free sample fixture; never present it as a real decision), `recorded` (reserved). `workspace` says which data it ran on: `canonical`, `demo` or `sample`.
+- `provenance` says who answered: `live` (real models), `recorded` (a captured real run replayed through the unchanged agents, sample mode; never present it as a fresh decision), `scripted` (legacy label, no longer produced). `workspace` says which data it ran on: `canonical`, `demo` or `sample`.
 - Each run is saved (`GET /api/runs/{run_id}`) and can be opened in Agent Activity via `GET /agent-events/{run_id}`.
 - Errors: `422` invalid request, `503` model gateway unavailable (the message is safe, no provider output).
 
@@ -158,11 +158,11 @@ Storage is labelled for what it is: `ZETARIS` only when the repository really is
 
 | Field | Values |
 | --- | --- |
-| `provenance` | `live` real models answered; `scripted` the credential-free sample fixture answered; `recorded` reserved for a replayed real run |
+| `provenance` | `live` real models answered; `recorded` a captured real run replayed through the unchanged agents; `scripted` legacy, no longer produced |
 | `workspace` | `canonical` real Zetaris data; `demo` the resettable in-memory demo workspace; `sample` the offline fixture |
 | `synthetic_inputs` | `true` when the inputs (calendar events, test images) are demo input |
 
-Never label `scripted` or `illustration` activity as a real run. The sample backend lists one `scripted` run; the frontend's hand-written traces are `illustration`.
+Never label `scripted` or `illustration` activity as a real run. The sample backend lists `recorded` runs; the frontend's hand-written traces are `illustration`.
 
 `GET /health` reports `mode`, `workspace` and, in the demo workspace, `demo_workspace` (storage, snapshot counts).
 

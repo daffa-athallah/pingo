@@ -10,6 +10,8 @@ services:
       METERLESS_API_KEY: ${METERLESS_API_KEY:-}
       METERLESS_VISION_MODEL: ${METERLESS_VISION_MODEL:-gpt-4o-mini}
       METERLESS_REASONING_MODEL: ${METERLESS_REASONING_MODEL:-nvidia/nemotron-3-ultra-550b-a55b}
+    volumes:
+      - ./logs:/app/logs  # agent traces (trace.jsonl) appear here on the host
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
