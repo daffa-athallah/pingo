@@ -94,6 +94,19 @@ def _read_report(path):
         return {}
 
 
+def _saved_runs():
+    """Real reasoning runs saved by backend/scripts (context_eval, process_open_loops). Read-only."""
+    runs = {}
+    for path in sorted((RUNTIME / 'context_eval').glob('context-eval-*.json')):
+        for name, scenario in _read_report(path).get('scenarios', {}).items():
+            result = scenario.get('result', {})
+            if result.get('run_id'):
+                runs[result['run_id']] = {'run_id': result['run_id'], 'kind': 'context_critic', 'scenario': name,
+                                          'synthetic_context': bool(scenario.get('synthetic')), 'final_action': result.get('final_action'),
+                                          'trace_events': result.get('trace_events', [])}
+    return runs
+
+
 @app.get('/integration-status')
 def integration_status(request: Request):
     # Separate metadata, not invented TraceEvents or a forced visualization state.
@@ -110,7 +123,13 @@ def integration_status(request: Request):
     orchestrator = bool(roundtrip and run.get('verified') and run.get('kind') == 'real_zetaris_orchestrator_run' and run.get('evidence_id') == proof.get('evidence_id'))
     receipts = {label: {key: proof.get('receipts', {}).get(label, {}).get(key) for key in ('requested_model', 'routed_model', 'provider')}
                 for label in ('perception', 'reasoning')} if roundtrip else {}
-    return {'repository': type(repository).__name__, 'mode': request.app.state.mode,
+    zetaris = None
+    if request.app.state.mode == 'real':
+        # Live counts from the repository; no cached or invented values.
+        zetaris = {'connected': True, 'evidence': len(repository.list_evidence()), 'entities': len(repository.list_entities()),
+                   'open_loops': len(repository.get_active_open_loops(limit=1000))}
+    return {'zetaris': zetaris, 'saved_reasoning_runs': [{k: v for k, v in r.items() if k != 'trace_events'} for r in _saved_runs().values()],
+            'repository': type(repository).__name__, 'mode': request.app.state.mode,
             'real_roundtrip_verified': roundtrip, 'real_orchestrator_verified': orchestrator,
             'status': 'verified' if orchestrator else 'integration_pending',
             'receipts': receipts,
@@ -124,5 +143,8 @@ def agent_events(request: Request, run_id: str):
     else:
         result = _read_report(RUNTIME / 'proofs/IMG_8922.run.json').get('result', {})
     if result.get('run_id') != run_id:
-        raise HTTPException(status_code=404, detail='Run not found.')
+        saved = _saved_runs().get(run_id) if request.app.state.mode == 'real' else None
+        if saved is None:
+            raise HTTPException(status_code=404, detail='Run not found.')
+        return saved['trace_events']
     return result.get('trace_events', [])

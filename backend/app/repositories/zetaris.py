@@ -151,6 +151,12 @@ class ZetarisRepository:
             row = self._row('evidence', [evidence_id])
             return Evidence(*row) if row else None
 
+    def list_evidence(self) -> list[Evidence]:
+        """Read-only helper in stable order (timestamp, then ID); the agent protocol remains unchanged."""
+        with self._lock:
+            rows = self.connection.query(f'SELECT {self._fields("evidence")} FROM {self._table("evidence")} ORDER BY timestamp, evidence_id')
+            return [Evidence(*row) for row in rows]
+
     def get_evidence_entities(self, evidence_ids: Sequence[str]) -> list[EvidenceEntity]:
         """Read actual persisted edges for storage verification and provenance."""
         with self._lock:
