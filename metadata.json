@@ -1,5 +1,5 @@
 {
-  "name": "Recall",
+  "name": "Pingo",
   "track": "Reasoning Architecture",
   "sponsor_technology": {
     "zetaris": {
@@ -23,5 +23,6 @@
       "role": "Not used"
     }
   },
-  "see": "docs/sponsors.md"
+  "see": "docs/sponsors.md",
+  "code_name": "Recall"
 }

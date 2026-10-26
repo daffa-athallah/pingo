@@ -1,4 +1,6 @@
-# Recall
+# Pingo (repository and code name: Recall)
+
+> The product is called **Pingo**. The repository, code, API and these docs say "Recall" for the same system.
 
 **Saved screenshots → grounded intentions → reminders when they are useful.**
 
