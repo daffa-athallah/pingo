@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import BottomNav from './BottomNav'
 import NotificationCenter from '../../features/notifications/NotificationCenter'
 import JudgeGuide from '../../features/demo/JudgeGuide'
+import SaveScreenshotButton from '../../features/demo/SaveScreenshotButton'
 import NotificationSetup from '../../features/notifications/NotificationSetup'
 
 export default function AppShell() {
@@ -25,6 +26,7 @@ export default function AppShell() {
       <NotificationCenter />
       <BottomNav />
       <JudgeGuide />
+      <SaveScreenshotButton />
     </div>
   )
 }
