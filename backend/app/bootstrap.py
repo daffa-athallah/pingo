@@ -5,6 +5,17 @@ import os
 from backend.app.repositories.memory import InMemoryLoopRepository
 
 
+def app_mode() -> str:
+    """'sample' (credential-free scripted fixture), 'demo' (resettable in-memory workspace, real models) or 'real' (Zetaris).
+    Chosen explicitly by SAMPLE_MODE=true or RECALL_MODE=demo; there is no automatic fallback between them."""
+    demo = os.environ.get('RECALL_MODE', '').strip().lower()
+    if demo not in ('', 'demo', 'real'):
+        raise ValueError('RECALL_MODE must be demo or real.')
+    if sample_mode() and demo == 'demo':
+        raise ValueError('SAMPLE_MODE=true and RECALL_MODE=demo cannot both be set.')
+    return 'sample' if sample_mode() else 'demo' if demo == 'demo' else 'real'
+
+
 def sample_mode() -> bool:
     value = os.environ.get('SAMPLE_MODE', 'false').strip().lower()
     if value not in ('true', 'false'):
@@ -17,6 +28,11 @@ def open_repository():
     if sample_mode():
         # No Zetaris module import, JVM startup, credential check or network access.
         yield InMemoryLoopRepository()
+        return
+    if app_mode() == 'demo':
+        # Resettable in-memory workspace seeded from a snapshot of the canonical history. Real models, no Zetaris writes.
+        from backend.app.demo_workspace import open_demo_repository
+        yield open_demo_repository()
         return
     from backend.app.adapters.zetaris import JdbcSettings, ZetarisJdbc
     from backend.app.repositories.zetaris import ZetarisRepository

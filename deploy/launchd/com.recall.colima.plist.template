@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.recall.colima</string>
+  <key>ProgramArguments</key><array><string>/bin/bash</string><string>-c</string><string>colima status >/dev/null 2>&amp;1 || colima start</string></array>
+  <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>{{HOME}}/Library/Logs/recall/colima.log</string>
+  <key>StandardErrorPath</key><string>{{HOME}}/Library/Logs/recall/colima.log</string>
+</dict></plist>

@@ -39,6 +39,8 @@ backend/.venv/bin/python backend/scripts/process_open_loops.py         # Open Lo
 backend/.venv/bin/python backend/scripts/inspect_open_loops.py         # human-readable result
 backend/.venv/bin/python backend/scripts/context_eval.py --suburb "<place from the loop's Evidence>"  # synthetic context vs a real loop
 backend/.venv/bin/python backend/scripts/revision_fixture.py           # labelled Critic -> Open Loop -> Critic fixture
+backend/.venv/bin/python backend/scripts/serve.py --demo               # resettable demo workspace (port 8100): real models, in-memory data, Zetaris untouched
+backend/.venv/bin/python backend/scripts/upload_e2e.py                 # acceptance run against it: upload three images, watch the steps arrive live
 backend/.venv/bin/python backend/scripts/daily_check_ins.py            # daily: Critic reviews look-alike loops, merges or files Check-in questions
 backend/.venv/bin/python backend/scripts/consolidation_fixture.py      # labelled fixture exercising MERGE / ASK / KEEP_SEPARATE
 backend/.venv/bin/python -m unittest discover -s backend/tests         # offline tests
@@ -67,11 +69,15 @@ Rules to keep when changing things:
 - Nightshift has a loose response cache. Every reasoning payload carries a unique `request_id`; keep it, or a similar prompt can return another record's answer.
 - Different variants (colourway, size, dish, place) are different loops. Only the exact same item is merged; look-alikes go to the Critic's duplicate review, and uncertain ones to the daily Check-in.
 - Check-in questions belong to one day and do not carry over (`GET /api/check-ins` returns today's). Run `daily_check_ins.py` once a day (cron or launchd).
+- Every run says where it came from (`provenance`: live / scripted / recorded) and which data it used (`workspace`: canonical / demo / sample). Never show scripted, replayed or hand-written activity as a real run.
+- Observability (`app/observe.py`) wraps the gateway, repository and `decide` at the composition boundary. It never changes a decision, it exposes only structured inputs, retrievals, decisions, receipts and state changes (no model reasoning), and a failing observer cannot break a run.
 - Context events are synthetic until calendar/location sources exist; label them as test input.
 - Web/news search for Context is not implemented.
 - Tune behaviour in the prompt and in what the agent is shown (retrieval), then re-run the real-data scripts above and check the receipts. Do not loosen a validator to make output pass.
 
-**API for the UI:** [docs/api.md](docs/api.md) lists every endpoint, including `POST /api/context/evaluate` (Context → Critic for events a device reports) and phone access over Tailscale (`RECALL_CORS_ORIGINS`).
+**Demo machine:** [docs/operations.md](docs/operations.md): `backend/scripts/preflight.py` checks every dependency (PASS/WARN/FAIL with the fix), and `deploy/install_launchd.sh install` makes the API auto-start/restart and keeps the Mac awake.
+
+**API for the UI:** [docs/api.md](docs/api.md) lists every endpoint, including `POST /api/screenshots` (save a screenshot: Evidence → Open Loop, 202 + run_id, observable steps) and `POST /api/context/evaluate` (Context → Critic for events a device reports) and phone access over Tailscale (`RECALL_CORS_ORIGINS`).
 
 **Agent Activity** renders `TraceEvent`s. In real mode, `GET /agent-events/{run_id}` serves saved real runs and `GET /integration-status` reports live Zetaris counts.
 

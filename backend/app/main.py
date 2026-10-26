@@ -1,5 +1,6 @@
 """Small read-only HTTP composition layer. Agents and the visual frontend are unchanged."""
 from contextlib import asynccontextmanager
+import asyncio
 from collections import defaultdict
 from dataclasses import asdict, replace
 from datetime import datetime, timezone
@@ -16,9 +17,13 @@ from pydantic import BaseModel, Field
 from zoneinfo import ZoneInfo
 
 from backend.app.adapters.zetaris import ZetarisError
-from backend.app.bootstrap import open_repository, sample_mode
-from backend.app.context_api import LIVE_RUNS, router as context_router
+from backend.app.bootstrap import app_mode, open_repository
+from backend.app.context_api import router as context_router
+from backend.app.demo_workspace import SnapshotError, read_snapshot, seed, workspace_info
 from backend.app.orchestration.consolidation import apply_merge, short
+from backend.app.runs import RunStore, summary
+from backend.app.runs_api import router as runs_router, workspace_runs
+from backend.app.upload_api import router as upload_router
 
 RUNTIME = Path(__file__).resolve().parents[1] / 'runtime'
 SCREENSHOTS = Path(os.environ.get('RECALL_SCREENSHOT_DIR') or Path(__file__).resolve().parents[2] / 'screenshot')
@@ -28,17 +33,38 @@ TIMEZONE = ZoneInfo(os.environ.get('RECALL_TIMEZONE', 'Australia/Melbourne'))
 CHECK_IN_RESPONSES = {'same', 'different', 'related', 'other'}
 
 
+def _paths(mode: str) -> tuple[Path, Path]:
+    """(uploads, saved runs). The demo workspace keeps its own folders so it can never mix with canonical data."""
+    base = RUNTIME if mode == 'real' else RUNTIME / 'demo'
+    return base / 'uploads', base / 'live_runs'
+
+
 @asynccontextmanager
 async def lifespan(app):
+    mode = app_mode()
+    _view_cache.clear()
     with open_repository() as repository:
+        uploads, run_dir = _paths(mode)
         app.state.repository = repository
-        app.state.mode = 'sample' if sample_mode() else 'real'
+        app.state.mode = mode
+        app.state.workspace = {'real': 'canonical', 'demo': 'demo', 'sample': 'sample'}[mode]
+        app.state.uploads_dir = uploads
+        app.state.image_dirs = [] if mode == 'sample' else [SCREENSHOTS, uploads]
+        app.state.runs = RunStore(app.state.workspace, None if mode == 'sample' else run_dir)
+        app.state.write_lock = asyncio.Lock()  # Zetaris is safe with one writer: uploads are processed one at a time
+        app.state.tasks = set()  # background upload runs, kept referenced until they finish
+        app.state.on_data_changed = lambda: _refresh_views(repository)
         app.state.sample = None
-        if sample_mode():
+        app.state.demo_info = workspace_info() if mode == 'demo' else None
+        if mode == 'sample':
             from backend.app.sample import run_sample
             app.state.sample = await run_sample(repository)
+            scripted = app.state.sample['result']
+            app.state.runs.add_finished({'run_id': scripted['run_id'], 'kind': 'scripted_sample', 'label': 'Scripted sample', 'provenance': 'scripted',
+                                         'workspace': 'sample', 'synthetic_inputs': True, 'status': 'done', 'started_at': None,
+                                         'finished_at': None, 'result': scripted})
         else:
-            # Warm the slow Zetaris reads so the first screen does not wait.
+            # Warm the slow reads (Zetaris) so the first screen does not wait. Instant for the in-memory demo workspace.
             Thread(target=lambda: (_cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}),
                                    _cached('loops', lambda: _loop_views(repository)),
                                    _cached('zetaris', lambda: _zetaris_counts(repository))), daemon=True).start()
@@ -54,6 +80,8 @@ _ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:
 app.add_middleware(CORSMiddleware, allow_origins=_ORIGINS, allow_origin_regex=os.environ.get('RECALL_CORS_ORIGIN_REGEX') or None,
                    allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
 app.include_router(context_router)
+app.include_router(upload_router)
+app.include_router(runs_router)
 
 
 @app.exception_handler(ZetarisError)
@@ -63,8 +91,10 @@ async def storage_error(request, error):
 
 @app.get('/health')
 def health(request: Request):
-    return {'status': 'ok', 'mode': request.app.state.mode, 'repository': type(request.app.state.repository).__name__,
-            'external_models_used': False if request.app.state.mode == 'sample' else None}
+    state = request.app.state
+    return {'status': 'ok', 'mode': state.mode, 'workspace': state.workspace, 'repository': type(state.repository).__name__,
+            'external_models_used': False if state.mode == 'sample' else None,
+            **({'demo_workspace': state.demo_info} if state.demo_info else {})}
 
 
 def entity_view(repository, entity):
@@ -82,13 +112,7 @@ def entity_view(repository, entity):
 @app.get('/entities')
 def entities(request: Request, domain: str | None = None):
     repository = request.app.state.repository
-    if request.app.state.mode == 'sample':
-        items = sorted(repository.entities.values(), key=lambda item: item.entity_id)
-        if domain is not None:
-            items = [item for item in items if item.domain == domain]
-    else:
-        items = repository.list_entities(domain=domain)
-    return [entity_view(repository, entity) for entity in items]
+    return [entity_view(repository, entity) for entity in repository.list_entities(domain=domain)]
 
 
 @app.get('/entities/{entity_id}')
@@ -139,6 +163,15 @@ def _cached(key, build):
     return hit[1]
 
 
+def _refresh_views(repository):
+    """Stored data changed (an upload): drop the cached reads and rebuild them in the background."""
+    with _view_lock:
+        for key in ('loops', 'evidence', 'zetaris'):
+            _view_cache.pop(key, None)
+    Thread(target=lambda: (_cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}),
+                           _cached('loops', lambda: _loop_views(repository))), daemon=True).start()
+
+
 def _zetaris_counts(repository):
     return {'connected': True, 'evidence': len(repository.list_evidence()), 'entities': len(repository.list_entities()),
             'open_loops': len(repository.get_active_open_loops(limit=1000))}
@@ -147,14 +180,10 @@ def _zetaris_counts(repository):
 def _evidence_by_entity(repository, entity_ids):
     """entity_id -> Evidence, in a constant number of queries on Zetaris."""
     by_entity = defaultdict(list)
-    if hasattr(repository, 'list_evidence'):
-        evidence = {item.evidence_id: item for item in repository.list_evidence()}
-        for edge in repository.get_evidence_entities(list(evidence)):
-            if edge.entity_id in entity_ids:
-                by_entity[edge.entity_id].append(evidence[edge.evidence_id])
-    else:
-        for entity_id in entity_ids:
-            by_entity[entity_id] = repository.get_related_evidence([entity_id], limit=1000)
+    evidence = {item.evidence_id: item for item in repository.list_evidence()}
+    for edge in repository.get_evidence_entities(list(evidence)):
+        if edge.entity_id in entity_ids:
+            by_entity[edge.entity_id].append(evidence[edge.evidence_id])
     return by_entity
 
 
@@ -225,15 +254,14 @@ def _thumbnail(source: Path, evidence_id: str, width: int) -> Path:
 @app.get('/evidence/{evidence_id}/image')
 def evidence_image(request: Request, evidence_id: str, w: int = 800):
     repository = request.app.state.repository
-    if hasattr(repository, 'list_evidence'):
-        evidence = _cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}).get(evidence_id)
-    else:
-        evidence = repository.get_evidence(evidence_id)
+    evidence = _cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}).get(evidence_id)
     # Sensitive Evidence never leaves the repository, and only a plain basename inside the screenshot folder is served.
     if evidence is None or evidence.sensitive or not evidence.image_ref or Path(evidence.image_ref).name != evidence.image_ref:
         raise HTTPException(status_code=404, detail='Image not found.')
-    path = (SCREENSHOTS / evidence.image_ref).resolve()
-    if path.parent != SCREENSHOTS.resolve() or not path.is_file():
+    # The imported screenshots live in SCREENSHOTS, this workspace's uploads in its own folder; only a plain basename inside one is served.
+    path = next((candidate for folder in request.app.state.image_dirs if (candidate := (folder / evidence.image_ref).resolve()).parent == folder.resolve()
+                 and candidate.is_file()), None)
+    if path is None:
         raise HTTPException(status_code=404, detail='Image not found.')
     try:
         path = _thumbnail(path, evidence.evidence_id, min(max(w, 128), 1600))
@@ -253,11 +281,11 @@ def check_ins(request: Request):
     repository = request.app.state.repository
     if not hasattr(repository, 'get_check_ins'):
         return {'questions': []}
-    views = {v['loop_id']: v for v in _cached('loops', lambda: _loop_views(repository))} if request.app.state.mode == 'real' else {}
+    views = {v['loop_id']: v for v in _cached('loops', lambda: _loop_views(repository))} if request.app.state.mode != 'sample' else {}
     base = str(request.base_url).rstrip('/')
     questions = []
     for item in repository.get_check_ins(day=_today(), status='PENDING'):
-        if request.app.state.mode == 'real' and not all(i in views for i in (item.loop_id, item.other_loop_id) if i):
+        if request.app.state.mode != 'sample' and not all(i in views for i in (item.loop_id, item.other_loop_id) if i):
             continue  # a loop was merged or retired since the question was made
         question = dict(item.question)
         question['supporting_images'] = [
@@ -298,7 +326,7 @@ def respond_to_check_in(request: Request, check_in_id: str, answer: CheckInAnswe
 @app.get('/sample')
 def sample(request: Request):
     if request.app.state.mode != 'sample':
-        raise HTTPException(status_code=404, detail='Sample fixtures are disabled in real mode.')
+        raise HTTPException(status_code=404, detail='The scripted sample fixture exists only in SAMPLE_MODE.')
     return request.app.state.sample
 
 
@@ -310,52 +338,15 @@ def _read_report(path):
         return {}
 
 
-def _saved_runs():
-    """Real reasoning runs saved by backend/scripts (context_eval, process_open_loops). Read-only."""
-    runs = {}
-    folder = RUNTIME / 'context_eval'
-    for path in sorted(folder.glob('context-eval-*.json')):
-        for name, scenario in _read_report(path).get('scenarios', {}).items():
-            result = scenario.get('result', {})
-            if result.get('run_id'):
-                runs[result['run_id']] = {'run_id': result['run_id'], 'kind': 'context_critic', 'scenario': name,
-                                          'synthetic_context': bool(scenario.get('synthetic')), 'final_action': result.get('final_action'),
-                                          'trace_events': result.get('trace_events', []), 'result': result, 'source_file': path.name,
-                                          'context_event': scenario.get('context_event'), 'loop_title': _read_report(path).get('loop_title')}
-    for path in sorted(folder.glob('revision-fixture-*.json')):
-        report = _read_report(path)
-        result = report.get('result', {})
-        if result.get('run_id'):
-            runs[result['run_id']] = {'run_id': result['run_id'], 'kind': 'revision_fixture', 'scenario': 'revision', 'synthetic_context': True,
-                                      'final_action': result.get('final_action'), 'trace_events': result.get('trace_events', []),
-                                      'result': result, 'source_file': path.name, 'original_title': report.get('original_title'),
-                                      'final_title': report.get('final_title')}
-    return runs
-
-
-@app.get('/runs')
-def runs(request: Request):
-    """Latest saved real run per scenario, as full RunResult objects for Agent Activity. Inputs flagged synthetic are labelled."""
-    if request.app.state.mode == 'sample':
-        return []
-    latest = {}
-    for run in _saved_runs().values():
-        if not any(event.get('agent') == 'ZETARIS' for event in run['trace_events']) and run['kind'] == 'context_critic':
-            continue  # older runs saved before repository reads were traced
-        key = run['scenario']
-        if key not in latest or run['source_file'] > latest[key]['source_file']:
-            latest[key] = run
-    order = ['A_relevant', 'B_restraint', 'revision']
-    return [{k: v for k, v in latest[key].items() if k != 'trace_events'} for key in order if key in latest]
-
-
 @app.get('/integration-status')
 def integration_status(request: Request):
     # Separate metadata, not invented TraceEvents or a forced visualization state.
-    repository = request.app.state.repository
-    proof = _read_report(RUNTIME / 'proofs/IMG_8922.roundtrip.json')
-    run = _read_report(RUNTIME / 'proofs/IMG_8922.run.json')
-    stored = repository.get_evidence(proof['evidence_id']) if request.app.state.mode == 'real' and proof.get('evidence_id') else None
+    state = request.app.state
+    repository = state.repository
+    real = state.mode == 'real'
+    proof = _read_report(RUNTIME / 'proofs/IMG_8922.roundtrip.json') if real else {}
+    run = _read_report(RUNTIME / 'proofs/IMG_8922.run.json') if real else {}
+    stored = repository.get_evidence(proof['evidence_id']) if real and proof.get('evidence_id') else None
     roundtrip = bool(stored and stored.source == 'screenshot' and proof.get('verified') and proof.get('kind') == 'real_zetaris_roundtrip')
     if roundtrip:
         loop = repository.get_open_loop(proof.get('loop_id', ''))
@@ -365,30 +356,34 @@ def integration_status(request: Request):
     orchestrator = bool(roundtrip and run.get('verified') and run.get('kind') == 'real_zetaris_orchestrator_run' and run.get('evidence_id') == proof.get('evidence_id'))
     receipts = {label: {key: proof.get('receipts', {}).get(label, {}).get(key) for key in ('requested_model', 'routed_model', 'provider')}
                 for label in ('perception', 'reasoning')} if roundtrip else {}
-    zetaris = None
-    if request.app.state.mode == 'real':
-        # Live counts from the repository; no cached or invented values.
-        zetaris = _cached('zetaris', lambda: _zetaris_counts(repository))
-    return {'zetaris': zetaris, 'saved_reasoning_runs': [{k: v for k, v in r.items() if k != 'trace_events'} for r in _saved_runs().values()],
-            'repository': type(repository).__name__, 'mode': request.app.state.mode,
+    # Live counts from Zetaris, only when this really is Zetaris. The demo workspace is in-memory and says so.
+    zetaris = _cached('zetaris', lambda: _zetaris_counts(repository)) if real else None
+    return {'zetaris': zetaris, 'workspace': state.workspace, 'demo_workspace': state.demo_info,
+            # Runs of THIS workspace only; another mode's runs are never listed here.
+            'saved_reasoning_runs': [summary(r, include_events=False) for r in workspace_runs(request)],
+            'repository': type(repository).__name__, 'mode': state.mode,
             'real_roundtrip_verified': roundtrip, 'real_orchestrator_verified': orchestrator,
             'status': 'verified' if orchestrator else 'integration_pending',
             'receipts': receipts,
             'run_id': run.get('result', {}).get('run_id') if orchestrator else None}
 
 
-@app.get('/agent-events/{run_id}')
-def agent_events(request: Request, run_id: str):
-    if request.app.state.mode == 'sample':
-        result = request.app.state.sample['result']
-    else:
-        result = _read_report(RUNTIME / 'proofs/IMG_8922.run.json').get('result', {})
-    if result.get('run_id') != run_id:
-        saved = _saved_runs().get(run_id)
-        if saved is not None:
-            return saved['trace_events']
-        live = (LIVE_RUNS / f'{run_id}.json')
-        if live.parent == LIVE_RUNS and live.is_file():
-            return _read_report(live).get('result', {}).get('trace_events', [])
-        raise HTTPException(status_code=404, detail='Run not found.')
-    return result.get('trace_events', [])
+@app.post('/api/demo/reset')
+async def reset_demo_workspace(request: Request):
+    """Demo workspace only: restore the snapshot, forget this workspace's runs and uploads. Canonical data is never touched."""
+    state = request.app.state
+    if state.mode != 'demo':
+        raise HTTPException(status_code=404, detail='There is no resettable demo workspace in this mode.')
+    async with state.write_lock:  # waits for a run in progress instead of cutting it off
+        try:
+            seed(state.repository, read_snapshot())
+        except SnapshotError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from None
+        state.runs.clear()
+        if state.uploads_dir.is_dir():
+            for path in state.uploads_dir.iterdir():
+                if path.is_file():
+                    path.unlink(missing_ok=True)
+        _refresh_views(state.repository)
+    return {'ok': True, 'demo_workspace': workspace_info(), 'evidence': len(state.repository.list_evidence()),
+            'active_loops': len(state.repository.get_active_open_loops(limit=1000))}

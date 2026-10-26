@@ -1,0 +1,2110 @@
+{
+ "entities": [
+  {
+   "brand": "Angela's Bakery",
+   "category": "food",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_0ab1234d4784",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "$59.00 AUD",
+    "size": "4 inch, 6 inch, 8 inch"
+   },
+   "name": "Ube Cake",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Sydney",
+   "country": "Australia",
+   "domain": "travel",
+   "entity_id": "ent_0c92e39800e6",
+   "entity_type": "city",
+   "location_name": null,
+   "metadata": {
+    "date": "08/12/2026 - 15/12/2026",
+    "price": "AUD $607"
+   },
+   "name": "Sydney",
+   "subcategory": null
+  },
+  {
+   "brand": "OPUMO",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_114f796bbc78",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "blue"
+   },
+   "name": "Mastering Men's Cardigan",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_13f7367455fa",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Elmo’s",
+   "subcategory": null
+  },
+  {
+   "brand": "Nike",
+   "category": "footwear",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_1476f73f72e7",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "washed coral"
+   },
+   "name": "Women's Air Jordan 3 'Treat Yourself' 'Washed Coral'",
+   "subcategory": null
+  },
+  {
+   "brand": "Kallarona",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_15014ddc84a9",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "IDR 849K"
+   },
+   "name": "LAUTAN TOP",
+   "subcategory": "top"
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_15c0bc1f7221",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne CBD",
+   "metadata": {
+    "halal": "true",
+    "late_night": "true",
+    "price": "under $10"
+   },
+   "name": "OMB Burger",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": "restaurant",
+   "city": null,
+   "country": null,
+   "domain": "food",
+   "entity_id": "ent_1784ca42ac55",
+   "entity_type": "place",
+   "location_name": null,
+   "metadata": {},
+   "name": "Chard Burger",
+   "subcategory": null
+  },
+  {
+   "brand": "Saucony",
+   "category": "footwear",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_19e6cf0782fa",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "gray",
+    "price": "$379.00"
+   },
+   "name": "Endorphin Pro 5",
+   "subcategory": null
+  },
+  {
+   "brand": "Jetstar",
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "travel",
+   "entity_id": "ent_1ef7b85fb3a9",
+   "entity_type": "airline",
+   "location_name": null,
+   "metadata": {
+    "price": "$249"
+   },
+   "name": "Jetstar",
+   "subcategory": null
+  },
+  {
+   "brand": "elf",
+   "category": "cosmetics",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_1fafc47e371b",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "elf Soft Glam Satin Foundation",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_20a7024fbe55",
+   "entity_type": "restaurant",
+   "location_name": "QV Square",
+   "metadata": {
+    "address": "Shop QS029, Level 2, QV Square, Melbourne VIC 3000",
+    "opening_hours": "Tuesday: 11:30am - 3pm, 5:30pm - 9:30pm; Wednesday: 11:30am - 3pm, 5:30pm - 9:30pm"
+   },
+   "name": "Yamamoto Udon Izakaya",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_24ba32382917",
+   "entity_type": "burger",
+   "location_name": "Melbourne",
+   "metadata": {
+    "ranking": "14th best"
+   },
+   "name": "Charrd",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "event",
+   "entity_id": "ent_31188fe847df",
+   "entity_type": "movie",
+   "location_name": null,
+   "metadata": {
+    "duration": "174 min",
+    "rating": "CTC"
+   },
+   "name": "You Can See Everything",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Brisbane",
+   "country": "Australia",
+   "domain": "travel",
+   "entity_id": "ent_3329e385eb2d",
+   "entity_type": "city",
+   "location_name": null,
+   "metadata": {
+    "date": "28/01/2027 - 02/02/2027",
+    "price": "AUD $662"
+   },
+   "name": "Brisbane",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "event",
+   "entity_id": "ent_355495a8cb9a",
+   "entity_type": "date",
+   "location_name": null,
+   "metadata": {},
+   "name": "Monday 16 November",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_3a8a782bd2de",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Gimlet",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_3d6cfd117d8a",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Betty’s Burgers",
+   "subcategory": null
+  },
+  {
+   "brand": "Palmolive",
+   "category": "body wash",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_45a5118d45d5",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "scent": "vanilla",
+    "size": "750 mL"
+   },
+   "name": "Palmolive",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "event",
+   "entity_id": "ent_45b116922553",
+   "entity_type": "venue",
+   "location_name": "QV",
+   "metadata": {},
+   "name": "no vacancy gallery",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_494693672706",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Charred",
+   "subcategory": null
+  },
+  {
+   "brand": "Bandit",
+   "category": "apparel",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_533e263ed160",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "red and pink"
+   },
+   "name": "Vanisher™ V-Neck Race Crop - Growing Grid - Poppy",
+   "subcategory": null
+  },
+  {
+   "brand": "WoolOvers",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_582baa2bfd21",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "$135.00"
+   },
+   "name": "Mens Lambswool V Neck",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": "Eau Thermale Avène",
+   "category": "skin care",
+   "city": null,
+   "country": null,
+   "domain": "health",
+   "entity_id": "ent_63413e652694",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "Eau Thermale Avène Cicalfate+ Repair Cream",
+   "subcategory": null
+  },
+  {
+   "brand": "Peter Christian",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_638b0bcb873f",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "Men's Chunky Cardigans",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": "Medicube",
+   "category": "cleansing",
+   "city": null,
+   "country": null,
+   "domain": "beauty",
+   "entity_id": "ent_65658d4be4da",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "size": "110 g / 3.88 oz"
+   },
+   "name": "Medicube Red Body Peeling Shot Cleanser",
+   "subcategory": null
+  },
+  {
+   "brand": "Rimmel",
+   "category": "cosmetics",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_65dcddcdcd5d",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "half price",
+    "size": "30 ml"
+   },
+   "name": "Rimmel Lasting Finish",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "event",
+   "entity_id": "ent_6b4f7420f991",
+   "entity_type": "event",
+   "location_name": "Stay Soft Market, Collingwood Yards",
+   "metadata": {
+    "date": "17 October",
+    "time": "2 - 9 PM"
+   },
+   "name": "suara",
+   "subcategory": null
+  },
+  {
+   "brand": "Kallarona",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_6ffe9e5b3f86",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "IDR 729K"
+   },
+   "name": "OMBAL TOP",
+   "subcategory": "top"
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "food",
+   "entity_id": "ent_74ec24e4e169",
+   "entity_type": "user",
+   "location_name": null,
+   "metadata": {
+    "date": "2025-11-18"
+   },
+   "name": "Zane",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": "destination",
+   "city": null,
+   "country": "Indonesia",
+   "domain": "travel",
+   "entity_id": "ent_801c6899868b",
+   "entity_type": "location",
+   "location_name": "Bali",
+   "metadata": {
+    "price": "$366"
+   },
+   "name": "Bali (Denpasar)",
+   "subcategory": null
+  },
+  {
+   "brand": "La Roche Posay",
+   "category": "skin care",
+   "city": null,
+   "country": null,
+   "domain": "health",
+   "entity_id": "ent_803af12c582f",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "La Roche Posay Cicaplast Baume B5+",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": "restaurant",
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_8733cd5d2dd6",
+   "entity_type": "place",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Elmo's Hamburger Restaurant",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_8763a21d70d2",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Juanita Peaches",
+   "subcategory": null
+  },
+  {
+   "brand": "Centellian 24",
+   "category": "skincare",
+   "city": null,
+   "country": null,
+   "domain": "health",
+   "entity_id": "ent_87d7d9edbbb1",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "Centellian 24 360° Shot PdRn Lifting Eye Cream",
+   "subcategory": null
+  },
+  {
+   "brand": "Stitch Fix",
+   "category": "fashion advice",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_8e632d8b9de0",
+   "entity_type": "content",
+   "location_name": null,
+   "metadata": {},
+   "name": "How to Wear Cardigans for Men",
+   "subcategory": null
+  },
+  {
+   "brand": "Kallarona",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_8f88e04936d9",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "IDR 899K"
+   },
+   "name": "GAUZELLE PANTS",
+   "subcategory": "pants"
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "social",
+   "entity_id": "ent_901c5da337fd",
+   "entity_type": "user",
+   "location_name": null,
+   "metadata": {},
+   "name": "ashley paige",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Dandenong",
+   "country": null,
+   "domain": "travel",
+   "entity_id": "ent_925e409dbcd5",
+   "entity_type": "place",
+   "location_name": "Dandenongs",
+   "metadata": {
+    "distance": "~1 hr from CBD",
+    "price": "0 AUD pp"
+   },
+   "name": "Alfred Nicholas Garden",
+   "subcategory": null
+  },
+  {
+   "brand": "Virgin Australia",
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "travel",
+   "entity_id": "ent_99ea4bb9b09d",
+   "entity_type": "airline",
+   "location_name": null,
+   "metadata": {},
+   "name": "Virgin Australia",
+   "subcategory": null
+  },
+  {
+   "brand": "Trenery",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_9d9036e76b67",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "navy"
+   },
+   "name": "Navy Merino Lapel Cardigan",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": "Anua",
+   "category": "skin care",
+   "city": null,
+   "country": null,
+   "domain": "health",
+   "entity_id": "ent_a25b0cd3ee09",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "anua_global Barrier Reboot Intensive Cream",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": "fitness",
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "health",
+   "entity_id": "ent_a58f08d9c643",
+   "entity_type": "class",
+   "location_name": "Melbourne CBD",
+   "metadata": {
+    "date": "Sep 21",
+    "duration": "50 min",
+    "time": "5:30 pm"
+   },
+   "name": "LIFT (FULLBODY)",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": "fitness",
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "health",
+   "entity_id": "ent_a5967d594b3e",
+   "entity_type": "class",
+   "location_name": "Melbourne CBD",
+   "metadata": {
+    "date": "Sep 25",
+    "duration": "50 min",
+    "time": "9:00 am"
+   },
+   "name": "ENGINE. SUSTAIN",
+   "subcategory": null
+  },
+  {
+   "brand": "Air Jordan",
+   "category": "footwear",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_a5d393ec5d50",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "pink",
+    "date": "March 6th"
+   },
+   "name": "Air Jordan 3 OG 'Neo Pink'",
+   "subcategory": null
+  },
+  {
+   "brand": "Kallarona",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_af4e5f94c0f5",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "IDR 889K"
+   },
+   "name": "OMBAL LONG TOP",
+   "subcategory": "top"
+  },
+  {
+   "brand": null,
+   "category": "fitness",
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "health",
+   "entity_id": "ent_af7591bfc99f",
+   "entity_type": "class",
+   "location_name": "Melbourne CBD",
+   "metadata": {
+    "date": "Sep 22",
+    "duration": "50 min",
+    "time": "7:00 am"
+   },
+   "name": "BASE (HYBRID)",
+   "subcategory": null
+  },
+  {
+   "brand": "Saucony",
+   "category": "footwear",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_b5851271f96d",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "blue",
+    "price": "$179.99"
+   },
+   "name": "Endorphin Speed 4",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "social",
+   "entity_id": "ent_b8dba53ca2ca",
+   "entity_type": "shade",
+   "location_name": null,
+   "metadata": {},
+   "name": "When the Sun Sets",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_bb4937f7fb29",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Maison Batard",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_bdb3f6a4622f",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Five Guys",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_bf60ddfc4acd",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "Chunky Knit Cardigan",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": null,
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_c667acc49b54",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "€48.00"
+   },
+   "name": "Men's Cardigan",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "travel",
+   "entity_id": "ent_c7dc9c5625e7",
+   "entity_type": "city",
+   "location_name": null,
+   "metadata": {
+    "date": "19/01/2027 - 28/01/2027",
+    "price": "AUD $550"
+   },
+   "name": "Melbourne",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_cf2863167398",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Fat Jaks",
+   "subcategory": null
+  },
+  {
+   "brand": "Palace Cinemas",
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "event",
+   "entity_id": "ent_cf69d344f159",
+   "entity_type": "cinema",
+   "location_name": null,
+   "metadata": {},
+   "name": "The Kino",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": null,
+   "country": null,
+   "domain": "social",
+   "entity_id": "ent_d3029cf99bde",
+   "entity_type": "shade",
+   "location_name": null,
+   "metadata": {},
+   "name": "25",
+   "subcategory": null
+  },
+  {
+   "brand": "Nike",
+   "category": "footwear",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_d465095a1808",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "pink",
+    "price": "$613.00"
+   },
+   "name": "Jordan Air Jordan 3 'Valentine's Day' Sneakers",
+   "subcategory": null
+  },
+  {
+   "brand": "Spud Co",
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_d4f74d38b4c0",
+   "entity_type": "product",
+   "location_name": "Melbourne CBD",
+   "metadata": {
+    "collection_time": "7:45 pm - 8:00 pm",
+    "date": "8 Oct 2026",
+    "price": "$4.99"
+   },
+   "name": "Spud Surprise Bag",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_e42f1faa7f18",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Slowpoke",
+   "subcategory": null
+  },
+  {
+   "brand": null,
+   "category": null,
+   "city": "Melbourne",
+   "country": "Australia",
+   "domain": "food",
+   "entity_id": "ent_ece37ec7c4d4",
+   "entity_type": "restaurant",
+   "location_name": "Melbourne",
+   "metadata": {},
+   "name": "Easey’s",
+   "subcategory": null
+  },
+  {
+   "brand": "Kallarona",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_eee7ed2daa72",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "IDR 689K"
+   },
+   "name": "LA VAGUE TOP",
+   "subcategory": "top"
+  },
+  {
+   "brand": "Kallarona",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_ef158d35e3be",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "price": "IDR 749K"
+   },
+   "name": "DOUBLE TOP",
+   "subcategory": "top"
+  },
+  {
+   "brand": "Oxford Shop",
+   "category": "clothing",
+   "city": null,
+   "country": null,
+   "domain": "shopping",
+   "entity_id": "ent_efcf4b8ed0ae",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {
+    "color": "navy",
+    "price": "$59.00"
+   },
+   "name": "Oxford Benedict Wool Cardigan",
+   "subcategory": "cardigan"
+  },
+  {
+   "brand": "CeraVe",
+   "category": "skin care",
+   "city": null,
+   "country": null,
+   "domain": "health",
+   "entity_id": "ent_f5158c9c5534",
+   "entity_type": "product",
+   "location_name": null,
+   "metadata": {},
+   "name": "CeraVe Moisturising Lotion",
+   "subcategory": null
+  }
+ ],
+ "evidence": [
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_d1c9b60e7300bbb978fcf6d9",
+   "image_ref": "0d113036-4275-46f7-bea5-f9deebfdbc09.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays various models of Saucony running shoes along with their prices. It includes the Endorphin Pro 5 and Endorphin Speed 4 models.",
+   "timestamp": "2026-10-25T12:40:04.824744+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_8eeeddf7507ac9f74a9b33e4",
+   "image_ref": "1ab3f13b-fe07-4bf0-8aff-5ad40bee050d.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a product page for an Ube Cake from Angela's Bakery, including pricing and size options.",
+   "timestamp": "2026-10-25T12:40:09.120296+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "health",
+   "evidence_id": "ev_ec452f14716239b9a885b18e",
+   "image_ref": "2882e6e0-4e9f-4e00-a5b1-0fca3aace077.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot features a TikTok live video where a person is reviewing the Centellian 24 360° Shot PdRn Lifting Eye Cream, with text overlay indicating it is 'fairly-rated'. The user also shares insights on their skin type and a quick elimination round.",
+   "timestamp": "2026-10-25T12:40:12.674386+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "beauty",
+   "evidence_id": "ev_5785d360f23b1594fd61decb",
+   "image_ref": "4d974422-581e-4836-82da-c0d3258d530c.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a bottle of Medicube's Red Body Peeling Shot Cleanser being held by a person. It includes text suggesting that the product is not for the weak.",
+   "timestamp": "2026-10-25T12:40:21.434194+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_2525848ce993f6572c3edbb8",
+   "image_ref": "5617f4c9-51f2-48a4-9652-6b92339e6ae4.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a product listing for a women's running crop top from the brand Bandit. It features a red and pink pattern and is labeled as a 'Vanisher™ V-Neck Race Crop - Growing Grid - Poppy.'",
+   "timestamp": "2026-10-25T12:40:25.412751+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "event",
+   "evidence_id": "ev_24b085b537cfef0787db69ce",
+   "image_ref": "639a2fe9-7eaf-4332-a7d0-843d2851f3e5.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot announces a pop-up event introducing Indonesian brands in Melbourne. It includes details such as the date, time, and location of the event.",
+   "timestamp": "2026-10-25T12:40:28.519612+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "travel",
+   "evidence_id": "ev_668247757592f73ff5d66832",
+   "image_ref": "6ab9d402-c438-4618-b976-4b83c0ff7e7d.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot features a recommendation for Alfred Nicholas Garden in the Dandenongs, highlighting its picturesque pathways and ornamental bridges. It mentions the location's accessibility from the CBD and that there is no entry fee.",
+   "timestamp": "2026-10-25T12:40:32.713605+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "health",
+   "evidence_id": "ev_49d25ed9b54adb13556e6932",
+   "image_ref": "7f11a2ef-a685-4495-8783-948e27058345.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a user's profile with upcoming and previous class schedules at a fitness center. It includes details about class types, times, and the instructor.",
+   "timestamp": "2026-10-25T12:40:37.814697+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "event",
+   "evidence_id": "ev_8fec9cbf186a2f48fd45acaf",
+   "image_ref": "7f71af42-744f-465b-8bc1-d56be9530339.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot shows a social media post about an event at 'no vacancy gallery' located on level 3 of QV. The post includes a notification about vitamins and suggests a cozy lofi music vibe.",
+   "timestamp": "2026-10-25T12:40:41.105681+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "health",
+   "evidence_id": "ev_24f240d00d3dbf0085202587",
+   "image_ref": "81c885ac-c9f9-402f-9b75-10be883e6168.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot shows a video of a person discussing four different barrier creams and their unique performances, featuring product mentions and a call to action to try one of the creams via Amazon.",
+   "timestamp": "2026-10-25T12:40:45.492657+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_23711dcf85b5017c820e5235",
+   "image_ref": "9efccb81-885f-478c-9eeb-d0c0ff1df8d8.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays an order confirmation for a Spud Surprise Bag from Spud Co in Melbourne CBD, scheduled for collection on 8 October 2026.",
+   "timestamp": "2026-10-25T12:40:48.116375+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_c8e07581a1c3fc2581ab2528",
+   "image_ref": "IMG_8911.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot promotes Elmo's Hamburger Restaurant in Fitzroy North, Melbourne, highlighting their smashed burgers and shakes. It includes a personal review mentioning the taste and upcoming menu items.",
+   "timestamp": "2026-10-25T12:41:12.916003+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_cec51a5b7d33fc9401d77173",
+   "image_ref": "IMG_8912.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot shows a review about Elmo's Hamburger Restaurant in Melbourne, comparing it to Chard Burger. It includes a user's opinion and a description of the two burger places.",
+   "timestamp": "2026-10-25T12:41:24.228237+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_7d6a3561bd455c07a4ce133e",
+   "image_ref": "IMG_8913.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a product listing for the Jordan Air Jordan 3 'Valentine's Day' sneakers in pink, available for purchase on Farfetch.",
+   "timestamp": "2026-10-25T12:41:27.647075+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_476ae535923c144d7290867f",
+   "image_ref": "IMG_8914.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a promotional post for the Air Jordan 3 OG 'Neo Pink' sneakers, announcing their release date.",
+   "timestamp": "2026-10-25T12:41:34.924792+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_38f19d4b508fc9c667149a23",
+   "image_ref": "IMG_8915.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a product listing for the Women's Air Jordan 3 'Treat Yourself' in 'Washed Coral' color. It includes an image of the shoe and additional details.",
+   "timestamp": "2026-10-25T12:41:39.176066+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "travel",
+   "evidence_id": "ev_ad444422f50c1cd99e27f5a5",
+   "image_ref": "IMG_8916.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays flight options from Melbourne to Indonesia, with prices listed for one-way and return tickets. It features information on airlines like Jetstar and Virgin Australia.",
+   "timestamp": "2026-10-25T12:41:44.019732+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "travel",
+   "evidence_id": "ev_6e23168834c2921bd340c112",
+   "image_ref": "IMG_8917.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays flight options to Bali, Indonesia, from various Australian cities with prices and dates.",
+   "timestamp": "2026-10-25T12:41:50.573723+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_599e1c7670654fc1285f1b9c",
+   "image_ref": "IMG_8918.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays various men's cardigans available for purchase, showcasing different styles and brands. Some cardigans are featured alongside their prices.",
+   "timestamp": "2026-10-25T12:42:03.163988+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_a96e68dab0ae4e76f11e0036",
+   "image_ref": "IMG_8919.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a Google search result for men's blue cardigans, featuring various products and their brands.",
+   "timestamp": "2026-10-25T12:42:11.048090+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_322a489d0f93239bcb3871d0",
+   "image_ref": "IMG_8920.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot features a burger described as one of the world's best, specifically highlighting a burger named 'Charrd' located in Melbourne.",
+   "timestamp": "2026-10-25T12:42:16.538483+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "image_ref": "IMG_8921.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a visual guide to cheeseburgers in Melbourne, organized in a matrix based on affordability and indulgence. It features various burger spots with their names and positions on the matrix.",
+   "timestamp": "2026-10-25T12:42:25.444993+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_911de93f16a233a77fcfc1cb",
+   "image_ref": "IMG_8922.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot features a late-night halal burger spot in Melbourne CBD called OMB Burger, highlighting a promotion. It indicates the price is under $10.",
+   "timestamp": "2026-10-25T12:42:31.310572+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "event",
+   "evidence_id": "ev_5fc428b4948638bdff2946ea",
+   "image_ref": "c28b685d-85ee-4fad-9ad7-7ccd64f6c03d.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a movie listing for 'You Can See Everything' at Palace Cinemas, including booking options for a specific cinema and date.",
+   "timestamp": "2026-10-25T12:42:35.407024+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_0aacd8a900928366f08c4512",
+   "image_ref": "c5cd6b80-5bb4-4b12-b4fb-5e24bda832d1.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays information about Yamamoto Udon Izakaya in Melbourne, including its location and opening hours. It features a video related to the food served at the restaurant.",
+   "timestamp": "2026-10-25T12:42:39.602416+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "image_ref": "d0809cb2-d9d0-43b8-a875-45f07158c6f2.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a selection of clothing items with their names and prices. The items include various tops and pants, along with their respective prices in Indonesian Rupiah.",
+   "timestamp": "2026-10-25T12:42:45.968891+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "social",
+   "evidence_id": "ev_9c3a5e364f7551b778705e0b",
+   "image_ref": "d249f57f-eb7a-40b0-b040-3b91d8f86125.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a makeup tutorial video featuring a person applying eyeshadow. The user mentions using specific shades of eyeshadow and includes hashtags related to makeup.",
+   "timestamp": "2026-10-25T12:42:49.674541+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_ab689285b534e4b51d8e8ea6",
+   "image_ref": "dd9670cc-e6df-4a30-bad5-fc64ef87ef9a.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot features a display of Palmolive body wash products, including the Vanilla scent, with a user comment praising its affordability and effectiveness. The user mentions they have never purchased it for over $10.",
+   "timestamp": "2026-10-25T12:42:53.008366+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "shopping",
+   "evidence_id": "ev_b244de09a23863df240b748a",
+   "image_ref": "40fd8e40-bef6-4f9b-b22a-bd38faa8adbd.JPG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot displays a search for 'elf soft glam satin foundation' along with an advertisement for Rimmel's Lasting Finish foundation. Two individuals are demonstrating the elf foundation in a video format.",
+   "timestamp": "2026-10-25T12:43:05.339164+00:00"
+  },
+  {
+   "confidence": "high",
+   "domain": "food",
+   "evidence_id": "ev_b793a2e138d7d509d26670ff",
+   "image_ref": "IMG_8910.PNG",
+   "sensitive": 0,
+   "source": "screenshot",
+   "summary": "The screenshot features a video about Elmo's Hamburger Restaurant, highlighting it as one of Melbourne's most underrated burger spots. It mentions that Elmo's was overlooked in a top 100 burgers list.",
+   "timestamp": "2026-10-25T12:45:40.653174+00:00"
+  }
+ ],
+ "evidence_entities": [
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_20a7024fbe55",
+   "evidence_id": "ev_0aacd8a900928366f08c4512",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_d4f74d38b4c0",
+   "evidence_id": "ev_23711dcf85b5017c820e5235",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_6b4f7420f991",
+   "evidence_id": "ev_24b085b537cfef0787db69ce",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_63413e652694",
+   "evidence_id": "ev_24f240d00d3dbf0085202587",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_803af12c582f",
+   "evidence_id": "ev_24f240d00d3dbf0085202587",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_a25b0cd3ee09",
+   "evidence_id": "ev_24f240d00d3dbf0085202587",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_f5158c9c5534",
+   "evidence_id": "ev_24f240d00d3dbf0085202587",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_533e263ed160",
+   "evidence_id": "ev_2525848ce993f6572c3edbb8",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_24ba32382917",
+   "evidence_id": "ev_322a489d0f93239bcb3871d0",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_1476f73f72e7",
+   "evidence_id": "ev_38f19d4b508fc9c667149a23",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_13f7367455fa",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_3a8a782bd2de",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_3d6cfd117d8a",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_494693672706",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_8763a21d70d2",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_bb4937f7fb29",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_bdb3f6a4622f",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_cf2863167398",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_e42f1faa7f18",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_ece37ec7c4d4",
+   "evidence_id": "ev_3e7c7cf6a8df659acc34bd9b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_a5d393ec5d50",
+   "evidence_id": "ev_476ae535923c144d7290867f",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_a58f08d9c643",
+   "evidence_id": "ev_49d25ed9b54adb13556e6932",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_a5967d594b3e",
+   "evidence_id": "ev_49d25ed9b54adb13556e6932",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_af7591bfc99f",
+   "evidence_id": "ev_49d25ed9b54adb13556e6932",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_65658d4be4da",
+   "evidence_id": "ev_5785d360f23b1594fd61decb",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_582baa2bfd21",
+   "evidence_id": "ev_599e1c7670654fc1285f1b9c",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_638b0bcb873f",
+   "evidence_id": "ev_599e1c7670654fc1285f1b9c",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_9d9036e76b67",
+   "evidence_id": "ev_599e1c7670654fc1285f1b9c",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_bf60ddfc4acd",
+   "evidence_id": "ev_599e1c7670654fc1285f1b9c",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_c667acc49b54",
+   "evidence_id": "ev_599e1c7670654fc1285f1b9c",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_31188fe847df",
+   "evidence_id": "ev_5fc428b4948638bdff2946ea",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_355495a8cb9a",
+   "evidence_id": "ev_5fc428b4948638bdff2946ea",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_cf69d344f159",
+   "evidence_id": "ev_5fc428b4948638bdff2946ea",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_925e409dbcd5",
+   "evidence_id": "ev_668247757592f73ff5d66832",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_15014ddc84a9",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_6ffe9e5b3f86",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_8f88e04936d9",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_af4e5f94c0f5",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_eee7ed2daa72",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_ef158d35e3be",
+   "evidence_id": "ev_6c5f842c84b02542714839ae",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_0c92e39800e6",
+   "evidence_id": "ev_6e23168834c2921bd340c112",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_3329e385eb2d",
+   "evidence_id": "ev_6e23168834c2921bd340c112",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_c7dc9c5625e7",
+   "evidence_id": "ev_6e23168834c2921bd340c112",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_d465095a1808",
+   "evidence_id": "ev_7d6a3561bd455c07a4ce133e",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_0ab1234d4784",
+   "evidence_id": "ev_8eeeddf7507ac9f74a9b33e4",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_45b116922553",
+   "evidence_id": "ev_8fec9cbf186a2f48fd45acaf",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_15c0bc1f7221",
+   "evidence_id": "ev_911de93f16a233a77fcfc1cb",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_901c5da337fd",
+   "evidence_id": "ev_9c3a5e364f7551b778705e0b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_b8dba53ca2ca",
+   "evidence_id": "ev_9c3a5e364f7551b778705e0b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_d3029cf99bde",
+   "evidence_id": "ev_9c3a5e364f7551b778705e0b",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_114f796bbc78",
+   "evidence_id": "ev_a96e68dab0ae4e76f11e0036",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_8e632d8b9de0",
+   "evidence_id": "ev_a96e68dab0ae4e76f11e0036",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_9d9036e76b67",
+   "evidence_id": "ev_a96e68dab0ae4e76f11e0036",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_efcf4b8ed0ae",
+   "evidence_id": "ev_a96e68dab0ae4e76f11e0036",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_45a5118d45d5",
+   "evidence_id": "ev_ab689285b534e4b51d8e8ea6",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_1ef7b85fb3a9",
+   "evidence_id": "ev_ad444422f50c1cd99e27f5a5",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_801c6899868b",
+   "evidence_id": "ev_ad444422f50c1cd99e27f5a5",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_99ea4bb9b09d",
+   "evidence_id": "ev_ad444422f50c1cd99e27f5a5",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_c7dc9c5625e7",
+   "evidence_id": "ev_ad444422f50c1cd99e27f5a5",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_1fafc47e371b",
+   "evidence_id": "ev_b244de09a23863df240b748a",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_65dcddcdcd5d",
+   "evidence_id": "ev_b244de09a23863df240b748a",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_8733cd5d2dd6",
+   "evidence_id": "ev_b793a2e138d7d509d26670ff",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_8733cd5d2dd6",
+   "evidence_id": "ev_c8e07581a1c3fc2581ab2528",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_1784ca42ac55",
+   "evidence_id": "ev_cec51a5b7d33fc9401d77173",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_74ec24e4e169",
+   "evidence_id": "ev_cec51a5b7d33fc9401d77173",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_8733cd5d2dd6",
+   "evidence_id": "ev_cec51a5b7d33fc9401d77173",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_19e6cf0782fa",
+   "evidence_id": "ev_d1c9b60e7300bbb978fcf6d9",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_b5851271f96d",
+   "evidence_id": "ev_d1c9b60e7300bbb978fcf6d9",
+   "relationship": "depicted"
+  },
+  {
+   "confidence": 0.9,
+   "entity_id": "ent_87d7d9edbbb1",
+   "evidence_id": "ev_ec452f14716239b9a885b18e",
+   "relationship": "depicted"
+  }
+ ],
+ "loop_entities": [
+  {
+   "confidence": 0.7,
+   "entity_id": "ent_15c0bc1f7221",
+   "loop_id": "loop_11fcb461ff69",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_925e409dbcd5",
+   "loop_id": "loop_16112bb87aac",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_114f796bbc78",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_582baa2bfd21",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_638b0bcb873f",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.8,
+   "entity_id": "ent_8e632d8b9de0",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_9d9036e76b67",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_bf60ddfc4acd",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_c667acc49b54",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_efcf4b8ed0ae",
+   "loop_id": "loop_16b05d8810a3",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_533e263ed160",
+   "loop_id": "loop_20f6d7b12026",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_1476f73f72e7",
+   "loop_id": "loop_2e3c68a4b9ef",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_15014ddc84a9",
+   "loop_id": "loop_319fea79b4c5",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_6ffe9e5b3f86",
+   "loop_id": "loop_319fea79b4c5",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_8f88e04936d9",
+   "loop_id": "loop_319fea79b4c5",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_af4e5f94c0f5",
+   "loop_id": "loop_319fea79b4c5",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_eee7ed2daa72",
+   "loop_id": "loop_319fea79b4c5",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_ef158d35e3be",
+   "loop_id": "loop_319fea79b4c5",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_20a7024fbe55",
+   "loop_id": "loop_32d2b2760a9f",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_13f7367455fa",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_3a8a782bd2de",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_3d6cfd117d8a",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_494693672706",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_8763a21d70d2",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_bb4937f7fb29",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_bdb3f6a4622f",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_cf2863167398",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_e42f1faa7f18",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_ece37ec7c4d4",
+   "loop_id": "loop_35444761f735",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_d465095a1808",
+   "loop_id": "loop_3b7c8cfaf039",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_0c92e39800e6",
+   "loop_id": "loop_4b1ae4ab7784",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_1ef7b85fb3a9",
+   "loop_id": "loop_4b1ae4ab7784",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_3329e385eb2d",
+   "loop_id": "loop_4b1ae4ab7784",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_801c6899868b",
+   "loop_id": "loop_4b1ae4ab7784",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_99ea4bb9b09d",
+   "loop_id": "loop_4b1ae4ab7784",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_c7dc9c5625e7",
+   "loop_id": "loop_4b1ae4ab7784",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.8,
+   "entity_id": "ent_1784ca42ac55",
+   "loop_id": "loop_62822173fdc0",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_8733cd5d2dd6",
+   "loop_id": "loop_62822173fdc0",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_45a5118d45d5",
+   "loop_id": "loop_6fa9dec77bfe",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_0ab1234d4784",
+   "loop_id": "loop_8856a538f626",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_19e6cf0782fa",
+   "loop_id": "loop_ae231e014138",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_b5851271f96d",
+   "loop_id": "loop_ae231e014138",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_1fafc47e371b",
+   "loop_id": "loop_bc9e040ae3e9",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.75,
+   "entity_id": "ent_65dcddcdcd5d",
+   "loop_id": "loop_bc9e040ae3e9",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.65,
+   "entity_id": "ent_a5d393ec5d50",
+   "loop_id": "loop_e2809c1c0d15",
+   "relationship": "subject"
+  },
+  {
+   "confidence": 0.7,
+   "entity_id": "ent_24ba32382917",
+   "loop_id": "loop_fe53e6b99fea",
+   "relationship": "subject"
+  }
+ ],
+ "loops": [
+  {
+   "confidence": 0.85,
+   "created_at": "2026-10-26T03:11:45+00:00",
+   "domain": "food",
+   "loop_id": "loop_62822173fdc0",
+   "status": "ACTIVE",
+   "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+   "updated_at": "2026-10-26T03:25:59+00:00"
+  },
+  {
+   "confidence": 0.75,
+   "created_at": "2026-10-26T03:25:14+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_bc9e040ae3e9",
+   "status": "OPEN",
+   "title": "Interested in elf Soft Glam Satin Foundation",
+   "updated_at": "2026-10-26T03:25:14+00:00"
+  },
+  {
+   "confidence": 0.75,
+   "created_at": "2026-10-26T03:24:40+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_6fa9dec77bfe",
+   "status": "OPEN",
+   "title": "Interested in Palmolive Vanilla body wash",
+   "updated_at": "2026-10-26T03:24:40+00:00"
+  },
+  {
+   "confidence": 0.75,
+   "created_at": "2026-10-26T03:23:39+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_319fea79b4c5",
+   "status": "OPEN",
+   "title": "Interested in Kallarona clothing",
+   "updated_at": "2026-10-26T03:23:39+00:00"
+  },
+  {
+   "confidence": 0.75,
+   "created_at": "2026-10-26T03:22:50+00:00",
+   "domain": "food",
+   "loop_id": "loop_32d2b2760a9f",
+   "status": "OPEN",
+   "title": "Interested in Yamamoto Udon Izakaya (QV Square, Melbourne)",
+   "updated_at": "2026-10-26T03:22:50+00:00"
+  },
+  {
+   "confidence": 0.7,
+   "created_at": "2026-10-26T03:22:17+00:00",
+   "domain": "food",
+   "loop_id": "loop_11fcb461ff69",
+   "status": "OPEN",
+   "title": "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+   "updated_at": "2026-10-26T03:22:17+00:00"
+  },
+  {
+   "confidence": 0.75,
+   "created_at": "2026-10-26T03:20:46+00:00",
+   "domain": "food",
+   "loop_id": "loop_35444761f735",
+   "status": "OPEN",
+   "title": "Researching Melbourne cheeseburger options",
+   "updated_at": "2026-10-26T03:20:46+00:00"
+  },
+  {
+   "confidence": 0.7,
+   "created_at": "2026-10-26T03:20:01+00:00",
+   "domain": "food",
+   "loop_id": "loop_fe53e6b99fea",
+   "status": "OPEN",
+   "title": "Interested in Charrd burger (Melbourne)",
+   "updated_at": "2026-10-26T03:20:01+00:00"
+  },
+  {
+   "confidence": 0.8,
+   "created_at": "2026-10-26T03:17:42+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_16b05d8810a3",
+   "status": "ACTIVE",
+   "title": "Interested in men's cardigans",
+   "updated_at": "2026-10-26T03:19:00+00:00"
+  },
+  {
+   "confidence": 0.85,
+   "created_at": "2026-10-26T03:15:24+00:00",
+   "domain": "travel",
+   "loop_id": "loop_4b1ae4ab7784",
+   "status": "ACTIVE",
+   "title": "Interested in flights Melbourne to Bali (Jetstar, Virgin Australia, Jan 2027 dates)",
+   "updated_at": "2026-10-26T03:16:40+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:14:18+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_2e3c68a4b9ef",
+   "status": "OPEN",
+   "title": "Interested in Women's Air Jordan 3 'Treat Yourself' 'Washed Coral' sneakers",
+   "updated_at": "2026-10-26T03:14:18+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:13:40+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_e2809c1c0d15",
+   "status": "OPEN",
+   "title": "Interested in Air Jordan 3 OG 'Neo Pink' sneakers",
+   "updated_at": "2026-10-26T03:13:40+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:12:59+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_3b7c8cfaf039",
+   "status": "OPEN",
+   "title": "Interested in Jordan Air Jordan 3 'Valentine's Day' sneakers",
+   "updated_at": "2026-10-26T03:12:59+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:10:45+00:00",
+   "domain": "travel",
+   "loop_id": "loop_16112bb87aac",
+   "status": "OPEN",
+   "title": "Interested in Alfred Nicholas Garden (Dandenongs, free entry, ~1 hr from CBD)",
+   "updated_at": "2026-10-26T03:10:45+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:09:34+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_20f6d7b12026",
+   "status": "OPEN",
+   "title": "Interested in Bandit Vanisher™ V-Neck Race Crop - Growing Grid - Poppy",
+   "updated_at": "2026-10-26T03:09:34+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:08:48+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_8856a538f626",
+   "status": "OPEN",
+   "title": "Interested in Ube Cake from Angela's Bakery",
+   "updated_at": "2026-10-26T03:08:48+00:00"
+  },
+  {
+   "confidence": 0.65,
+   "created_at": "2026-10-26T03:08:03+00:00",
+   "domain": "shopping",
+   "loop_id": "loop_ae231e014138",
+   "status": "OPEN",
+   "title": "Interested in Saucony Endorphin Pro 5 and Speed 4 running shoes",
+   "updated_at": "2026-10-26T03:08:03+00:00"
+  }
+ ],
+ "meta": {
+  "counts": {
+   "active_loops": 17,
+   "entities": 65,
+   "evidence": 30,
+   "evidence_entities": 69,
+   "loop_entities": 46
+  },
+  "exported_at": "2026-10-26T07:43:14+00:00",
+  "source": "zetaris"
+ }
+}

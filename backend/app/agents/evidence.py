@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, replace
 import json
 from pathlib import Path
 import re
+import uuid
 
 from backend.app.adapters.nightshift import ModelGateway, ModelGatewayError
 
@@ -174,5 +175,6 @@ class EvidenceAgent:
         content = await self.gateway.complete([{'role': 'user', 'content': [
             {'type': 'image_url', 'image_url': {'url': image_data_url(image)}},
             {'type': 'text', 'text': EVIDENCE_PROMPT},
+            {'type': 'text', 'text': f'request_id: {uuid.uuid4().hex}'},  # every perception call must be a fresh model call (Nightshift cache)
         ]}], model=model)
         return parse_evidence(content)

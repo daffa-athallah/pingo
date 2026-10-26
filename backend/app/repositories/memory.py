@@ -78,6 +78,20 @@ class InMemoryLoopRepository:
                    for l in self.loop_entities):
             self.loop_entities.append(link)
 
+    # Read helpers that ZetarisRepository also offers, so the API can treat both the same way. They add no agent behaviour.
+    def get_evidence(self, evidence_id: str):
+        return self.evidence.get(evidence_id)
+
+    def list_evidence(self) -> list[Evidence]:
+        return sorted(self.evidence.values(), key=lambda e: (e.timestamp, e.evidence_id))
+
+    def list_entities(self, *, domain: str | None = None) -> list[Entity]:
+        return sorted((e for e in self.entities.values() if domain is None or e.domain == domain), key=lambda e: e.entity_id)
+
+    def get_evidence_entities(self, evidence_ids: Sequence[str]) -> list[EvidenceEntity]:
+        wanted = set(evidence_ids)
+        return sorted((k for k in self.evidence_entities if k.evidence_id in wanted), key=lambda k: (k.evidence_id, k.entity_id, k.relationship))
+
     def save_check_in(self, check_in: CheckIn) -> None:
         self.check_ins[check_in.check_in_id] = check_in
 
