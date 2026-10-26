@@ -88,7 +88,7 @@ All agents go through one `LoopRepository` contract. In real mode it is `Zetaris
 
 ## Structured TraceEvents
 
-Each step emits a `TraceEvent`: `run_id`, `timestamp`, `agent`, `action`, `reason`, `input_refs`, `next_step`, `output_ref`, `receipt`. Repository reads appear as `ZETARIS` events (for example "Loaded Open Loop with 4 entities and 4 supporting Evidence records from Zetaris") and only when the read happened. Model-backed events carry a sanitized receipt (`requested_model`, `routed_model`, `provider`). The Agent Activity view consumes these via `GET /agent-events/{run_id}`; in real mode `GET /integration-status` reports live Zetaris counts and lists the saved reasoning runs.
+Each step emits a `TraceEvent`: `run_id`, `timestamp`, `agent`, `action`, `reason`, `input_refs`, `next_step`, `output_ref`, `receipt`. Repository reads appear as `ZETARIS` events (for example "Loaded Open Loop with 4 entities and 4 supporting Evidence records from Zetaris") and only when the read happened. Model-backed events carry a sanitized receipt (`requested_model`, `routed_model`, `provider`). `POST /api/context/evaluate` runs the Context → Critic flow for events a client reports, read-only with respect to stored data (any revision the Critic asks for appears in the trace and is discarded), and saves the run so it can be opened here. The Agent Activity view consumes traces via `GET /agent-events/{run_id}`; in real mode `GET /integration-status` reports live Zetaris counts and lists the saved reasoning runs.
 
 ## Model routing
 

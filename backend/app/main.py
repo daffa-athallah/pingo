@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 
 from backend.app.adapters.zetaris import ZetarisError
 from backend.app.bootstrap import open_repository, sample_mode
+from backend.app.context_api import LIVE_RUNS, router as context_router
 from backend.app.orchestration.consolidation import apply_merge, short
 
 RUNTIME = Path(__file__).resolve().parents[1] / 'runtime'
@@ -45,7 +46,14 @@ async def lifespan(app):
 
 
 app = FastAPI(title='Recall data API', lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5175', 'http://127.0.0.1:5175'], allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
+# Extra origins (for example a Tailscale HTTPS URL) come from the environment, never from code:
+#   RECALL_CORS_ORIGINS=https://my-mac.tailnet.ts.net,https://ica-mac.tailnet.ts.net:5173
+#   RECALL_CORS_ORIGIN_REGEX=https://.*\\.ts\\.net(:\\d+)?   (optional)
+_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5175', 'http://127.0.0.1:5175',
+            *[o.strip().rstrip('/') for o in os.environ.get('RECALL_CORS_ORIGINS', '').split(',') if o.strip()]]
+app.add_middleware(CORSMiddleware, allow_origins=_ORIGINS, allow_origin_regex=os.environ.get('RECALL_CORS_ORIGIN_REGEX') or None,
+                   allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
+app.include_router(context_router)
 
 
 @app.exception_handler(ZetarisError)
@@ -376,8 +384,11 @@ def agent_events(request: Request, run_id: str):
     else:
         result = _read_report(RUNTIME / 'proofs/IMG_8922.run.json').get('result', {})
     if result.get('run_id') != run_id:
-        saved = _saved_runs().get(run_id) if request.app.state.mode == 'real' else None
-        if saved is None:
-            raise HTTPException(status_code=404, detail='Run not found.')
-        return saved['trace_events']
+        saved = _saved_runs().get(run_id)
+        if saved is not None:
+            return saved['trace_events']
+        live = (LIVE_RUNS / f'{run_id}.json')
+        if live.parent == LIVE_RUNS and live.is_file():
+            return _read_report(live).get('result', {}).get('trace_events', [])
+        raise HTTPException(status_code=404, detail='Run not found.')
     return result.get('trace_events', [])

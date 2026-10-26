@@ -71,6 +71,8 @@ Rules to keep when changing things:
 - Web/news search for Context is not implemented.
 - Tune behaviour in the prompt and in what the agent is shown (retrieval), then re-run the real-data scripts above and check the receipts. Do not loosen a validator to make output pass.
 
+**API for the UI:** [docs/api.md](docs/api.md) lists every endpoint, including `POST /api/context/evaluate` (Context → Critic for events a device reports) and phone access over Tailscale (`RECALL_CORS_ORIGINS`).
+
 **Agent Activity** renders `TraceEvent`s. In real mode, `GET /agent-events/{run_id}` serves saved real runs and `GET /integration-status` reports live Zetaris counts.
 
 
