@@ -15,6 +15,9 @@ class InMemoryLoopRepository:
         self.loops: dict[str, OpenLoop] = {}
         self.loop_entities: list[LoopEntity] = []
         self.check_ins: dict[str, CheckIn] = {}
+        self.context_events = {}
+        self.context_evaluations = {}
+        self.notifications = {}
 
     def save_evidence(self, evidence: Evidence, entities: Sequence[Entity], links: Sequence[EvidenceEntity]) -> None:
         self.evidence[evidence.evidence_id] = evidence
@@ -80,6 +83,27 @@ class InMemoryLoopRepository:
 
     def save_check_in(self, check_in: CheckIn) -> None:
         self.check_ins[check_in.check_in_id] = check_in
+
+    def save_context_event(self, event):
+        self.context_events[event.context_id] = event
+
+    def get_context_events(self):
+        return list(self.context_events.values())
+
+    def save_context_evaluation(self, evaluation):
+        self.context_evaluations[evaluation.evaluation_id] = evaluation
+
+    def get_context_evaluation(self, evaluation_id):
+        return self.context_evaluations.get(evaluation_id)
+
+    def save_notification(self, notification):
+        self.notifications[notification.notification_id] = notification
+
+    def get_notification(self, notification_id):
+        return self.notifications.get(notification_id)
+
+    def list_notifications(self):
+        return sorted(self.notifications.values(), key=lambda n: n.created_at, reverse=True)
 
     def get_check_in(self, check_in_id: str) -> CheckIn | None:
         return self.check_ins.get(check_in_id)

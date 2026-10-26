@@ -1,6 +1,8 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import BottomNav from './BottomNav'
+import NotificationCenter from '../../features/notifications/NotificationCenter'
+import NotificationSetup from '../../features/notifications/NotificationSetup'
 
 export default function AppShell() {
   const { pathname } = useLocation()
@@ -16,7 +18,10 @@ export default function AppShell() {
       <a className="skip-link" href="#main-content">Skip to content</a>
       <main className="app-main" id="main-content" ref={mainRef} tabIndex={-1}>
         <Outlet />
+        <NotificationSetup />
+        {(import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(window.location.hostname)) && pathname !== '/context-simulator' && <Link className="context-dev-link" to="/context-simulator">Developer: Context Simulator</Link>}
       </main>
+      <NotificationCenter />
       <BottomNav />
     </div>
   )

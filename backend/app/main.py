@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 
 from backend.app.adapters.zetaris import ZetarisError
 from backend.app.bootstrap import open_repository, sample_mode
-from backend.app.context_api import LIVE_RUNS, router as context_router
+from backend.app.context_api import LIVE_RUNS, router as readonly_context_router
 from backend.app.orchestration.consolidation import apply_merge, short
 
 RUNTIME = Path(__file__).resolve().parents[1] / 'runtime'
@@ -32,6 +32,8 @@ CHECK_IN_RESPONSES = {'same', 'different', 'related', 'other'}
 async def lifespan(app):
     with open_repository() as repository:
         app.state.repository = repository
+        from backend.app.context.service import ContextService
+        app.state.context_service = ContextService(repository)
         app.state.mode = 'sample' if sample_mode() else 'real'
         app.state.sample = None
         if sample_mode():
@@ -50,10 +52,11 @@ app = FastAPI(title='Recall data API', lifespan=lifespan)
 #   RECALL_CORS_ORIGINS=https://my-mac.tailnet.ts.net,https://ica-mac.tailnet.ts.net:5173
 #   RECALL_CORS_ORIGIN_REGEX=https://.*\\.ts\\.net(:\\d+)?   (optional)
 _ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5175', 'http://127.0.0.1:5175',
-            *[o.strip().rstrip('/') for o in os.environ.get('RECALL_CORS_ORIGINS', '').split(',') if o.strip()]]
+            *[o.strip().rstrip('/') for o in os.environ.get('RECALL_CORS_ORIGINS', '').split(',') if o.strip()],
+            *[o.strip().rstrip('/') for o in os.environ.get('PINGO_FRONTEND_ORIGINS', '').split(',') if o.strip()]]
 app.add_middleware(CORSMiddleware, allow_origins=_ORIGINS, allow_origin_regex=os.environ.get('RECALL_CORS_ORIGIN_REGEX') or None,
                    allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
-app.include_router(context_router)
+app.include_router(readonly_context_router)
 
 
 @app.exception_handler(ZetarisError)
@@ -392,3 +395,7 @@ def agent_events(request: Request, run_id: str):
             return _read_report(live).get('result', {}).get('trace_events', [])
         raise HTTPException(status_code=404, detail='Run not found.')
     return result.get('trace_events', [])
+
+# Additive application routes; agent/orchestrator contracts remain unchanged.
+from backend.app.context.routes import router as context_router
+app.include_router(context_router)

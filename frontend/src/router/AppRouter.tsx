@@ -6,6 +6,8 @@ import CategoryPage from '../pages/category/CategoryPage'
 import EntityDetailPage from '../pages/entity/EntityDetailPage'
 import AgentActivity from '../features/agent-activity/AgentActivity'
 import LiveAgentActivity from '../features/agent-activity/LiveAgentActivity'
+import ContextSimulator from '../pages/context/ContextSimulator'
+import NotificationDetail from '../features/notifications/NotificationDetail'
 
 export default function AppRouter() {
   return (
@@ -14,6 +16,8 @@ export default function AppRouter() {
         <Route element={<AppShell />}>
           <Route index element={<HomePage />} />
           <Route path="check-in" element={<CheckInPage />} />
+          <Route path="context-simulator" element={<ContextSimulator />} />
+          <Route path="recalls/:notificationId" element={<NotificationDetail />} />
           <Route path="category/:category" element={<CategoryPage />} />
           <Route path="entity/:entityId" element={<EntityDetailPage />} />
           <Route path="agent-activity" element={import.meta.env.VITE_USE_MOCK === 'true' ? <AgentActivity /> : <LiveAgentActivity />} />
