@@ -42,6 +42,25 @@ curl http://localhost:8000/agent-events/run_sample_revision
 
 The API returns structured decisions, evidence references, concise reasons and receipts. It does not request or show chain of thought. [Complete API](docs/api.md).
 
+## Modes: how to turn sample mode off
+
+| You want | Do this | Needs |
+| --- | --- | --- |
+| Look around, offline (default) | `docker compose up --build` | Nothing. No keys. |
+| **Your own screenshot or calendar event, real models** | Put the lines below in a `.env` file at the repo root, then `docker compose up --build` again. The sample workspace stays in memory and is resettable; the **Try it** tab links to the upload page. | A Meterless Nightshift instance |
+| Same, without Docker | `backend/.env` with `METERLESS_*`, then `serve.py --demo` (port 8100, resettable) | Nightshift, Python |
+| Full system on real Zetaris data | `SAMPLE_MODE=false` via `compose.zetaris.yaml` or `serve.py --env-file backend/.env` | Zetaris + Nightshift |
+
+```sh
+# .env at the repo root (never committed). From Docker, a Nightshift on your machine is reached through host.docker.internal.
+METERLESS_BASE_URL=http://host.docker.internal:8088/v1
+METERLESS_API_KEY=
+METERLESS_VISION_MODEL=gpt-4o-mini
+METERLESS_REASONING_MODEL=nvidia/nemotron-3-ultra-550b-a55b
+```
+
+`SAMPLE_MODE=false` without Zetaris does **not** fall back to sample data: the backend reports that storage is unavailable. Run provenance is always shown (`recorded` for replays, `live` for real model calls).
+
 ## Run with Python
 
 Requires Python 3.10+ (Docker uses 3.11):

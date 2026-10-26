@@ -5,6 +5,13 @@ services:
       dockerfile: backend/Dockerfile
     environment:
       SAMPLE_MODE: "true"
+      # Optional: with these set (see README "Modes"), the sample workspace also runs your own screenshots and context through real models.
+      METERLESS_BASE_URL: ${METERLESS_BASE_URL:-}
+      METERLESS_API_KEY: ${METERLESS_API_KEY:-}
+      METERLESS_VISION_MODEL: ${METERLESS_VISION_MODEL:-gpt-4o-mini}
+      METERLESS_REASONING_MODEL: ${METERLESS_REASONING_MODEL:-nvidia/nemotron-3-ultra-550b-a55b}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "127.0.0.1:${RECALL_BACKEND_PORT:-8000}:8000"
     healthcheck:
