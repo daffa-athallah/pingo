@@ -1,0 +1,6 @@
+{
+  "name": "example_2_revision",
+  "what_it_shows": "The Critic rejects an over-specific intention and the Open Loop Agent revises it before anything surfaces.",
+  "endpoint": "python backend/scripts/revision_fixture.py",
+  "fixture": "a saved intention retitled \"Book a table at OMB Burger tonight at 8pm\" (nothing supports the time or booking), then a Melbourne CBD calendar event"
+}

@@ -33,8 +33,10 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual(first['mode'], 'sample')
         self.assertFalse(first['model_calls'])
         self.assertEqual(first['result']['final_action'], 'SURFACE')
-        self.assertEqual([event['agent'] for event in first['result']['trace_events']], ['CONTEXT', 'CRITIC'])
-        self.assertTrue(all(event['receipt'] is None for event in first['result']['trace_events']))
+        self.assertEqual([event['agent'] for event in first['result']['trace_events']], ['ZETARIS', 'CONTEXT', 'CRITIC'])
+        self.assertFalse(first['agents_executed'])
+        self.assertEqual(first['data_source'], 'cached_run_history')
+        self.assertTrue(all(event['receipt']['provider'] == 'nvidia' for event in first['result']['trace_events'] if event.get('receipt')))
 
     def test_sample_requires_explicit_mode(self):
         with patch.dict(os.environ, {'SAMPLE_MODE': 'false'}, clear=True):

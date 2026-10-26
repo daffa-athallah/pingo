@@ -1,0 +1,19 @@
+{
+  "name": "example_3_surface",
+  "what_it_shows": "A calendar event near a saved place: the Context Agent matches, the Critic approves a reminder with its evidence.",
+  "endpoint": "POST /api/context/evaluate",
+  "body": {
+    "synthetic": true,
+    "events": [
+      {
+        "context_type": "CALENDAR",
+        "title": "Dinner with Alex",
+        "occurs_at": "2026-10-26T20:00:00+11:00",
+        "location_name": "Fitzroy North",
+        "city": "Melbourne",
+        "country": "Australia"
+      }
+    ]
+  },
+  "curl": "curl -X POST -H 'Content-Type: application/json' -d '{\"synthetic\": true, \"events\": [{\"context_type\": \"CALENDAR\", \"title\": \"Dinner with Alex\", \"occurs_at\": \"2026-10-26T20:00:00+11:00\", \"location_name\": \"Fitzroy North\", \"city\": \"Melbourne\", \"country\": \"Australia\"}]}' http://localhost:8000/api/context/evaluate"
+}

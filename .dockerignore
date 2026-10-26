@@ -10,4 +10,9 @@
 **/*.pyc
 backend/runtime
 zetaris-platform
-screenshot
+env.local
+**/env.local
+HANDOFF.md
+.agents
+.codex
+.aws

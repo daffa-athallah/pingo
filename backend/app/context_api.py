@@ -13,7 +13,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from backend.app.adapters.nightshift import ModelGateway, ModelGatewayError
-from backend.app.bootstrap import build_orchestrator, sample_mode
+from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
 from backend.app.context_policy import sensitive_reason
 from backend.app.domain.models import ContextEvent, ContextType
 from backend.app.orchestration.consolidation import short
@@ -39,10 +39,8 @@ class EvaluateRequest(BaseModel):
 
 @asynccontextmanager
 async def _gateway():
-    if sample_mode():
-        from backend.app.sample import SampleGateway
-        yield SampleGateway()  # scripted fixture; no model is called
-        return
+    if sample_mode() and not live_models():
+        raise ModelGatewayError('Sample mode accepts bundled recorded cases only; use /api/sample/history.')
     async with ModelGateway.from_env() as gateway:
         yield gateway
 
@@ -84,7 +82,7 @@ def _message(final_action: str, surface: dict | None, question: str | None) -> d
 
 async def _evaluate(request: Request, body: EvaluateRequest) -> dict:
     state = request.app.state
-    provenance = 'scripted' if sample_mode() else 'live'
+    provenance = 'recorded' if sample_mode() and not live_models() else 'live'
     kept, skipped, described = [], [], []
     for item in body.events:
         context_id = 'ctx_' + uuid.uuid4().hex[:10]
@@ -102,6 +100,8 @@ async def _evaluate(request: Request, body: EvaluateRequest) -> dict:
     if not kept:
         return {**common, 'run_id': None, 'status': 'done', 'decision': 'STAY_SILENT', 'final_action': 'STAY_SILENT', 'message': None,
                 'surface': None, 'ask': None, 'error': None, 'result': None, 'receipts': []}
+    if state.mode == 'sample' and not live_models():
+        raise HTTPException(status_code=422, detail='Arbitrary context needs live models. Configure METERLESS_BASE_URL, or replay a bundled example via /api/sample/cases.')
     repository = ReadOnlyOverlayRepository(state.repository)
     try:
         async with _gateway() as gateway:

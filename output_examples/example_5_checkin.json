@@ -1,0 +1,68 @@
+{
+  "name": "example_5_checkin",
+  "provenance": "recorded",
+  "workspace": "sample",
+  "synthetic_inputs": true,
+  "note": "Exported from a recorded run of the real agents; model replies were captured from Nightshift (receipts describe the capture).",
+  "final_action": "ASK",
+  "revision_count": 0,
+  "verification_count": 0,
+  "message_payload": null,
+  "question": null,
+  "outcome": null,
+  "check_ins": [
+    {
+      "id": "ci_c85bd02afaa9d9",
+      "loop_id": "f4",
+      "type": "CONFIRM",
+      "domain": "food",
+      "summary": "You saved \"Elmo's Burgers\" and \"Elmo's Hamburger Restaurant (Fitzroy North)\".",
+      "question": "Are 'Elmo's Burgers' (from a Melbourne burger list) and 'Elmo's Hamburger Restaurant (Fitzroy North)' the same venue?",
+      "context": "Recall wants to know whether these are one thing or two. If they are the same thing they are combined; otherwise both stay.",
+      "supporting_images": [],
+      "positive": {
+        "value": "same",
+        "label": "Yes, same thing"
+      },
+      "negative": {
+        "value": "different",
+        "label": "No, keep both"
+      },
+      "options": [
+        {
+          "value": "related",
+          "label": "Related, keep both"
+        },
+        {
+          "value": "other",
+          "label": "Something else",
+          "allows_comment": true
+        }
+      ]
+    }
+  ],
+  "consolidation": {
+    "run_id": "run_sample_duplicates",
+    "day": "2026-10-26",
+    "candidate_pairs": 4,
+    "judged": 4,
+    "merged": [
+      [
+        "f1",
+        "f2"
+      ]
+    ],
+    "asked": [
+      "ci_c85bd02afaa9d9"
+    ],
+    "kept_separate": 2,
+    "model_calls": 1,
+    "errors": []
+  },
+  "surface": null,
+  "agents_in_trace": [
+    "CRITIC",
+    "REPOSITORY"
+  ],
+  "trace_events": 5
+}

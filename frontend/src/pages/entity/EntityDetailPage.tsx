@@ -16,12 +16,12 @@ export default function EntityDetailPage() {
       <div className="entity-detail-sheet">
         <span className="entity-detail-handle" aria-hidden="true" />
         <header className="entity-detail-header"><h1>{entity?.name ?? 'Saved intention'}</h1>{entity?.location && <p>{entity.location}</p>}</header>
-        <section className="entity-detail-intention" aria-labelledby="intention-heading">
+        <section data-guide-target="intention" className="entity-detail-intention" aria-labelledby="intention-heading">
           <h2 id="intention-heading"><span><RecallIcon name="target" /></span>Your intention</h2>
           <p>{entity?.inferredIntention ?? 'Intent detail will go here.'}</p>
         </section>
         {entity?.screenshots && entity.screenshots.length > 0 && (
-          <section className="entity-detail-shots" aria-labelledby="shots-heading">
+          <section data-guide-target="screenshots" className="entity-detail-shots" aria-labelledby="shots-heading">
             <h2 id="shots-heading">Your screenshots ({entity.screenshots.length})</h2>
             <div className="entity-detail-shot-list">
               {entity.screenshots.map((shot) => (

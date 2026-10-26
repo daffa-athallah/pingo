@@ -1,0 +1,19 @@
+{
+  "name": "example_4_restraint",
+  "what_it_shows": "An unrelated calendar event: no saved intention matches, so Recall stays silent.",
+  "endpoint": "POST /api/context/evaluate",
+  "body": {
+    "synthetic": true,
+    "events": [
+      {
+        "context_type": "CALENDAR",
+        "title": "Pick up dry cleaning",
+        "occurs_at": "2026-10-26T20:00:00+11:00",
+        "location_name": "Fitzroy North",
+        "city": "Melbourne",
+        "country": "Australia"
+      }
+    ]
+  },
+  "curl": "curl -X POST -H 'Content-Type: application/json' -d '{\"synthetic\": true, \"events\": [{\"context_type\": \"CALENDAR\", \"title\": \"Pick up dry cleaning\", \"occurs_at\": \"2026-10-26T20:00:00+11:00\", \"location_name\": \"Fitzroy North\", \"city\": \"Melbourne\", \"country\": \"Australia\"}]}' http://localhost:8000/api/context/evaluate"
+}

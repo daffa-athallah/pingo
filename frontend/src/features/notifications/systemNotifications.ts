@@ -21,6 +21,7 @@ export async function enableSystemNotifications(): Promise<NotificationPermissio
 }
 
 export async function showSystemNotification(notice: PingoNotification): Promise<boolean> {
+  if (notice.payload.sources.includes('CACHED')) return false
   if (notificationSupport() !== 'granted') return false
   const history = shown()
   if (history.has(notice.notification_id)) return false

@@ -1,64 +1,65 @@
-"""Explicit deterministic demo fixtures. No image analysis, sponsor calls or receipts.
-
-Never use these scripted replies for production. The entrypoint requires
-SAMPLE_MODE=true and labels every output as synthetic.
-"""
-from __future__ import annotations
-
+"""Sample mode reads cached product history. It never manufactures or reruns decisions."""
+from copy import deepcopy
 import json
-from contextlib import nullcontext
+from pathlib import Path
 
-from backend.app.bootstrap import build_orchestrator, open_repository, sample_mode
+from backend.app.bootstrap import sample_mode
+from backend.app.repositories.context_store import Notification
 
-
-class SampleGateway:
-    vision_model = 'sample-fixture-no-model'
-    reasoning_model = 'sample-fixture-no-model'
-    last_routing = {}
-
-    async def complete(self, messages, **kwargs):
-        if not sample_mode():
-            raise RuntimeError('Scripted fixture gateway requires SAMPLE_MODE=true.')
-        payload = json.loads(messages[-1]['content'])
-        if 'new_evidence' in payload:
-            result = dict(decision='CREATE', target_loop_id=None, proposed_title='Sample interest in a café',
-                          domain='food', confidence=0.7, concise_reason='Scripted sample decision; no model was called.',
-                          supporting_evidence_ids=[payload['new_evidence']['evidence_id']],
-                          supporting_entity_ids=[item['entity_id'] for item in payload['new_entities']], material_uncertainty=None)
-        elif 'context_decision' in payload:
-            result = dict(decision='SURFACE', loop_id=payload['open_loop']['loop_id'], confidence=0.8,
-                          concise_reason='Scripted sample review; no model was called.',
-                          supporting_evidence_ids=[item['evidence_id'] for item in payload['supporting_evidence']],
-                          supporting_context_ids=[item['context_id'] for item in payload['context_events']],
-                          material_uncertainty=None, question=None, revision_request=None, verification_request=None)
-        elif 'candidate_open_loops' in payload:
-            result = dict(decision='MATCH', candidate_loop_id=payload['candidate_open_loops'][0]['loop_id'],
-                          trigger_type='CALENDAR', relevant_context_ids=[payload['context_events'][0]['context_id']],
-                          relevance_confidence=0.8, concise_reason='Scripted sample context; no model was called.',
-                          material_uncertainty=None, verification_request=None)
-        else:
-            raise RuntimeError('Unsupported sample fixture request.')
-        return json.dumps(result)
+HISTORY = Path(__file__).resolve().parents[1] / 'demo/history.json'
 
 
-async def run_sample(repository=None) -> dict:
+def read_history():
+    data = json.loads(HISTORY.read_text())
+    records = data['records']
+    if not records or any(r.get('provenance') != 'recorded' or not r.get('cached') for r in records):
+        raise ValueError('Sample history must contain explicitly cached run records.')
+    return deepcopy(data)
+
+
+def cached_recall_views(repository, records):
+    """Adapt stored SURFACE payloads to the existing recall-detail contract.
+
+    These are views of historical decisions, not evidence of notification delivery.
+    They start read so merely loading the app does not display a new notification.
+    Feedback is handled by the existing service on this disposable local repository.
+    """
+    views = []
+    for record in records:
+        result = record['result']
+        payload = result.get('message_payload') or {}
+        loop = repository.get_open_loop(payload.get('loop_id'))
+        evidence = [repository.get_evidence(i) for i in payload.get('evidence_ids', [])]
+        if result.get('final_action') != 'SURFACE' or not loop or not evidence or any(e is None or e.sensitive for e in evidence):
+            continue
+        entities = repository.get_entities(sorted({k.entity_id for k in repository.get_loop_entities([loop.loop_id])}))
+        notice = Notification('cached_' + record['run_id'], loop.loop_id, record['started_at'], {
+            'title': loop.title, 'message': 'An intention you saved may be relevant now. Revisit the evidence behind it.',
+            'reason': payload['reason'], 'run_id': record['run_id'],
+            'sources': ['CACHED', *(['SIMULATED'] if record.get('synthetic_inputs') else [])],
+            'trigger_types': [(record.get('context_event') or {}).get('context_type', 'CALENDAR')],
+            'context_ids': payload.get('context_ids', []),
+            'entities': [{'entity_id': e.entity_id, 'name': e.name} for e in entities],
+            'evidence': [{'evidence_id': e.evidence_id, 'summary': e.summary, 'image_url': f'/evidence/{e.evidence_id}/image' if e.image_ref else None} for e in evidence],
+            'cached': True, 'original_delivery_verified': False,
+            'delivery_status': 'APPROVED', 'read': True, 'dismissed': False, 'feedback': None,
+            'snoozed_until': None, 'feedback_events': [],
+        })
+        repository.save_notification(notice)
+        views.append({'notification_id': notice.notification_id, 'loop_id': loop.loop_id, 'run_id': record['run_id'],
+                      'title': loop.title, 'context': record.get('context_event'), 'reason': payload['reason'],
+                      'evidence_ids': payload['evidence_ids'], 'captured_at': record['started_at'],
+                      'synthetic_inputs': record.get('synthetic_inputs', False)})
+    return views
+
+
+async def run_sample(repository=None):
     if not sample_mode():
-        raise RuntimeError('Set SAMPLE_MODE=true to run the offline fixture example.')
-    from backend.app.agents.evidence import Entity, Evidence, Location
-    from backend.app.domain.models import ContextEvent, ContextType
-    from backend.app.ingestion.evidence_bridge import ingest
-
-    now = lambda: '2026-10-25T10:00:00+00:00'
-    scope = nullcontext(repository) if repository is not None else open_repository()
-    with scope as repository:
-        extraction = Evidence('food', 'Synthetic sample café screenshot fixture; no image was analyzed.',
-                              [Entity('Sample café', 'cafe', location=Location('Sample area', 'Melbourne', 'Australia'))], False, 'high')
-        graph = ingest(extraction, repository, source='sample_fixture', captured_at=now(), new_id=lambda: 'ev_sample')
-        orchestrator = build_orchestrator(SampleGateway(), repository, now=now, new_run_id=lambda: 'run_sample',
-                                          new_loop_id=lambda: 'loop_sample')
-        await orchestrator.open_loop_agent.process(graph.evidence, graph.entities)
-        context = ContextEvent('ctx_sample', ContextType.CALENDAR, 'Synthetic sample café visit', now(), 'Sample area', 'Melbourne', 'Australia')
-        result = await orchestrator.evaluate_context([context])
-        return {'mode': 'sample', 'data_source': 'synthetic_fixture', 'model_calls': False,
-                'repository': 'InMemoryLoopRepository', 'evidence_ids': ['ev_sample'],
-                'result': result.to_dict()}
+        raise RuntimeError('Set SAMPLE_MODE=true to read the cached history.')
+    data = read_history()
+    views = cached_recall_views(repository, data['records']) if repository is not None else []
+    return {'mode': 'sample', 'data_source': 'cached_run_history', 'provenance': 'recorded',
+            'workspace': 'sample', 'model_calls': False, 'agents_executed': False,
+            'repository': 'InMemoryLoopRepository', 'cached_at': data['cached_at'],
+            'records': data['records'], 'recall_views': views,
+            'result': next((r['result'] for r in data['records'] if r['result']['final_action'] == 'SURFACE'), data['records'][0]['result'])}

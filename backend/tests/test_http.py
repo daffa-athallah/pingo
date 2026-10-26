@@ -20,9 +20,10 @@ class HttpSampleTests(unittest.TestCase):
                 self.assertEqual((health['mode'], health['repository']), ('sample', 'InMemoryLoopRepository'))
                 self.assertFalse(client.get('/sample').json()['model_calls'])
                 self.assertEqual(client.get('/integration-status').json()['status'], 'integration_pending')
-                events = client.get('/agent-events/run_sample').json()
-                self.assertEqual([event['agent'] for event in events], ['CONTEXT', 'CRITIC'])
-                self.assertTrue(all(event['receipt'] is None for event in events))
+                run_id = client.get('/sample').json()['result']['run_id']
+                events = client.get(f'/agent-events/{run_id}').json()
+                self.assertEqual([event['agent'] for event in events], ['ZETARIS', 'CONTEXT', 'CRITIC'])
+                self.assertTrue(all(event['receipt']['provider'] == 'nvidia' for event in events if event.get('receipt')))
 
     def test_counts_come_from_evidence_edges_not_files(self):
         with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), TestClient(app) as client:
@@ -34,7 +35,7 @@ class HttpSampleTests(unittest.TestCase):
             response = client.get('/entities/ent_count_test').json()
             self.assertEqual(response['screenshot_count'], 2)
             self.assertEqual(response['inferred_intention'], None)
-            self.assertEqual(client.get('/entities?domain=shopping').json(), [])
+            self.assertTrue(client.get('/entities?domain=shopping').json())
             self.assertEqual(client.get('/entities/missing').status_code, 404)
 
     def test_real_http_projection_uses_the_repository_without_visual_changes(self):

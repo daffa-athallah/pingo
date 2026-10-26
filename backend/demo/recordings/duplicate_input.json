@@ -1,0 +1,41 @@
+{
+  "label": "Synthetic look-alike fixture, adapted from consolidation_fixture.py; decisions captured from real Nightshift models",
+  "loops": [
+    [
+      "f1",
+      "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+      "OMB Burger",
+      "A promo for OMB Burger, a halal late-night burger spot in Melbourne CBD, under $10."
+    ],
+    [
+      "f2",
+      "Interested in Own My Burger late-night halal burgers",
+      "OMB Burger",
+      "A story about OMB Burger serving halal burgers late at night in the Melbourne CBD."
+    ],
+    [
+      "f3",
+      "Interested in Elmo's Hamburger Restaurant (Fitzroy North)",
+      "Elmo's Hamburger Restaurant",
+      "A video recommending Elmo's Hamburger Restaurant in Fitzroy North."
+    ],
+    [
+      "f4",
+      "Interested in Elmo's Burgers",
+      "Elmo's Burgers",
+      "A list of burger places mentioning Elmo's Burgers in Melbourne."
+    ],
+    [
+      "f5",
+      "Interested in Yamamoto Udon Izakaya (QV Square, Melbourne)",
+      "Yamamoto Udon Izakaya",
+      "Opening hours and food video for Yamamoto Udon Izakaya at QV Square."
+    ],
+    [
+      "f6",
+      "Interested in Yamamoto Cafe Bondi (Sydney)",
+      "Yamamoto Cafe Bondi",
+      "A cafe called Yamamoto Cafe in Bondi, Sydney."
+    ]
+  ]
+}

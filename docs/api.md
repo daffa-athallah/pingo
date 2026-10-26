@@ -193,3 +193,19 @@ Browser geolocation only works on HTTPS (or localhost), so serve the UI and the 
 `tailscale funnel` would make the API public. There is no authentication, and the API serves personal screenshots and loops, so do not leave it on.
 
 Without the backend machine: run the backend with `SAMPLE_MODE=true` (offline fixtures), or the frontend with `VITE_USE_MOCK=true`.
+
+## Recorded sample cases (judge setup)
+
+In `SAMPLE_MODE=true`, browsing data is now the committed historical snapshot (30 Evidence, 65 entities, 17 active loops). Each of seven recorded cases is replayed on demand through the existing agents and registered in `/runs` with `provenance: recorded`, `workspace: sample`, `synthetic_inputs: true`. No live model, Zetaris, H-MEM service or Node runtime is called. Receipts describe the **original capture**. See [recording details](../backend/demo/recordings/README.md).
+
+| Endpoint | Response |
+| --- | --- |
+| `GET /api/sample/cases` | `[{id, label, provenance: "recorded", synthetic_inputs: true}]` |
+| `GET /api/sample/cases/{id}/image` | Bundled synthetic PNG (`attach` / `create` only; sensitive and unknown cases are `404`) |
+| `POST /api/sample/cases/{id}/replay` | Finished run record, also readable through `/api/runs/{run_id}` and `/agent-events/{run_id}` |
+
+Available IDs: `attach`, `create`, `sensitive`, `surface`, `restraint`, `revision`, `duplicates`. Historical replays use independent copies of the snapshot; duplicate review uses a labelled synthetic six-loop fixture. Neither mutates the browsing workspace. Duplicate replay additionally returns `check_ins` containing the generated Check-in questions. Those questions belong to the isolated case; they are not today's product Check-ins. The Home guide ("Try it" tab) offers the case buttons and `/agent-activity` shows the traces labelled **Recorded real run, replayed**.
+
+Arbitrary `POST /api/screenshots` remains `501` in sample mode. Arbitrary `POST /api/context/evaluate` is `422` (privacy-filtered events can still return silent without a model call); use an explicit case replay. Unknown cases are `404`; these endpoints are `404` outside sample mode. Replay has no live or scripted fallback on input drift.
+
+This section supersedes the earlier description of one scripted sample run and `recorded` as reserved. Real/demo mode routes keep their previous behavior.

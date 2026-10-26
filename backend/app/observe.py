@@ -110,11 +110,12 @@ def loop_state(repository, loop_id: str | None, *, exclude_evidence_id: str | No
 
 
 class UploadObserver:
-    def __init__(self, recorder: RunRecorder, repository, *, image_ref: str):
+    def __init__(self, recorder: RunRecorder, repository, *, image_ref: str, workspace: str = 'demo'):
         self.recorder, self.repository, self.image_ref = recorder, repository, image_ref
         self.zetaris = type(repository).__name__ == 'ZetarisRepository'
         self.store_agent = 'ZETARIS' if self.zetaris else 'REPOSITORY'
-        self.store_label = 'Zetaris' if self.zetaris else 'the demo workspace (in-memory)'
+        self.store_label = 'Zetaris' if self.zetaris else f'the {workspace} workspace (in-memory)'
+        self.storage_backend = 'zetaris' if self.zetaris else f'in-memory {workspace} workspace'
         self.receipts: dict[str, dict | None] = {}
         self.evidence_id: str | None = None
         self.sensitive = False
@@ -230,7 +231,7 @@ class UploadObserver:
         matched = [e for e in entities if e.entity_id in existing_entity_ids]
         new = [e for e in entities if e.entity_id not in existing_entity_ids]
         detail = {'evidence_id': evidence.evidence_id, 'entities_new': len(new), 'entities_matched_existing': len(matched), 'links': len(links),
-                  'backend': 'zetaris' if self.zetaris else 'in-memory demo workspace'}
+                  'backend': self.storage_backend}
         if not evidence.sensitive:
             detail['new_entities'] = [e.name for e in new]
             detail['matched_entities'] = [e.name for e in matched]

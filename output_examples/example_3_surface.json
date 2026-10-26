@@ -1,0 +1,82 @@
+{
+  "name": "example_3_surface",
+  "provenance": "recorded",
+  "workspace": "sample",
+  "synthetic_inputs": true,
+  "note": "Exported from a recorded run of the real agents; model replies were captured from Nightshift (receipts describe the capture).",
+  "final_action": "SURFACE",
+  "revision_count": 0,
+  "verification_count": 0,
+  "message_payload": {
+    "loop_id": "loop_62822173fdc0",
+    "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+    "reason": "Calendar dinner in Fitzroy North tomorrow matches active interest in Elmo's Hamburger Restaurant in same area; multiple screenshots show sustained interest.",
+    "evidence_ids": [
+      "ev_b793a2e138d7d509d26670ff",
+      "ev_cec51a5b7d33fc9401d77173",
+      "ev_c8e07581a1c3fc2581ab2528"
+    ],
+    "context_ids": [
+      "ctx_sample_surface"
+    ]
+  },
+  "question": null,
+  "outcome": null,
+  "check_ins": null,
+  "consolidation": null,
+  "surface": {
+    "loop": {
+      "loop_id": "loop_62822173fdc0",
+      "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+      "domain": "food",
+      "status": "ACTIVE",
+      "confidence": 0.85
+    },
+    "entities": [
+      {
+        "entity_id": "ent_1784ca42ac55",
+        "name": "Chard Burger"
+      },
+      {
+        "entity_id": "ent_8733cd5d2dd6",
+        "name": "Elmo's Hamburger Restaurant"
+      }
+    ],
+    "why_now": "Calendar dinner in Fitzroy North tomorrow matches active interest in Elmo's Hamburger Restaurant in same area; multiple screenshots show sustained interest.",
+    "evidence": [
+      {
+        "evidence_id": "ev_b793a2e138d7d509d26670ff",
+        "summary": "The screenshot features a video about Elmo's Hamburger Restaurant, highlighting it as one of Melbourne's most underrated burger spots. It mentions that Elmo's was overlooked in a top 100 burgers list.",
+        "timestamp": "2026-10-25T12:45:40.653174+00:00",
+        "image_url": "/evidence/ev_b793a2e138d7d509d26670ff/image"
+      },
+      {
+        "evidence_id": "ev_cec51a5b7d33fc9401d77173",
+        "summary": "The screenshot shows a review about Elmo's Hamburger Restaurant in Melbourne, comparing it to Chard Burger. It includes a user's opinion and a description of the two burger places.",
+        "timestamp": "2026-10-25T12:41:24.228237+00:00",
+        "image_url": "/evidence/ev_cec51a5b7d33fc9401d77173/image"
+      },
+      {
+        "evidence_id": "ev_c8e07581a1c3fc2581ab2528",
+        "summary": "The screenshot promotes Elmo's Hamburger Restaurant in Fitzroy North, Melbourne, highlighting their smashed burgers and shakes. It includes a personal review mentioning the taste and upcoming menu items.",
+        "timestamp": "2026-10-25T12:41:12.916003+00:00",
+        "image_url": "/evidence/ev_c8e07581a1c3fc2581ab2528/image"
+      }
+    ],
+    "context": [
+      {
+        "context_id": "ctx_sample_surface",
+        "context_type": "CALENDAR",
+        "title": "Dinner with Alex",
+        "occurs_at": "2026-10-26T20:00:00+11:00",
+        "location_name": "Fitzroy North",
+        "city": "Melbourne"
+      }
+    ]
+  },
+  "agents_in_trace": [
+    "CONTEXT",
+    "CRITIC"
+  ],
+  "trace_events": 2
+}

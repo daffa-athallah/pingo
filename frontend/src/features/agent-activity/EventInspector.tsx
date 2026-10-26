@@ -97,7 +97,7 @@ export default function EventInspector({ node, note }: { node: TimelineNode | nu
       {placeholder ? (
         <section className="aa-routing">
           <h3>Zetaris</h3>
-          <p className="aa-note">Integration pending. This step is stored through the repository boundary, which is an in-memory placeholder until the Zetaris connection is merged. No Zetaris query is claimed.</p>
+          <p className="aa-note">Shared repository state. This diagram node is a visual aid, not a recorded Zetaris query. The workspace label identifies the storage used.</p>
         </section>
       ) : null}
 

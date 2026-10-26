@@ -1,0 +1,307 @@
+{
+  "cached_at": "2026-10-26T10:36:57+00:00",
+  "source": "saved local run reports",
+  "records": [
+    {
+      "run_id": "run_add904e4ce30",
+      "kind": "context_critic",
+      "scenario": "A_relevant",
+      "label": "A_relevant",
+      "provenance": "recorded",
+      "workspace": "sample",
+      "synthetic_inputs": true,
+      "status": "done",
+      "started_at": "2026-10-26T03:28:57+00:00",
+      "finished_at": null,
+      "source_file": "context-eval-20261026T032917.json",
+      "context_event": {
+        "context_id": "ctx_ctrl_a",
+        "context_type": "CALENDAR",
+        "title": "Dinner with Alex",
+        "occurs_at": "2026-10-27T19:00:00+11:00",
+        "location_name": "Fitzroy North",
+        "city": "Melbourne",
+        "country": "Australia",
+        "metadata": {}
+      },
+      "loop_title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+      "result": {
+        "run_id": "run_add904e4ce30",
+        "run_type": "CONTEXT_EVALUATION",
+        "final_action": "SURFACE",
+        "loop_id": "loop_62822173fdc0",
+        "evidence_id": null,
+        "message_payload": {
+          "loop_id": "loop_62822173fdc0",
+          "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+          "reason": "Calendar dinner in Fitzroy North tomorrow matches active interest in Elmo's Hamburger Restaurant in same area; multiple screenshots show sustained interest.",
+          "evidence_ids": [
+            "ev_b793a2e138d7d509d26670ff",
+            "ev_cec51a5b7d33fc9401d77173",
+            "ev_c8e07581a1c3fc2581ab2528"
+          ],
+          "context_ids": [
+            "ctx_ctrl_a"
+          ]
+        },
+        "question": null,
+        "error": null,
+        "revision_count": 0,
+        "verification_count": 0,
+        "trace_events": [
+          {
+            "run_id": "run_add904e4ce30",
+            "timestamp": "2026-10-26T03:28:57+00:00",
+            "agent": "ZETARIS",
+            "action": "LOAD",
+            "reason": "Loaded Open Loop with 2 entities and 3 supporting Evidence records from Zetaris.",
+            "input_refs": [
+              "loop:loop_62822173fdc0",
+              "evidence:ev_b793a2e138d7d509d26670ff",
+              "evidence:ev_cec51a5b7d33fc9401d77173",
+              "evidence:ev_c8e07581a1c3fc2581ab2528"
+            ],
+            "next_step": "CONTEXT",
+            "output_ref": "loop:loop_62822173fdc0",
+            "receipt": null
+          },
+          {
+            "run_id": "run_add904e4ce30",
+            "timestamp": "2026-10-26T03:28:42+00:00",
+            "agent": "CONTEXT",
+            "action": "MATCH",
+            "reason": "Calendar event for dinner in Fitzroy North matches open loop for Elmo's Hamburger Restaurant in same area at dinner time.",
+            "input_refs": [
+              "context:ctx_ctrl_a",
+              "loop:loop_62822173fdc0"
+            ],
+            "next_step": "CRITIC",
+            "output_ref": "loop:loop_62822173fdc0",
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          },
+          {
+            "run_id": "run_add904e4ce30",
+            "timestamp": "2026-10-26T03:28:56+00:00",
+            "agent": "CRITIC",
+            "action": "SURFACE",
+            "reason": "Calendar dinner in Fitzroy North tomorrow matches active interest in Elmo's Hamburger Restaurant in same area; multiple screenshots show sustained interest.",
+            "input_refs": [
+              "loop:loop_62822173fdc0",
+              "context:ctx_ctrl_a",
+              "evidence:ev_b793a2e138d7d509d26670ff",
+              "evidence:ev_cec51a5b7d33fc9401d77173",
+              "evidence:ev_c8e07581a1c3fc2581ab2528"
+            ],
+            "next_step": "OUTPUT",
+            "output_ref": "loop:loop_62822173fdc0",
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          }
+        ]
+      },
+      "cached": true,
+      "original_provenance": "live",
+      "original_workspace": "canonical",
+      "recording_note": "Cached result of an earlier model run. Reading history does not run an agent or model again."
+    },
+    {
+      "run_id": "run_a6b2a6b0ca23",
+      "kind": "context_critic",
+      "scenario": "B_restraint",
+      "label": "B_restraint",
+      "provenance": "recorded",
+      "workspace": "sample",
+      "synthetic_inputs": true,
+      "status": "done",
+      "started_at": "2026-10-26T03:29:17+00:00",
+      "finished_at": null,
+      "source_file": "context-eval-20261026T032917.json",
+      "context_event": {
+        "context_id": "ctx_ctrl_b",
+        "context_type": "CALENDAR",
+        "title": "Pick up dry cleaning",
+        "occurs_at": "2026-10-27T17:30:00+11:00",
+        "location_name": "Fitzroy North",
+        "city": "Melbourne",
+        "country": "Australia",
+        "metadata": {}
+      },
+      "loop_title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+      "result": {
+        "run_id": "run_a6b2a6b0ca23",
+        "run_type": "CONTEXT_EVALUATION",
+        "final_action": "STAY_SILENT",
+        "loop_id": null,
+        "evidence_id": null,
+        "message_payload": null,
+        "question": null,
+        "error": null,
+        "revision_count": 0,
+        "verification_count": 0,
+        "trace_events": [
+          {
+            "run_id": "run_a6b2a6b0ca23",
+            "timestamp": "2026-10-26T03:29:17+00:00",
+            "agent": "ZETARIS",
+            "action": "LOAD",
+            "reason": "Loaded Open Loop with 2 entities and 3 supporting Evidence records from Zetaris.",
+            "input_refs": [
+              "loop:loop_62822173fdc0",
+              "evidence:ev_b793a2e138d7d509d26670ff",
+              "evidence:ev_cec51a5b7d33fc9401d77173",
+              "evidence:ev_c8e07581a1c3fc2581ab2528"
+            ],
+            "next_step": "CONTEXT",
+            "output_ref": "loop:loop_62822173fdc0",
+            "receipt": null
+          },
+          {
+            "run_id": "run_a6b2a6b0ca23",
+            "timestamp": "2026-10-26T03:29:17+00:00",
+            "agent": "CONTEXT",
+            "action": "NO_MATCH",
+            "reason": "Calendar event for dry cleaning pickup in Fitzroy North does not clearly connect to any open loop; restaurant interest loop exists for same area but different activity with no dining indication.",
+            "input_refs": [
+              "context:ctx_ctrl_b"
+            ],
+            "next_step": "STOP",
+            "output_ref": null,
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          }
+        ]
+      },
+      "cached": true,
+      "original_provenance": "live",
+      "original_workspace": "canonical",
+      "recording_note": "Cached result of an earlier model run. Reading history does not run an agent or model again."
+    },
+    {
+      "run_id": "run_7b8ad0ff2717",
+      "kind": "revision_fixture",
+      "scenario": "revision",
+      "label": "revision",
+      "provenance": "recorded",
+      "workspace": "sample",
+      "synthetic_inputs": true,
+      "status": "done",
+      "started_at": "2026-10-26T03:29:33+00:00",
+      "finished_at": null,
+      "source_file": "revision-fixture-20261026T033005.json",
+      "original_title": "Book a table at OMB Burger tonight at 8pm",
+      "final_title": "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+      "result": {
+        "run_id": "run_7b8ad0ff2717",
+        "run_type": "CONTEXT_EVALUATION",
+        "final_action": "SURFACE",
+        "loop_id": "loop_fixture_overspecific",
+        "evidence_id": null,
+        "message_payload": {
+          "loop_id": "loop_fixture_overspecific",
+          "title": "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+          "reason": "User interested in OMB Burger (halal, late-night, under $10) matches calendar dinner in Melbourne CBD at 8pm; timely suggestion.",
+          "evidence_ids": [
+            "ev_911de93f16a233a77fcfc1cb"
+          ],
+          "context_ids": [
+            "ctx_ctrl_rev"
+          ]
+        },
+        "question": null,
+        "error": null,
+        "revision_count": 1,
+        "verification_count": 0,
+        "trace_events": [
+          {
+            "run_id": "run_7b8ad0ff2717",
+            "timestamp": "2026-10-26T03:29:33+00:00",
+            "agent": "CONTEXT",
+            "action": "MATCH",
+            "reason": "Calendar event for dinner in Melbourne CBD at 8pm matches open loop to book OMB Burger tonight at 8pm in same area.",
+            "input_refs": [
+              "context:ctx_ctrl_rev",
+              "loop:loop_fixture_overspecific"
+            ],
+            "next_step": "CRITIC",
+            "output_ref": "loop:loop_fixture_overspecific",
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          },
+          {
+            "run_id": "run_7b8ad0ff2717",
+            "timestamp": "2026-10-26T03:29:43+00:00",
+            "agent": "CRITIC",
+            "action": "REQUEST_REVISION",
+            "reason": "Loop title states a specific booking plan and time not supported by evidence; evidence only shows restaurant attributes.",
+            "input_refs": [
+              "loop:loop_fixture_overspecific",
+              "context:ctx_ctrl_rev",
+              "evidence:ev_911de93f16a233a77fcfc1cb"
+            ],
+            "next_step": "OPEN_LOOP",
+            "output_ref": null,
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          },
+          {
+            "run_id": "run_7b8ad0ff2717",
+            "timestamp": "2026-10-26T03:29:53+00:00",
+            "agent": "OPEN_LOOP",
+            "action": "REVISE",
+            "reason": "Screenshot shows OMB Burger details; suggests interest but not a confirmed booking plan.",
+            "input_refs": [
+              "loop:loop_fixture_overspecific",
+              "evidence:ev_911de93f16a233a77fcfc1cb"
+            ],
+            "next_step": "CRITIC",
+            "output_ref": "loop:loop_fixture_overspecific",
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          },
+          {
+            "run_id": "run_7b8ad0ff2717",
+            "timestamp": "2026-10-26T03:30:05+00:00",
+            "agent": "CRITIC",
+            "action": "SURFACE",
+            "reason": "User interested in OMB Burger (halal, late-night, under $10) matches calendar dinner in Melbourne CBD at 8pm; timely suggestion.",
+            "input_refs": [
+              "loop:loop_fixture_overspecific",
+              "context:ctx_ctrl_rev",
+              "evidence:ev_911de93f16a233a77fcfc1cb"
+            ],
+            "next_step": "OUTPUT",
+            "output_ref": "loop:loop_fixture_overspecific",
+            "receipt": {
+              "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+              "provider": "nvidia"
+            }
+          }
+        ]
+      },
+      "cached": true,
+      "original_provenance": "live",
+      "original_workspace": "canonical",
+      "recording_note": "Cached result of an earlier model run. Reading history does not run an agent or model again."
+    }
+  ]
+}

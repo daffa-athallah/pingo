@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 from zoneinfo import ZoneInfo
 
 from backend.app.adapters.zetaris import ZetarisError
-from backend.app.bootstrap import app_mode, open_repository
+from backend.app.bootstrap import app_mode, live_models, open_repository
 from backend.app.context_api import router as context_router
 from backend.app.demo_workspace import SnapshotError, read_snapshot, seed, workspace_info
 from backend.app.hmem import HMemClient, HMemError, seed_from_repository
@@ -27,6 +27,7 @@ from backend.app.runs_api import router as runs_router, workspace_runs
 from backend.app.upload_api import router as upload_router
 
 RUNTIME = Path(__file__).resolve().parents[1] / 'runtime'
+SAMPLE_IMAGES = Path(__file__).resolve().parents[1] / 'demo/recordings/images'  # bundled synthetic test screenshots (sample mode only)
 SCREENSHOTS = Path(os.environ.get('RECALL_SCREENSHOT_DIR') or Path(__file__).resolve().parents[2] / 'screenshot')
 VIEW_TTL_SECONDS = 60
 SUPPORTED_DOMAINS = {'food', 'shopping', 'travel'}
@@ -59,7 +60,7 @@ async def lifespan(app):
         app.state.mode = mode
         app.state.workspace = {'real': 'canonical', 'demo': 'demo', 'sample': 'sample'}[mode]
         app.state.uploads_dir = uploads
-        app.state.image_dirs = [] if mode == 'sample' else [SCREENSHOTS, uploads]
+        app.state.image_dirs = [SCREENSHOTS, SAMPLE_IMAGES, uploads] if mode == 'sample' else [SCREENSHOTS, uploads]
         app.state.runs = RunStore(app.state.workspace, None if mode == 'sample' else run_dir)
         app.state.write_lock = asyncio.Lock()  # Zetaris is safe with one writer: uploads are processed one at a time
         app.state.tasks = set()  # background upload runs, kept referenced until they finish
@@ -74,10 +75,8 @@ async def lifespan(app):
         if mode == 'sample':
             from backend.app.sample import run_sample
             app.state.sample = await run_sample(repository)
-            scripted = app.state.sample['result']
-            app.state.runs.add_finished({'run_id': scripted['run_id'], 'kind': 'scripted_sample', 'label': 'Scripted sample', 'provenance': 'scripted',
-                                         'workspace': 'sample', 'synthetic_inputs': True, 'status': 'done', 'started_at': None,
-                                         'finished_at': None, 'result': scripted})
+            for record in app.state.sample['records']:
+                app.state.runs.add_finished(record)
         else:
             # Warm the slow reads (Zetaris) so the first screen does not wait. Instant for the in-memory demo workspace.
             Thread(target=lambda: (_cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}),
@@ -109,7 +108,7 @@ async def storage_error(request, error):
 def health(request: Request):
     state = request.app.state
     return {'status': 'ok', 'mode': state.mode, 'workspace': state.workspace, 'repository': type(state.repository).__name__,
-            'external_models_used': False if state.mode == 'sample' else None,
+            'external_models_used': False if state.mode == 'sample' and not live_models() else None, 'live_models': live_models(),
             **({'demo_workspace': state.demo_info} if state.demo_info else {}), 'hmem': _hmem_status(state.hmem)}
 
 
@@ -362,7 +361,7 @@ def respond_to_check_in(request: Request, check_in_id: str, answer: CheckInAnswe
 @app.get('/sample')
 def sample(request: Request):
     if request.app.state.mode != 'sample':
-        raise HTTPException(status_code=404, detail='The scripted sample fixture exists only in SAMPLE_MODE.')
+        raise HTTPException(status_code=404, detail='Recorded examples exist only in SAMPLE_MODE.')
     return request.app.state.sample
 
 
@@ -434,3 +433,6 @@ async def reset_demo_workspace(request: Request):
 # Context simulation and notifications (additive routes; agent and orchestrator contracts are unchanged).
 from backend.app.context.routes import router as notifications_router  # noqa: E402
 app.include_router(notifications_router)
+
+from backend.app.sample_api import router as sample_router
+app.include_router(sample_router)

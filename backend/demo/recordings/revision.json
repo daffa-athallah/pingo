@@ -1,0 +1,48 @@
+{
+  "case": "revision",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:12:06+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "14b84cd10ec4f97a2273dfec86ffef2a2aa1b06dfb4fff47f7edff35caa8b24b",
+      "reply": "{\n  \"decision\": \"MATCH\",\n  \"candidate_loop_id\": \"loop_11fcb461ff69\",\n  \"trigger_type\": \"CALENDAR\",\n  \"relevant_context_ids\": [\"ctx_sample_revision\"],\n  \"relevance_confidence\": 0.9,\n  \"concise_reason\": \"Calendar event for dinner in Melbourne CBD at 8pm matches open loop to book OMB Burger tonight at 8pm in same area.\",\n  \"material_uncertainty\": null,\n  \"verification_request\": null\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    },
+    {
+      "signature": "0324e770eabf39c1ffeff7bbdba7e65a523a7e0af2d9bcdc021ad65afc2c80f6",
+      "reply": "{\n  \"decision\": \"REQUEST_REVISION\",\n  \"loop_id\": \"loop_11fcb461ff69\",\n  \"confidence\": 0.7,\n  \"concise_reason\": \"Loop title states a specific booking plan and time not supported by evidence; evidence only shows restaurant attributes.\",\n  \"supporting_evidence_ids\": [\"ev_911de93f16a233a77fcfc1cb\"],\n  \"supporting_context_ids\": [\"ctx_sample_revision\"],\n  \"material_uncertainty\": null,\n  \"question\": null,\n  \"revision_request\": \"Loop title states a specific booking plan ('Book a table at OMB Burger tonight at 8pm') not supported by evidence which only shows restaurant attributes. Revise to reflect only evidenced interest (e.g., 'Interested in OMB Burger for dinner in Melbourne CBD').\",\n  \"verification_request\": null\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    },
+    {
+      "signature": "639aba095ba8dba1bb60fc256e34325d5b734989f9b0f11c29d2de695405a4ce",
+      "reply": "{\n  \"decision\": \"REVISE\",\n  \"target_loop_id\": \"loop_11fcb461ff69\",\n  \"proposed_title\": \"Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)\",\n  \"domain\": \"food\",\n  \"confidence\": 0.7,\n  \"concise_reason\": \"Screenshot shows OMB Burger details; suggests interest but not a confirmed booking plan.\",\n  \"supporting_evidence_ids\": [\"ev_911de93f16a233a77fcfc1cb\"],\n  \"supporting_entity_ids\": [\"ent_15c0bc1f7221\"],\n  \"material_uncertainty\": \"Could be browsing, saving for future reference, comparing options, or planning a visit; no action confirmed.\"\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    },
+    {
+      "signature": "cd1a51f101c53e8375b3996d7b49e2236b58f67528469967e507dcb1318dc861",
+      "reply": "{\n  \"decision\": \"SURFACE\",\n  \"loop_id\": \"loop_11fcb461ff69\",\n  \"confidence\": 0.8,\n  \"concise_reason\": \"User interested in OMB Burger (halal, late-night, under $10) matches calendar dinner in Melbourne CBD at 8pm; timely suggestion.\",\n  \"supporting_evidence_ids\": [\"ev_911de93f16a233a77fcfc1cb\"],\n  \"supporting_context_ids\": [\"ctx_sample_revision\"],\n  \"material_uncertainty\": null,\n  \"question\": null,\n  \"revision_request\": null,\n  \"verification_request\": null\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    }
+  ],
+  "memory_calls": [],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "SURFACE"
+}

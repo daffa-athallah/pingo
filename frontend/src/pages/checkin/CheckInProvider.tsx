@@ -35,6 +35,12 @@ export function CheckInProvider({ children }: { children: ReactNode }) {
     return () => controller.abort()
   }, [revision])
 
+  useEffect(() => {
+    const refresh = () => setRevision(value => value + 1)
+    window.addEventListener('recall:data-changed', refresh)
+    return () => window.removeEventListener('recall:data-changed', refresh)
+  }, [])
+
   const submit = useCallback(async (id: string, answer: CheckInResponse) => {
     if (inFlight.current.has(id)) throw new Error('Response already saving')
     inFlight.current.add(id)

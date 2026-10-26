@@ -1,0 +1,21 @@
+{
+  "case": "sensitive",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:10:24+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "1179b2b1ff635c9634972b70261c3bb1da176dac27495259befbd3c1917380eb",
+      "reply": "```json\n{\n  \"domain\": \"health\",\n  \"summary\": \"The screenshot displays a synthetic medical record labeled as a privacy test. It includes the patient's name, a diagnosis note, and a disclaimer indicating it is not a real medical record.\",\n  \"entities\": [\n    {\n      \"name\": \"Example Person\",\n      \"type\": \"patient\",\n      \"category\": null,\n      \"subcategory\": null,\n      \"brand\": null,\n      \"location\": null,\n      \"attributes\": {}\n    }\n  ],\n  \"sensitive\": true,\n  \"confidence\": \"high\"\n}\n```",
+      "receipt": {
+        "requested_model": "gpt-4o-mini",
+        "routed_model": "gpt-4o-mini",
+        "provider": "openai"
+      }
+    }
+  ],
+  "memory_calls": [],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "STORED"
+}

@@ -1,0 +1,354 @@
+{
+  "ran_at": "2026-10-26T11:26:06+00:00",
+  "method": "Does Recall interrupt at the right moments? 20 synthetic calendar events against the saved history, run through the real agents and real models.\n\nGold labels come from construction, not from the model: 10 events are placed where a saved intention clearly applies (SURFACE expected), 10 are\nunrelated errands and appointments (STAY_SILENT expected). Each event runs on a fresh in-memory copy of the saved history; nothing is written to Zetaris.\nSmall and synthetic: it measures restraint and grounding, not user benefit. Needs Nightshift (METERLESS_* in backend/.env).",
+  "models": "Recall -> Nightshift -> NVIDIA Nemotron",
+  "summary": {
+    "events": 20,
+    "true_positive": 9,
+    "false_negative": 1,
+    "false_positive": 0,
+    "true_negative": 10,
+    "precision": 1.0,
+    "recall": 0.9,
+    "interruptions_on_unrelated_events": 0,
+    "surfaced_with_valid_evidence_citation": "9/9",
+    "decisions": {
+      "STAY_SILENT": 11,
+      "SURFACE": 9
+    },
+    "critic_revisions_requested": 0,
+    "context_verifications": 0,
+    "errors": 0
+  },
+  "rows": [
+    {
+      "event": "Dinner with Alex",
+      "place": "Fitzroy North",
+      "decision": "SURFACE",
+      "loop": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+      "reason": "Calendar dinner in Fitzroy North tomorrow matches active interest in Elmo's Hamburger Restaurant in same area; multiple screenshots show sustained interest.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "Elmo"
+    },
+    {
+      "event": "Lunch catch-up near QV",
+      "place": "QV Square",
+      "decision": "SURFACE",
+      "loop": "Interested in Yamamoto Udon Izakaya (QV Square, Melbourne)",
+      "reason": "Calendar lunch catch-up at QV Square at 7 PM matches interest in Yamamoto Udon Izakaya (same location, open dinner hours).",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "Yamamoto Udon"
+    },
+    {
+      "event": "Late night out in the city",
+      "place": "Melbourne CBD",
+      "decision": "SURFACE",
+      "loop": "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+      "reason": "User interested in OMB Burger (halal, late-night, under $10) matches calendar late night out in Melbourne CBD; timely food suggestion.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "OMB Burger"
+    },
+    {
+      "event": "Plan the January holiday",
+      "place": "Home",
+      "decision": "SURFACE",
+      "loop": "Interested in flights Melbourne to Bali (Jetstar, Virgin Australia, Jan 2027 dates)",
+      "reason": "Calendar event 'Plan the January holiday' on Nov 3 in Melbourne directly matches active loop researching Melbourne–Bali flights for Jan 2027 with Jetstar/Virgin Australia; evidence shows Melbourne departure 19/01–28/01/2027 at AUD $550.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "Bali flights"
+    },
+    {
+      "event": "Free Sunday, thinking of a day trip",
+      "place": "Dandenong Ranges",
+      "decision": "SURFACE",
+      "loop": "Interested in Alfred Nicholas Garden (Dandenongs, free entry, ~1 hr from CBD)",
+      "reason": "User interested in Alfred Nicholas Garden (free, ~1hr from CBD) matches calendar day trip to Dandenong Ranges; timely suggestion.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "Alfred Nicholas Garden"
+    },
+    {
+      "event": "Shopping trip for new shoes",
+      "place": "Chadstone Shopping Centre",
+      "decision": "SURFACE",
+      "loop": "Interested in Saucony Endorphin Pro 5 and Speed 4 running shoes",
+      "reason": "Shopping trip for new shoes aligns with documented interest in specific Saucony models; screenshot evidence supports intention.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "sneakers"
+    },
+    {
+      "event": "Start training for a 10k",
+      "place": "Albert Park",
+      "decision": "SURFACE",
+      "loop": "Interested in Saucony Endorphin Pro 5 and Speed 4 running shoes",
+      "reason": "Starting 10k training at Albert Park aligns with documented interest in specific Saucony running shoe models; screenshot evidence supports intention.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "Saucony running shoes"
+    },
+    {
+      "event": "Pick up skincare and makeup",
+      "place": "Chemist Warehouse",
+      "decision": "SURFACE",
+      "loop": "Interested in elf Soft Glam Satin Foundation",
+      "reason": "Chemist Warehouse trip for makeup aligns with documented interest in elf Soft Glam Satin Foundation; screenshot evidence supports intention.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "foundation / body wash"
+    },
+    {
+      "event": "Sam's birthday party",
+      "place": "Sam’s place",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "Ube cake"
+    },
+    {
+      "event": "Autumn wardrobe shopping",
+      "place": "Bourke Street Mall",
+      "decision": "SURFACE",
+      "loop": "Interested in Kallarona clothing",
+      "reason": "Autumn wardrobe shopping at Bourke Street Mall aligns with documented interest in Kallarona clothing; screenshot evidence supports intention.",
+      "cites_existing_evidence": true,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT",
+        "CRITIC"
+      ],
+      "error": null,
+      "expected": "SURFACE",
+      "target_intention": "cardigans"
+    },
+    {
+      "event": "Dentist appointment",
+      "place": "Collins Street Dental",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Team standup",
+      "place": "Zoom",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Pick up dry cleaning",
+      "place": "Fitzroy North",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Call Mum",
+      "place": "Home",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Lodge tax return",
+      "place": "Home",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Car service",
+      "place": "Clayton Auto",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Gym: leg day",
+      "place": "Fitness First",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Return library books",
+      "place": "Brunswick Library",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "GP check-up",
+      "place": "Carlton Medical",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    },
+    {
+      "event": "Conference in Sydney",
+      "place": "ICC Sydney",
+      "decision": "STAY_SILENT",
+      "loop": null,
+      "reason": null,
+      "cites_existing_evidence": false,
+      "revisions": 0,
+      "verifications": 0,
+      "agents": [
+        "CONTEXT"
+      ],
+      "error": null,
+      "expected": "STAY_SILENT",
+      "target_intention": null
+    }
+  ]
+}

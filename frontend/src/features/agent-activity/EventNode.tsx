@@ -22,7 +22,7 @@ function pillClass(action: string) {
 const EventNode = forwardRef<HTMLButtonElement, Props>(function EventNode({ node, visible, active, selected, onSelect }, ref) {
   const meta = AGENTS[node.agent]
   const isEvent = node.kind === 'event' && node.event
-  const label = node.event?.agent === 'REPOSITORY' ? 'Demo workspace' : node.kind === 'state' || node.agent === 'ZETARIS' ? 'Zetaris' : node.kind === 'input' ? node.title : meta.label
+  const label = node.event?.agent === 'REPOSITORY' || node.kind === 'state' ? 'Repository' : node.agent === 'ZETARIS' ? 'Zetaris' : node.kind === 'input' ? node.title : meta.label
   const role = node.kind === 'input' ? 'Input' : meta.role
   const className = ['aa-node', `aa-node-${node.kind}`, `aa-agent-${node.agent.toLowerCase()}`, node.lane === 'branch' ? 'is-branch' : '',
     node.placeholder ? 'is-placeholder' : '', visible ? 'is-visible' : '', active ? 'is-active' : '', selected ? 'is-selected' : '',
@@ -44,7 +44,7 @@ const EventNode = forwardRef<HTMLButtonElement, Props>(function EventNode({ node
         {node.headline ? <span className="aa-node-headline">{node.headline}</span> : null}
         {isEvent ? <span className="aa-node-reason">{node.event!.reason}</span> : null}
         {!isEvent && node.detail ? <span className="aa-node-reason">{node.detail}</span> : null}
-        {node.placeholder ? <span className="aa-badge">Integration pending</span> : null}
+        {node.placeholder ? <span className="aa-badge">Shared state</span> : null}
       </span>
     </button>
   )

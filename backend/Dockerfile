@@ -9,6 +9,8 @@ WORKDIR /app
 COPY backend/requirements*.txt /app/backend/
 RUN pip install --no-cache-dir -r /app/backend/requirements-server.txt
 COPY backend /app/backend
+COPY screenshot /app/screenshot
+RUN mkdir -p /app/backend/runtime && chmod 777 /app/backend/runtime
 RUN useradd --create-home recall
 USER recall
 EXPOSE 8000

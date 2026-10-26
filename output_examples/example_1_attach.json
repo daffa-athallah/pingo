@@ -1,0 +1,108 @@
+{
+  "name": "example_1_attach",
+  "provenance": "recorded",
+  "workspace": "sample",
+  "synthetic_inputs": true,
+  "note": "Exported from a recorded run of the real agents; model replies were captured from Nightshift (receipts describe the capture).",
+  "final_action": "STORED",
+  "revision_count": 0,
+  "verification_count": 0,
+  "message_payload": null,
+  "question": null,
+  "outcome": {
+    "status": "stored",
+    "evidence": {
+      "evidence_id": "ev_sample_attach",
+      "sensitive": false,
+      "domain": "food",
+      "summary": "The screenshot displays information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes.",
+      "confidence": "high",
+      "timestamp": "2026-10-26T06:00:00+00:00",
+      "entities": [
+        {
+          "entity_id": "ent_ded0c95133f6",
+          "name": "Elmo's Hamburger"
+        }
+      ],
+      "image_url": "/api/sample/cases/attach/image"
+    },
+    "open_loop": {
+      "decision": "ATTACH",
+      "reason": "New screenshot about Elmo's Hamburger Restaurant directly supports existing loop covering this venue and Chard Burger.",
+      "confidence": 0.85,
+      "loop": {
+        "loop_id": "loop_62822173fdc0",
+        "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+        "domain": "food",
+        "status": "ACTIVE",
+        "confidence": 0.85,
+        "screenshots": 4,
+        "screenshot_count": 4,
+        "entities": [
+          {
+            "entity_id": "ent_1784ca42ac55",
+            "name": "Chard Burger"
+          },
+          {
+            "entity_id": "ent_8733cd5d2dd6",
+            "name": "Elmo's Hamburger Restaurant"
+          },
+          {
+            "entity_id": "ent_ded0c95133f6",
+            "name": "Elmo's Hamburger"
+          }
+        ]
+      },
+      "change": {
+        "change": "supporting screenshots 3 → 4",
+        "before": {
+          "loop_id": "loop_62822173fdc0",
+          "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+          "domain": "food",
+          "status": "ACTIVE",
+          "confidence": 0.85,
+          "screenshots": 3
+        },
+        "after": {
+          "loop_id": "loop_62822173fdc0",
+          "title": "Interested in Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)",
+          "domain": "food",
+          "status": "ACTIVE",
+          "confidence": 0.85,
+          "screenshots": 4
+        }
+      }
+    },
+    "receipts": [
+      {
+        "agent": "EVIDENCE",
+        "action": "EXTRACT",
+        "receipt": {
+          "requested_model": "gpt-4o-mini",
+          "routed_model": "gpt-4o-mini",
+          "provider": "openai"
+        }
+      },
+      {
+        "agent": "OPEN_LOOP",
+        "action": "ATTACH",
+        "receipt": {
+          "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "provider": "nvidia"
+        }
+      }
+    ],
+    "error": null
+  },
+  "check_ins": null,
+  "consolidation": null,
+  "surface": null,
+  "agents_in_trace": [
+    "EVIDENCE",
+    "H-MEM",
+    "OPEN_LOOP",
+    "REPOSITORY"
+  ],
+  "trace_events": 11
+}

@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import BottomNav from './BottomNav'
 import NotificationCenter from '../../features/notifications/NotificationCenter'
+import JudgeGuide from '../../features/demo/JudgeGuide'
 import NotificationSetup from '../../features/notifications/NotificationSetup'
 
 export default function AppShell() {
@@ -23,6 +24,7 @@ export default function AppShell() {
       </main>
       <NotificationCenter />
       <BottomNav />
+      <JudgeGuide />
     </div>
   )
 }

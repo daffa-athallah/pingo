@@ -56,10 +56,10 @@ function useMediaQuery(query: string) {
 
 // Never call anything a real run unless real models produced it.
 const PROVENANCE_BADGE: Record<RunProvenance, string> = {
-  live: 'Real run', scripted: 'Scripted sample', recorded: 'Recorded real run', illustration: 'Hand-written illustration',
+  live: 'Real run', scripted: 'Scripted sample', recorded: 'Cached run history', illustration: 'Hand-written illustration',
 }
 const PROVENANCE_NOTE: Record<RunProvenance, string> = {
-  live: '', scripted: 'scripted sample: no model was called', recorded: 'recorded real run, replayed', illustration: 'hand-written illustration, not a run',
+  live: '', scripted: 'scripted sample: no model was called', recorded: 'cached decisions from an earlier run; no agents execute here', illustration: 'hand-written illustration, not a run',
 }
 
 const STEP_MS: Record<string, number> = { input: 260, state: 260, event: 900, result: 800 }
@@ -133,7 +133,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
         </div>
         <p className="aa-tagline">No single model call decides what the user sees.</p>
         <ul className="aa-architecture" aria-label="Architecture">
-          {ARCHITECTURE.map(([name, role]) => <li key={name}><strong>{name}</strong> {role}</li>)}
+          {ARCHITECTURE.map(([name, role]) => <li key={name}><strong>{name === 'Zetaris' && (demo?.workspace === 'sample' || demo?.workspace === 'demo') ? 'Repository' : name}</strong> {role}</li>)}
         </ul>
       </header>
 
@@ -157,14 +157,14 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
         {!reduced ? (
           <div className="aa-controls">
             {!done ? <button type="button" onClick={finish}>Skip</button> : null}
-            <button type="button" onClick={restart}>Replay</button>
+            <button type="button" onClick={restart}>Play trace</button>
           </div>
         ) : null}
       </div>
 
       <div className={`aa-body${view === 'map' ? ' is-map' : ''}`}>
         {view === 'map' ? (
-          <SystemMap timeline={timeline} visibleCount={visibleCount} focusKey={focusKey} animateFocus={animateFocus} onSelectNode={selectMapNode} />
+          <SystemMap storageLabel={demo?.workspace === 'sample' || demo?.workspace === 'demo' ? 'IN-MEMORY REPOSITORY' : 'ZETARIS'} timeline={timeline} visibleCount={visibleCount} focusKey={focusKey} animateFocus={animateFocus} onSelectNode={selectMapNode} />
         ) : (
           <ExecutionGraph timeline={timeline} visibleCount={visibleCount} selectedKey={selected?.key ?? null} onSelect={select} animate={!reduced} playing={playing} />
         )}
@@ -178,7 +178,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
         {zetaris?.connected
           ? <p>Connected to Zetaris: {zetaris.evidence} evidence, {zetaris.entities} entities, {zetaris.open_loops} open loops.</p>
           : workspaceNote ? <p>{workspaceNote}</p>
-          : <p>Zetaris integration is a placeholder in this view. Steps shown as shared state are not claimed as Zetaris queries.</p>}
+          : <p>No storage connection was verified for this view. Diagram state nodes do not claim database queries.</p>}
       </footer>
     </div>
   )

@@ -208,7 +208,7 @@ class UploadApi(Base):
 
 
 class SampleModeIsolation(unittest.TestCase):
-    def test_sample_mode_never_reads_or_writes_real_runs_and_labels_scripted_activity(self):
+    def test_sample_mode_never_reads_or_writes_real_runs_and_labels_recorded_activity(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         runtime = Path(tmp.name)
@@ -220,13 +220,14 @@ class SampleModeIsolation(unittest.TestCase):
         with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), patch('backend.app.main.RUNTIME', runtime), patch('backend.app.runs_api.RUNTIME', runtime), \
                 TestClient(app) as client:
             listed = client.get('/runs').json()
-            self.assertEqual([(r['run_id'], r['provenance'], r['workspace']) for r in listed], [('run_sample', 'scripted', 'sample')])
+            self.assertEqual(len(listed), len(client.get('/api/sample/history').json()['records']))
+            self.assertTrue(all((r['provenance'], r['workspace']) == ('recorded', 'sample') for r in listed))
             status = client.get('/integration-status').json()
-            self.assertEqual([r['run_id'] for r in status['saved_reasoning_runs']], ['run_sample'])
+            self.assertEqual(len(status['saved_reasoning_runs']), len(listed))
             self.assertEqual(client.get('/api/runs/run_REAL').status_code, 404)
             self.assertEqual(client.get('/agent-events/run_REAL2').status_code, 404)
-            evaluated = client.post('/api/context/evaluate', json={'events': [{'context_type': 'CALENDAR', 'title': 'Dinner with Alex'}]}).json()
-            self.assertEqual((evaluated['provenance'], evaluated['workspace'], evaluated['receipts']), ('scripted', 'sample', []))
+            evaluated = client.post('/api/context/evaluate', json={'events': [{'context_type': 'CALENDAR', 'title': 'Dinner with Alex'}]})
+            self.assertEqual(evaluated.status_code, 422)
             self.assertEqual(client.get('/health').json()['workspace'], 'sample')
         self.assertEqual(list((runtime / 'live_runs').glob('run_*.json')), [runtime / 'live_runs' / 'run_REAL2.json'])  # nothing was written
 

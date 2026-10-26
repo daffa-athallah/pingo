@@ -1,0 +1,65 @@
+{
+  "name": "example_2_revision",
+  "provenance": "recorded",
+  "workspace": "sample",
+  "synthetic_inputs": true,
+  "note": "Exported from a recorded run of the real agents; model replies were captured from Nightshift (receipts describe the capture).",
+  "final_action": "SURFACE",
+  "revision_count": 1,
+  "verification_count": 0,
+  "message_payload": {
+    "loop_id": "loop_11fcb461ff69",
+    "title": "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+    "reason": "User interested in OMB Burger (halal, late-night, under $10) matches calendar dinner in Melbourne CBD at 8pm; timely suggestion.",
+    "evidence_ids": [
+      "ev_911de93f16a233a77fcfc1cb"
+    ],
+    "context_ids": [
+      "ctx_sample_revision"
+    ]
+  },
+  "question": null,
+  "outcome": null,
+  "check_ins": null,
+  "consolidation": null,
+  "surface": {
+    "loop": {
+      "loop_id": "loop_11fcb461ff69",
+      "title": "Interested in OMB Burger (halal, late-night, under $10, Melbourne CBD)",
+      "domain": "food",
+      "status": "OPEN",
+      "confidence": 0.7
+    },
+    "entities": [
+      {
+        "entity_id": "ent_15c0bc1f7221",
+        "name": "OMB Burger"
+      }
+    ],
+    "why_now": "User interested in OMB Burger (halal, late-night, under $10) matches calendar dinner in Melbourne CBD at 8pm; timely suggestion.",
+    "evidence": [
+      {
+        "evidence_id": "ev_911de93f16a233a77fcfc1cb",
+        "summary": "The screenshot features a late-night halal burger spot in Melbourne CBD called OMB Burger, highlighting a promotion. It indicates the price is under $10.",
+        "timestamp": "2026-10-25T12:42:31.310572+00:00",
+        "image_url": "/evidence/ev_911de93f16a233a77fcfc1cb/image"
+      }
+    ],
+    "context": [
+      {
+        "context_id": "ctx_sample_revision",
+        "context_type": "CALENDAR",
+        "title": "Dinner with Alex",
+        "occurs_at": "2026-10-26T20:00:00+11:00",
+        "location_name": "Melbourne CBD",
+        "city": "Melbourne"
+      }
+    ]
+  },
+  "agents_in_trace": [
+    "CONTEXT",
+    "CRITIC",
+    "OPEN_LOOP"
+  ],
+  "trace_events": 4
+}

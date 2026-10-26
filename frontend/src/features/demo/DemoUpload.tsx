@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../../services/api'
-import { getHealth, getRunRecord, resetDemo, startUpload } from '../../services/runsApi'
+import { getHealth, getRunRecord, resetDemo, resetSample, startUpload } from '../../services/runsApi'
 import type { Health, RunRecord } from '../../services/runsApi'
 import './demo.css'
 
@@ -9,6 +9,7 @@ import './demo.css'
 const STEP_LABEL: Record<string, string> = { UPLOAD: 'Upload', EVIDENCE: 'Evidence Agent', REPOSITORY: 'Demo workspace', ZETARIS: 'Zetaris', OPEN_LOOP: 'Open Loop Agent', RUN: 'Run' }
 
 export default function DemoUpload() {
+  const navigate = useNavigate()
   const [health, setHealth] = useState<Health | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [run, setRun] = useState<RunRecord | null>(null)
@@ -16,9 +17,9 @@ export default function DemoUpload() {
   const timer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
-    getHealth().then(setHealth).catch((e: unknown) => setError(e instanceof Error ? e.message : 'The backend is not reachable.'))
+    getHealth().then((value) => { if (value.mode === 'sample' && !value.live_models) navigate('/?guide=1', { replace: true }); else setHealth(value) }).catch((e: unknown) => setError(e instanceof Error ? e.message : 'The backend is not reachable.'))
     return () => window.clearInterval(timer.current)
-  }, [])
+  }, [navigate])
 
   const watch = (runId: string) => {
     window.clearInterval(timer.current)
@@ -47,10 +48,10 @@ export default function DemoUpload() {
 
   const reset = async () => {
     setError(null); setRun(null)
-    try { await resetDemo() } catch (e) { setError(e instanceof Error ? e.message : 'Reset failed.') }
+    try { await (health?.mode === 'sample' ? resetSample() : resetDemo()) } catch (e) { setError(e instanceof Error ? e.message : 'Reset failed.') }
   }
 
-  const demoWorkspace = health?.mode === 'demo'
+  const demoWorkspace = health?.mode === 'demo' || (health?.mode === 'sample' && !!health.live_models)
   const events = run?.result.trace_events ?? []
   const outcome = run?.outcome
   return (
@@ -74,6 +75,8 @@ export default function DemoUpload() {
 
       {run ? (
         <>
+          {run.provenance === 'recorded' ? <p className="demo-badge">Recorded real run, replayed. Receipts describe the original capture. Each case uses an isolated snapshot.</p> : null}
+          {run.check_ins?.map((question) => <p key={question.id}><strong>Check-in:</strong> {question.question}</p>)}
           <ol className="demo-steps" aria-live="polite">
             {events.map((event) => (
               <li key={event.seq ?? `${event.agent}-${event.action}`} className={`is-${event.agent.toLowerCase()}`}>
@@ -101,6 +104,7 @@ export default function DemoUpload() {
               </p>
             </div>
           ) : null}
+          {!outcome ? <p><Link to={`/agent-activity?demo=${run.run_id}`}>Open in Agent Activity</Link> · {run.result.final_action}</p> : null}
           {run.status === 'failed' ? <p className="demo-error" role="alert">{run.result.error ?? 'The screenshot could not be processed. Nothing was stored.'}</p> : null}
         </>
       ) : null}

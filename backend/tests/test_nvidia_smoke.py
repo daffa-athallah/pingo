@@ -12,7 +12,7 @@ from unittest.mock import patch
 import httpx
 from openai import OpenAI
 
-from backend.scripts import test_nvidia as smoke
+from backend.legacy import test_nvidia as smoke
 
 
 class NvidiaSmokeTests(unittest.TestCase):

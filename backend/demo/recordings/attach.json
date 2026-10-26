@@ -1,0 +1,221 @@
+{
+  "case": "attach",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:10:00+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "947b70278bc168298fe349b2123100f6e1e297ed0397a544532f2b006613ac50",
+      "reply": "```json\n{\n  \"domain\": \"food\",\n  \"summary\": \"The screenshot shows information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes. It is open from Wednesday to Sunday, 5 PM until late, and has a rating of 4.6 stars from 800 reviews.\",\n  \"entities\": [\n    {\n      \"name\": \"Elmo's Hamburger\",\n      \"type\": \"restaurant\",\n      \"category\": null,\n      \"subcategory\": null,\n      \"brand\": null,\n      \"location\": {\n        \"location_name\": \"Fitzroy North\",\n        \"city\": \"Melbourne\",\n        \"country\": \"Australia\"\n      },\n      \"attributes\": {\n        \"price\": null,\n        \"halal\": null,\n        \"late_night\": null,\n        \"color\": null,\n        \"size\": null,\n        \"date\": null,\n        \"rating\": \"4.6 stars from 800 reviews\"\n      }\n    }\n  ],\n  \"sensitive\": false,\n  \"confidence\": \"high\"\n}\n```",
+      "receipt": {
+        "requested_model": "gpt-4o-mini",
+        "routed_model": "gpt-4o-mini",
+        "provider": "openai"
+      }
+    },
+    {
+      "signature": "947b70278bc168298fe349b2123100f6e1e297ed0397a544532f2b006613ac50",
+      "reply": "```json\n{\n  \"domain\": \"food\",\n  \"summary\": \"The screenshot displays information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes.\",\n  \"entities\": [\n    {\n      \"name\": \"Elmo's Hamburger\",\n      \"type\": \"restaurant\",\n      \"category\": \"hamburger\",\n      \"subcategory\": null,\n      \"brand\": null,\n      \"location\": {\n        \"location_name\": \"Fitzroy North\",\n        \"city\": \"Melbourne\",\n        \"country\": \"Australia\"\n      },\n      \"attributes\": {\n        \"open_hours\": \"Wed to Sun, 5pm until late\",\n        \"rating\": \"4.6 stars from 800 reviews\"\n      }\n    }\n  ],\n  \"sensitive\": false,\n  \"confidence\": \"high\"\n}\n```",
+      "receipt": {
+        "requested_model": "gpt-4o-mini",
+        "routed_model": "gpt-4o-mini",
+        "provider": "openai"
+      }
+    },
+    {
+      "signature": "1cc022b682f12255f21a513bc67db019f8d4d27cd902cc19ef2a1d0172338db4",
+      "reply": "{\n  \"decision\": \"ATTACH\",\n  \"target_loop_id\": \"loop_62822173fdc0\",\n  \"proposed_title\": null,\n  \"domain\": \"food\",\n  \"confidence\": 0.85,\n  \"concise_reason\": \"New screenshot about Elmo's Hamburger Restaurant directly supports existing loop covering this venue and Chard Burger.\",\n  \"supporting_evidence_ids\": [\"ev_b793a2e138d7d509d26670ff\", \"ev_c8e07581a1c3fc2581ab2528\", \"ev_sample_attach\"],\n  \"supporting_entity_ids\": [\"ent_ded0c95133f6\", \"ent_8733cd5d2dd6\", \"ent_1784ca42ac55\"],\n  \"material_uncertainty\": \"Could be general burger research rather than specific visit intent; loop already hedged as interest.\"\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    }
+  ],
+  "memory_calls": [
+    {
+      "method": "query",
+      "args": [
+        "The screenshot displays information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes. Entities: Elmo's Hamburger."
+      ],
+      "result": {
+        "memories": [
+          {
+            "id": "mem-30",
+            "content": "The screenshot features a video about Elmo's Hamburger Restaurant, highlighting it as one of Melbourne's most underrated burger spots. It mentions that Elmo's was overlooked in a top 100 burgers list. Entities: Elmo's Hamburger Restaurant.",
+            "type": "factual",
+            "layer": "long_term",
+            "confidence": 0.9,
+            "source": "screenshot:IMG_8910.PNG",
+            "provenance": {
+              "origin": "file_save",
+              "learnedAt": 1792932340653,
+              "label": "Saved screenshot",
+              "refs": [
+                "evidence:ev_b793a2e138d7d509d26670ff"
+              ]
+            },
+            "domain": "general",
+            "namespace": "general/facts",
+            "entities": [
+              "elmo",
+              "hamburger",
+              "restaurant",
+              "melbourne",
+              "entities"
+            ],
+            "tags": [
+              "food"
+            ],
+            "accessCount": 1,
+            "supersedes": null,
+            "supersededBy": null,
+            "derivedFrom": [],
+            "relevance": 0.40394299536680434
+          },
+          {
+            "id": "mem-12",
+            "content": "The screenshot promotes Elmo's Hamburger Restaurant in Fitzroy North, Melbourne, highlighting their smashed burgers and shakes. It includes a personal review mentioning the taste and upcoming menu items. Entities: Elmo's Hamburger Restaurant.",
+            "type": "factual",
+            "layer": "long_term",
+            "confidence": 0.9,
+            "source": "screenshot:IMG_8911.PNG",
+            "provenance": {
+              "origin": "file_save",
+              "learnedAt": 1792932072916,
+              "label": "Saved screenshot",
+              "refs": [
+                "evidence:ev_c8e07581a1c3fc2581ab2528"
+              ]
+            },
+            "domain": "work",
+            "namespace": "work/facts",
+            "entities": [
+              "elmo",
+              "hamburger",
+              "restaurant",
+              "fitzroy",
+              "north",
+              "melbourne",
+              "entities"
+            ],
+            "tags": [
+              "food"
+            ],
+            "accessCount": 1,
+            "supersedes": null,
+            "supersededBy": null,
+            "derivedFrom": [],
+            "relevance": 0.37310103294438207
+          },
+          {
+            "id": "mem-13",
+            "content": "The screenshot shows a review about Elmo's Hamburger Restaurant in Melbourne, comparing it to Chard Burger. It includes a user's opinion and a description of the two burger places. Entities: Chard Burger, Zane, Elmo's Hamburger Restaurant.",
+            "type": "factual",
+            "layer": "long_term",
+            "confidence": 0.9,
+            "source": "screenshot:IMG_8912.PNG",
+            "provenance": {
+              "origin": "file_save",
+              "learnedAt": 1792932084228,
+              "label": "Saved screenshot",
+              "refs": [
+                "evidence:ev_cec51a5b7d33fc9401d77173"
+              ]
+            },
+            "domain": "work",
+            "namespace": "work/facts",
+            "entities": [
+              "elmo",
+              "hamburger",
+              "restaurant",
+              "melbourne",
+              "chard",
+              "burger",
+              "entities",
+              "zane"
+            ],
+            "tags": [
+              "food"
+            ],
+            "accessCount": 1,
+            "supersedes": null,
+            "supersededBy": null,
+            "derivedFrom": [],
+            "relevance": 0.3684227392749134
+          }
+        ],
+        "trace": {
+          "retrievalReason": "hybrid ranking for \"The screenshot displays information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes. Entities: Elmo's Hamburger.\" (domain: general)",
+          "strategy": "comprehensive",
+          "scores": {
+            "mem-30": 0.4039,
+            "mem-12": 0.3731,
+            "mem-13": 0.3684
+          }
+        },
+        "context": "[MEMORY CONTEXT]\n## general\n- [LT] The screenshot features a video about Elmo's Hamburger Restaurant, highlighting it as one of Melbourne's most underrated burger spots. It mentions that Elmo's was overlooked in a top 100 burgers list. Entities: Elmo's Hamburger Restaurant. (entities: elmo, hamburger, restaurant, melbourne, entities) <mem-30>\n## work\n- [LT] The screenshot promotes Elmo's Hamburger Restaurant in Fitzroy North, Melbourne, highlighting their smashed burgers and shakes. It includes a personal review mentioning the taste and upcoming menu items. Entities: Elmo's Hamburger Restaurant. (entities: elmo, hamburger, restaurant, fitzroy, north, melbourne, entities) <mem-12>\n- [LT] The screenshot shows a review about Elmo's Hamburger Restaurant in Melbourne, comparing it to Chard Burger. It includes a user's opinion and a description of the two burger places. Entities: Chard Burger, Zane, Elmo's Hamburger Restaurant. (entities: elmo, hamburger, restaurant, melbourne, chard, burger, entities, zane) <mem-13>\n[/MEMORY CONTEXT]"
+      }
+    },
+    {
+      "method": "add",
+      "args": [
+        {
+          "content": "The screenshot displays information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes. Entities: Elmo's Hamburger.",
+          "type": "factual",
+          "layer": "working",
+          "confidence": 0.9,
+          "source": "screenshot:attach.png",
+          "tags": [
+            "food"
+          ],
+          "goalRunId": null,
+          "provenance": {
+            "origin": "file_save",
+            "learnedAt": 1792994400000,
+            "label": "Saved screenshot",
+            "refs": [
+              "evidence:ev_sample_attach"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "id": "mem-31",
+        "content": "The screenshot displays information about Elmo's Hamburger, a restaurant in Fitzroy North, Melbourne, known for its smashed cheeseburgers and thick shakes. Entities: Elmo's Hamburger.",
+        "type": "factual",
+        "layer": "working",
+        "confidence": 0.9,
+        "source": "screenshot:attach.png",
+        "provenance": {
+          "origin": "file_save",
+          "learnedAt": 1792994400000,
+          "label": "Saved screenshot",
+          "refs": [
+            "evidence:ev_sample_attach"
+          ]
+        },
+        "domain": "general",
+        "namespace": "general/facts",
+        "entities": [
+          "elmo",
+          "hamburger",
+          "fitzroy",
+          "north",
+          "melbourne",
+          "entities"
+        ],
+        "tags": [
+          "food"
+        ],
+        "accessCount": 0,
+        "supersedes": null,
+        "supersededBy": null,
+        "derivedFrom": []
+      }
+    }
+  ],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "STORED"
+}

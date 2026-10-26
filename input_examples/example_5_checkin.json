@@ -1,0 +1,6 @@
+{
+  "name": "example_5_checkin",
+  "what_it_shows": "Look-alike saves: the Critic merges one pair, keeps others apart, and asks you about the pair it is unsure of.",
+  "endpoint": "python backend/scripts/consolidation_fixture.py",
+  "fixture": "backend/demo/recordings/duplicate_input.json (six synthetic look-alike intentions)"
+}

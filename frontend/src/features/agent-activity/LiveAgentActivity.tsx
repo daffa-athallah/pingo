@@ -15,6 +15,12 @@ function clock(timestamp: string | null) {
 
 function toDemo(run: RunRecord): DemoRun {
   const common = { id: run.run_id, provenance: run.provenance, status: run.status, workspace: run.workspace, runs: [run.result] }
+  if (run.cached) {
+    return { ...common, label: run.label, annotations: {}, blurb: 'Cached output from a previous model run. These are the original saved decisions and receipts; no agents or models execute while you read this history.' }
+  }
+  if (run.provenance === 'recorded') {
+    return { ...common, label: run.label, annotations: {}, blurb: 'Recorded real run, replayed through the unchanged agents. Synthetic test inputs; receipts belong to the original capture. No live model or memory engine is called.' }
+  }
   if (run.kind === 'screenshot_upload') {
     return { ...common, label: `Upload ${clock(run.started_at)}`.trim(), annotations: {},
       blurb: 'A new screenshot goes through the Evidence Agent, is stored, and the Open Loop Agent decides what it means. Steps appear as they happen.' }
@@ -62,6 +68,6 @@ export default function LiveAgentActivity() {
   const demos = runs?.map(toDemo)
   const workspaceNote = health?.mode === 'demo'
     ? 'Demo workspace: an in-memory copy of the Zetaris history. Nothing here is written to Zetaris, and the workspace can be reset.'
-    : health?.mode === 'sample' ? 'Offline sample: no Zetaris, no models. Anything labelled scripted was answered by a fixture.' : undefined
+    : health?.mode === 'sample' ? 'Cached run history. Decisions, context and receipts come from earlier runs; nothing is re-evaluated here.' : undefined
   return <AgentActivity demos={demos} zetaris={status} workspaceNote={workspaceNote} />
 }

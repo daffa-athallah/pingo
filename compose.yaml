@@ -18,7 +18,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        VITE_CHECKIN_DEMO: "true"
+        VITE_CHECKIN_DEMO: "false"
     ports:
       - "127.0.0.1:${RECALL_FRONTEND_PORT:-5175}:80"
     depends_on:

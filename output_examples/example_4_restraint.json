@@ -1,0 +1,20 @@
+{
+  "name": "example_4_restraint",
+  "provenance": "recorded",
+  "workspace": "sample",
+  "synthetic_inputs": true,
+  "note": "Exported from a recorded run of the real agents; model replies were captured from Nightshift (receipts describe the capture).",
+  "final_action": "STAY_SILENT",
+  "revision_count": 0,
+  "verification_count": 0,
+  "message_payload": null,
+  "question": null,
+  "outcome": null,
+  "check_ins": null,
+  "consolidation": null,
+  "surface": null,
+  "agents_in_trace": [
+    "CONTEXT"
+  ],
+  "trace_events": 1
+}

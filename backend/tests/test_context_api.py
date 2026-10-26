@@ -59,16 +59,19 @@ class EvaluateApi(unittest.TestCase):
     def test_surface_payload_has_why_now_evidence_context_and_does_not_write(self):
         client = self.client()
         before = snapshot(app.state.repository)
-        body = client.post('/api/context/evaluate', json={'events': [EVENT], 'synthetic': True}).json()
-        self.assertEqual(body['final_action'], 'SURFACE')
-        self.assertTrue(body['synthetic'])
-        surface = body['surface']
-        self.assertTrue(surface['why_now'] and surface['evidence'] and surface['loop']['title'])
-        self.assertEqual([c['title'] for c in surface['context']], ['Dinner with Alex'])
-        self.assertEqual([e['agent'] for e in body['result']['trace_events']], ['CONTEXT', 'CRITIC'])
+        history = client.get('/api/sample/history').json()
+        view = history['recall_views'][0]
+        notice = client.get(f"/notifications/{view['notification_id']}").json()
+        body = client.get(f"/api/runs/{view['run_id']}").json()
+        self.assertEqual(body['result']['final_action'], 'SURFACE')
+        self.assertTrue(body['synthetic_inputs'])
+        self.assertTrue(notice['payload']['reason'] and notice['payload']['evidence'])
+        self.assertEqual(history['data_source'], 'cached_run_history')
+        self.assertFalse(history['agents_executed'])
+        self.assertFalse(notice['payload']['original_delivery_verified'])
+        self.assertIn('CACHED', notice['payload']['sources'])
         self.assertEqual(snapshot(app.state.repository), before)
-        self.assertEqual(client.get(f"/api/runs/{body['run_id']}").json()['result']['run_id'], body['run_id'])
-        self.assertEqual(len(client.get(f"/agent-events/{body['run_id']}").json()), 2)
+        self.assertEqual(len(client.get(f"/agent-events/{body['run_id']}").json()), 3)
 
     def test_validation_and_privacy(self):
         client = self.client()

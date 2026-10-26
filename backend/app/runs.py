@@ -17,6 +17,8 @@ import json
 from pathlib import Path
 from threading import RLock
 
+from backend.app import tracelog
+
 PROVENANCE = ('live', 'scripted', 'recorded')
 WORKSPACES = ('canonical', 'demo', 'sample')
 
@@ -51,6 +53,7 @@ class RunRecorder:
             self.record['status'] = 'failed' if final_action == 'FAILED_SAFE' else 'done'
             self.record['finished_at'] = _now()
         self._store._persist(self.record)
+        tracelog.write(self.record)
         return self.record
 
 

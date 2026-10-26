@@ -302,6 +302,7 @@ class ContextInputTests(unittest.TestCase):
         with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), TestClient(app) as client:
             response = client.post('/context-simulator/evaluate', json=request().model_dump(mode='json'))
             self.assertEqual(response.status_code, 409)
-            self.assertEqual(client.get('/notifications').json(), [])
+            listed = client.get('/notifications').json()  # only cached history, never a new or unread notification
+            self.assertTrue(all(n['payload']['cached'] and n['payload']['read'] for n in listed))
             self.assertEqual(client.get('/notifications/missing').status_code, 404)
             self.assertEqual(client.post('/notifications/missing/actions', json={'action':'BUY_NOW'}).status_code, 422)

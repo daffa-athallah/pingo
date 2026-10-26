@@ -1,0 +1,79 @@
+{
+  "captured_at": "2026-10-26T11:16:52+00:00",
+  "source": "live Zetaris instance, read-only",
+  "namespace": "recall_data.app",
+  "table_counts": {
+    "evidence": 30,
+    "entities": 65,
+    "evidence_entities": 69,
+    "open_loops": 35,
+    "loop_entities": 88,
+    "context_events": 1,
+    "check_ins": 0,
+    "context_evaluations": 1,
+    "notifications": 1
+  },
+  "queries": [
+    {
+      "role": "Open Loop Agent: which saved intentions share entities",
+      "sql": "SELECT l.title, COUNT(DISTINCT le.entity_id) FROM recall_data.app.open_loops l JOIN recall_data.app.loop_entities le ON l.loop_id = le.loop_id WHERE l.status IN ('OPEN','ACTIVE') GROUP BY l.title ORDER BY 2 DESC",
+      "rows_returned": 17,
+      "sample": [
+        [
+          "Researching Melbourne cheeseburger options",
+          "10"
+        ],
+        [
+          "Interested in men's cardigans",
+          "8"
+        ],
+        [
+          "Interested in Kallarona clothing",
+          "6"
+        ]
+      ],
+      "note": "Active intentions and how many entities each ties together."
+    },
+    {
+      "role": "Open Loop Agent: Evidence per entity (related-evidence retrieval)",
+      "sql": "SELECT en.name, COUNT(DISTINCT ee.evidence_id) FROM recall_data.app.entities en JOIN recall_data.app.evidence_entities ee ON en.entity_id = ee.entity_id GROUP BY en.name ORDER BY 2 DESC",
+      "rows_returned": 65,
+      "sample": [
+        [
+          "Elmo's Hamburger Restaurant",
+          "3"
+        ],
+        [
+          "Navy Merino Lapel Cardigan",
+          "2"
+        ],
+        [
+          "Melbourne",
+          "2"
+        ]
+      ],
+      "note": "The join behind get_related_evidence: screenshots that mention the same entity."
+    },
+    {
+      "role": "Evidence Agent output: non-sensitive Evidence by domain",
+      "sql": "SELECT domain, COUNT(*) FROM recall_data.app.evidence WHERE sensitive = false GROUP BY domain ORDER BY 2 DESC",
+      "rows_returned": 7,
+      "sample": [
+        [
+          "shopping",
+          "11"
+        ],
+        [
+          "food",
+          "8"
+        ],
+        [
+          "travel",
+          "3"
+        ]
+      ],
+      "note": "Sensitive Evidence is stored but excluded from every reasoning query."
+    }
+  ],
+  "role": "Zetaris is the system of record: append-only Evidence, entities, links, Open Loops, Check-ins. The agents retrieve through it; without it they have no memory of what was saved."
+}

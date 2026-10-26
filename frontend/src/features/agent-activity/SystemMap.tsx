@@ -5,6 +5,7 @@ import type { EdgeId, EdgeUse, MapNodeId, MapNodeSpec, NodeView } from './mapMod
 import type { Timeline } from './traceAdapter'
 
 interface Props {
+  storageLabel?: string
   timeline: Timeline
   visibleCount: number
   /** Timeline node whose step is highlighted. */
@@ -90,7 +91,7 @@ function Chip({ spec, title, sub, state, onSelect }: { spec: MapNodeSpec; title:
   )
 }
 
-export default function SystemMap({ timeline, visibleCount, focusKey, animateFocus, onSelectNode }: Props) {
+export default function SystemMap({ timeline, visibleCount, focusKey, animateFocus, onSelectNode, storageLabel = 'ZETARIS' }: Props) {
   const view = buildMapView(timeline, visibleCount, focusKey, animateFocus)
   const spec = (id: MapNodeId) => NODES.find((n) => n.id === id)!
   const detail = (title: string) => timeline.nodes.find((n) => n.kind === 'input' && n.title === title)?.detail
@@ -121,9 +122,9 @@ export default function SystemMap({ timeline, visibleCount, focusKey, animateFoc
           <rect className="aa-map-halo" x="-5" y="-5" width="710" height="62" rx="20" />
           <rect className="aa-map-card" width="700" height="52" rx="16" />
           <Icon id="zetaris" x={16} y={15} />
-          <text x="52" y="22" className="aa-map-name aa-map-name-sm">ZETARIS · Shared state</text>
+          <text x="52" y="22" className="aa-map-name aa-map-name-sm">{storageLabel} · Shared state</text>
           <text x="52" y="40" className="aa-map-status">Evidence, entities and loops move between agents through shared state</text>
-          <g transform="translate(538 14)"><rect width="148" height="24" rx="12" className="aa-map-pending" /><text x="74" y="16" textAnchor="middle" className="aa-map-pending-text">Integration pending</text></g>
+          <g transform="translate(538 14)"><rect width="148" height="24" rx="12" className="aa-map-pending" /><text x="74" y="16" textAnchor="middle" className="aa-map-pending-text">Shared state</text></g>
         </g>
 
         <g className={`aa-map-node aa-map-bar is-${ns.state}`} transform={`translate(${spec('nightshift').x} ${spec('nightshift').y})`}>

@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from backend.app.adapters.nightshift import ModelGateway, ModelGatewayError
-from backend.scripts.test_nvidia import IMAGE_PROMPT, SmokeFailure, image_data_url, parse_vision_result, select_image
+from backend.legacy.test_nvidia import IMAGE_PROMPT, SmokeFailure, image_data_url, parse_vision_result, select_image
 
 
 async def run(args) -> int:

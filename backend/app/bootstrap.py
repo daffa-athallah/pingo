@@ -6,7 +6,7 @@ from backend.app.repositories.memory import InMemoryLoopRepository
 
 
 def app_mode() -> str:
-    """'sample' (credential-free scripted fixture), 'demo' (resettable in-memory workspace, real models) or 'real' (Zetaris).
+    """'sample' (credential-free recorded examples), 'demo' (resettable in-memory workspace, real models) or 'real' (Zetaris).
     Chosen explicitly by SAMPLE_MODE=true or RECALL_MODE=demo; there is no automatic fallback between them."""
     demo = os.environ.get('RECALL_MODE', '').strip().lower()
     if demo not in ('', 'demo', 'real'):
@@ -27,7 +27,8 @@ def sample_mode() -> bool:
 def open_repository():
     if sample_mode():
         # No Zetaris module import, JVM startup, credential check or network access.
-        yield InMemoryLoopRepository()
+        from backend.app.demo_workspace import open_demo_repository
+        yield open_demo_repository()
         return
     if app_mode() == 'demo':
         # Resettable in-memory workspace seeded from a snapshot of the canonical history. Real models, no Zetaris writes.
@@ -59,3 +60,9 @@ def build_orchestrator(gateway, repository, verifier=None, **kwargs):
     return RecallOrchestrator(EvidenceAgent(gateway), PersistenceBoundOpenLoopAgent(gateway, repository, now=now, new_id=new_loop_id),
                               ContextAgent(gateway, repository, now=now), CriticAgent(gateway, repository), repository,
                               verifier, **kwargs)
+
+
+def live_models() -> bool:
+    """True when Nightshift is configured. In sample mode this unlocks the live endpoints (your own screenshot or context) against the
+    in-memory sample workspace; without it sample mode answers only its bundled recorded examples."""
+    return bool(os.environ.get('METERLESS_BASE_URL', '').strip())

@@ -20,7 +20,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from backend.app.adapters.nightshift import ModelGatewayError
-from backend.app.bootstrap import build_orchestrator, sample_mode
+from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
 from backend.app.context_api import _gateway
 from backend.app.hmem import HMemRepository
 from backend.app.observe import ObservedGateway, ObservedRepository, UploadObserver, loop_state
@@ -155,8 +155,8 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
 async def upload_screenshot(request: Request, wait: int = 0):
     """Body: the raw image bytes (PNG, JPEG or WebP, at most 20 MiB), for example `fetch(url, {method: 'POST', body: file})`.
     Returns 202 with a run_id at once. `?wait=1` instead waits for the run and returns its outcome (scripts and tests)."""
-    if sample_mode():
-        raise HTTPException(status_code=501, detail='Screenshot upload needs the real vision model; it is disabled in sample mode.')
+    if sample_mode() and not live_models():
+        raise HTTPException(status_code=501, detail='Screenshot upload needs the vision model. Configure METERLESS_BASE_URL to enable it in sample mode, or replay a bundled example.')
     declared = request.headers.get('content-length')
     if declared and declared.isdigit() and int(declared) > MAX_BYTES:
         raise HTTPException(status_code=413, detail='Image exceeds the 20 MiB limit.')

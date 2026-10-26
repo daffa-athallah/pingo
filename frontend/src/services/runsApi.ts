@@ -4,7 +4,7 @@ import type { Provenance, RunResult, RunStatus } from '../features/agent-activit
 
 export interface RunRecord {
   run_id: string
-  kind: 'screenshot_upload' | 'context_evaluate' | 'context_critic' | 'revision_fixture' | 'scripted_sample'
+  kind: 'screenshot_upload' | 'context_evaluate' | 'context_critic' | 'revision_fixture' | 'scripted_sample' | 'recorded_sample'
   label: string
   provenance: Provenance
   workspace: 'canonical' | 'demo' | 'sample'
@@ -16,6 +16,9 @@ export interface RunRecord {
   outcome?: UploadOutcome
   context_event?: { title?: string; location_name?: string; city?: string }
   context_events?: { title?: string; context_type?: string; location_name?: string; city?: string; evaluated?: boolean }[]
+  check_ins?: { id: string; question: string }[]
+  cached?: boolean
+  recording_note?: string
   loop_title?: string
   original_title?: string
   final_title?: string
@@ -40,6 +43,7 @@ export interface Health {
   mode: 'real' | 'demo' | 'sample'
   workspace: 'canonical' | 'demo' | 'sample'
   repository: string
+  live_models?: boolean
   demo_workspace?: { storage: string; snapshot_counts?: Record<string, number> }
 }
 
@@ -65,3 +69,26 @@ export const startUpload = (file: File) =>
   json<{ run_id: string; status: RunStatus; duplicate?: boolean; outcome?: UploadOutcome }>('/api/screenshots', {
     method: 'POST', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' },
   })
+
+export interface CachedRecallView {
+  notification_id: string; loop_id: string; run_id: string; title: string; reason: string
+  evidence_ids: string[]; captured_at: string; synthetic_inputs: boolean
+  context?: { title?: string; occurs_at?: string; location_name?: string; city?: string }
+}
+export interface CachedHistory {
+  cached_at: string; data_source: 'cached_run_history'; provenance: 'recorded'; workspace: 'sample'
+  model_calls: false; agents_executed: false; records: RunRecord[]; recall_views: CachedRecallView[]
+}
+export const getCachedHistory = (signal?: AbortSignal) => json<CachedHistory>('/api/sample/history', { signal })
+
+export interface SampleCase { case: string; label: string; kind: 'screenshot' | 'location' | 'review'; image_url: string | null; sensitive: boolean }
+export const getSampleCases = (signal?: AbortSignal) => json<SampleCase[]>('/api/sample/cases', { signal })
+export const replaySampleCase = (name: string) => json<RunRecord>(`/api/sample/cases/${encodeURIComponent(name)}/replay`, { method: 'POST' })
+export const resetSample = () => json<{ ok: boolean }>('/api/sample/reset', { method: 'POST' })
+
+export interface ZetarisProof {
+  captured_at: string; source: string; namespace: string; role: string
+  table_counts: Record<string, number>
+  queries: { role: string; sql: string; rows_returned: number; sample: string[][]; note: string }[]
+}
+export const getZetarisProof = (signal?: AbortSignal) => json<ZetarisProof>('/api/sample/zetaris', { signal })

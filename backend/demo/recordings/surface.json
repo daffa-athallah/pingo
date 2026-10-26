@@ -1,0 +1,30 @@
+{
+  "case": "surface",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:10:58+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "c3141d490ab175359219825444e26344d4b55c086be5b8413cd243ec83152860",
+      "reply": "{\n  \"decision\": \"MATCH\",\n  \"candidate_loop_id\": \"loop_62822173fdc0\",\n  \"trigger_type\": \"CALENDAR\",\n  \"relevant_context_ids\": [\"ctx_sample_surface\"],\n  \"relevance_confidence\": 0.9,\n  \"concise_reason\": \"Calendar dinner event in Fitzroy North matches restaurant interest loop for Elmo's Hamburger Restaurant in same area at dinner time.\",\n  \"material_uncertainty\": null,\n  \"verification_request\": null\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    },
+    {
+      "signature": "62ac81c4fcea5886ecfca89f0bec95448b3b3a8a1a30430d61a6f7c30ea1d4f6",
+      "reply": "{\n  \"decision\": \"SURFACE\",\n  \"loop_id\": \"loop_62822173fdc0\",\n  \"confidence\": 0.9,\n  \"concise_reason\": \"Calendar dinner in Fitzroy North tomorrow matches active interest in Elmo's Hamburger Restaurant in same area; multiple screenshots show sustained interest.\",\n  \"supporting_evidence_ids\": [\"ev_b793a2e138d7d509d26670ff\", \"ev_cec51a5b7d33fc9401d77173\", \"ev_c8e07581a1c3fc2581ab2528\"],\n  \"supporting_context_ids\": [\"ctx_sample_surface\"],\n  \"material_uncertainty\": \"Dinner plans may already be set; companion's preferences unknown; loop is interest not commitment.\",\n  \"question\": null,\n  \"revision_request\": null,\n  \"verification_request\": null\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    }
+  ],
+  "memory_calls": [],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "SURFACE"
+}

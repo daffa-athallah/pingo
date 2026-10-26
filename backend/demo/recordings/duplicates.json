@@ -1,0 +1,21 @@
+{
+  "case": "duplicates",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:13:37+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "1a8f7d56c4b3ad97963971f67e60f8a461f8f51785706022dd66d493ab73c44f",
+      "reply": "{\"pairs\": [{\"loop_ids\": [\"f6\", \"f5\"], \"decision\": \"KEEP_SEPARATE\", \"canonical_loop_id\": null, \"question\": null, \"confidence\": 0.95, \"concise_reason\": \"Different venues: Yamamoto Cafe in Bondi, Sydney vs Yamamoto Udon Izakaya at QV Square, Melbourne; different concepts (cafe vs udon izakaya) and cities.\"}, {\"loop_ids\": [\"f4\", \"f3\"], \"decision\": \"ASK\", \"canonical_loop_id\": null, \"question\": \"Are 'Elmo's Burgers' (from a Melbourne burger list) and 'Elmo's Hamburger Restaurant (Fitzroy North)' the same venue?\", \"confidence\": 0.6, \"concise_reason\": \"Entity names differ slightly; f4 is a generic list mention, f3 specifies Fitzroy North location. Could be same place colloquially.\"}, {\"loop_ids\": [\"f4\", \"f2\"], \"decision\": \"KEEP_SEPARATE\", \"canonical_loop_id\": null, \"question\": null, \"confidence\": 0.99, \"concise_reason\": \"Completely different burger places: Elmo's Burgers vs OMB Burger (Own My Burger); different entities and attributes.\"}, {\"loop_ids\": [\"f2\", \"f1\"], \"decision\": \"MERGE\", \"canonical_loop_id\": \"f1\", \"question\": null, \"confidence\": 0.95, \"concise_reason\": \"Both reference OMB Burger with identical attributes (halal, late-night, Melbourne CBD); 'Own My Burger' appears to be the full name of OMB Burger.\"}]}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    }
+  ],
+  "memory_calls": [],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "ASK"
+}

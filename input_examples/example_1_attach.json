@@ -1,0 +1,8 @@
+{
+  "name": "example_1_attach",
+  "what_it_shows": "A new screenshot of a venue you already saved is attached to the existing intention.",
+  "endpoint": "POST /api/screenshots",
+  "body": "raw image bytes",
+  "image": "backend/demo/recordings/images/attach.png",
+  "curl": "curl -X POST --data-binary @backend/demo/recordings/images/attach.png -H \"Content-Type: image/png\" http://localhost:8000/api/screenshots?wait=1"
+}

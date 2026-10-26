@@ -57,6 +57,12 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 /** Open Loops from the backend (Zetaris in real mode). Mock data only when VITE_USE_MOCK=true; never a silent fallback. */
 export function useRecallEntities(): EntitiesState {
   const [state, setState] = useState<EntitiesState>(USE_MOCK ? { status: 'ready', entities: mockEntities, source: 'mock' } : { status: 'loading', entities: [] })
+  const [revision, setRevision] = useState(0)
+  useEffect(() => {  // the recorded-example guide announces that the sample data changed
+    const refresh = () => setRevision((value) => value + 1)
+    window.addEventListener('recall:data-changed', refresh)
+    return () => window.removeEventListener('recall:data-changed', refresh)
+  }, [])
   useEffect(() => {
     if (USE_MOCK) return undefined
     const controller = new AbortController()
@@ -66,6 +72,6 @@ export function useRecallEntities(): EntitiesState {
         if (!controller.signal.aborted) setState({ status: 'error', entities: [], message: error instanceof Error ? error.message : 'Could not load intentions.' })
       })
     return () => controller.abort()
-  }, [])
+  }, [revision])
   return state
 }

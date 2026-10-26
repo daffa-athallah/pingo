@@ -1,0 +1,133 @@
+{
+  "case": "create",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:10:20+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "5ae5c5891c92fcbd042acd720b34f0f6713d3227b6b3d4a720f0f059be4243ba",
+      "reply": "```json\n{\n  \"domain\": \"food\",\n  \"summary\": \"The screenshot shows details about Kiwami Ramen House, including its location, broth preparation, price range, and closing days.\",\n  \"entities\": [\n    {\n      \"name\": \"Kiwami Ramen House\",\n      \"type\": \"restaurant\",\n      \"category\": \"ramen\",\n      \"subcategory\": null,\n      \"brand\": null,\n      \"location\": {\n        \"location_name\": \"Lygon Street\",\n        \"city\": \"Carlton\",\n        \"country\": null\n      },\n      \"attributes\": {\n        \"price\": \"from $16\",\n        \"closed\": \"Mondays\",\n        \"broth_preparation\": \"18 hours\"\n      }\n    }\n  ],\n  \"sensitive\": false,\n  \"confidence\": \"high\"\n}\n```",
+      "receipt": {
+        "requested_model": "gpt-4o-mini",
+        "routed_model": "gpt-4o-mini",
+        "provider": "openai"
+      }
+    },
+    {
+      "signature": "a2244bdf02dda46868d68dee3adc13c12d96feaff835d88fe285e482b10a4c89",
+      "reply": "{\n  \"decision\": \"CREATE\",\n  \"target_loop_id\": null,\n  \"proposed_title\": \"Interested in Kiwami Ramen House (Lygon Street, Carlton)\",\n  \"domain\": \"food\",\n  \"confidence\": 0.78,\n  \"concise_reason\": \"Screenshot saved with location, broth description, price, and operating hours for Kiwami Ramen House; suggests interest in visiting.\",\n  \"supporting_evidence_ids\": [\"ev_sample_create\"],\n  \"supporting_entity_ids\": [\"ent_771d72f42fd7\"],\n  \"material_uncertainty\": \"Could be browsing, saving for future reference, or planning a visit; no action confirmed.\"\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    }
+  ],
+  "memory_calls": [
+    {
+      "method": "query",
+      "args": [
+        "The screenshot shows details about Kiwami Ramen House, including its location, broth preparation, price range, and closing days. Entities: Kiwami Ramen House."
+      ],
+      "result": {
+        "memories": [
+          {
+            "id": "mem-9",
+            "content": "The screenshot shows a social media post about an event at 'no vacancy gallery' located on level 3 of QV. The post includes a notification about vitamins and suggests a cozy lofi music vibe. Entities: no vacancy gallery.",
+            "type": "factual",
+            "layer": "long_term",
+            "confidence": 0.9,
+            "source": "screenshot:7f71af42-744f-465b-8bc1-d56be9530339.JPG",
+            "provenance": {
+              "origin": "file_save",
+              "learnedAt": 1792932041105,
+              "label": "Saved screenshot",
+              "refs": [
+                "evidence:ev_8fec9cbf186a2f48fd45acaf"
+              ]
+            },
+            "domain": "general",
+            "namespace": "general/facts",
+            "entities": [
+              "entities"
+            ],
+            "tags": [
+              "event"
+            ],
+            "accessCount": 1,
+            "supersedes": null,
+            "supersededBy": null,
+            "derivedFrom": [],
+            "relevance": 0.35651507626810514
+          }
+        ],
+        "trace": {
+          "retrievalReason": "hybrid ranking for \"The screenshot shows details about Kiwami Ramen House, including its location, broth preparation, price range, and closing days. Entities: Kiwami Ramen House.\" (domain: general)",
+          "strategy": "minimal",
+          "scores": {
+            "mem-9": 0.3565
+          }
+        },
+        "context": "[MEMORY CONTEXT]\n## general\n- [LT] The screenshot shows a social media post about an event at 'no vacancy gallery' located on level 3 of QV. The post includes a notification about vitamins and suggests a cozy lofi music vibe. Entities: no vacancy gallery. (entities: entities) <mem-9>\n[/MEMORY CONTEXT]"
+      }
+    },
+    {
+      "method": "add",
+      "args": [
+        {
+          "content": "The screenshot shows details about Kiwami Ramen House, including its location, broth preparation, price range, and closing days. Entities: Kiwami Ramen House.",
+          "type": "factual",
+          "layer": "working",
+          "confidence": 0.9,
+          "source": "screenshot:create.png",
+          "tags": [
+            "food"
+          ],
+          "goalRunId": null,
+          "provenance": {
+            "origin": "file_save",
+            "learnedAt": 1792994400000,
+            "label": "Saved screenshot",
+            "refs": [
+              "evidence:ev_sample_create"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "id": "mem-31",
+        "content": "The screenshot shows details about Kiwami Ramen House, including its location, broth preparation, price range, and closing days. Entities: Kiwami Ramen House.",
+        "type": "factual",
+        "layer": "working",
+        "confidence": 0.9,
+        "source": "screenshot:create.png",
+        "provenance": {
+          "origin": "file_save",
+          "learnedAt": 1792994400000,
+          "label": "Saved screenshot",
+          "refs": [
+            "evidence:ev_sample_create"
+          ]
+        },
+        "domain": "general",
+        "namespace": "general/facts",
+        "entities": [
+          "kiwami",
+          "ramen",
+          "house",
+          "entities"
+        ],
+        "tags": [
+          "food"
+        ],
+        "accessCount": 0,
+        "supersedes": null,
+        "supersededBy": null,
+        "derivedFrom": []
+      }
+    }
+  ],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "STORED"
+}

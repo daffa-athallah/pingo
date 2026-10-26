@@ -1,0 +1,21 @@
+{
+  "case": "restraint",
+  "clock": "2026-10-26T06:00:00+00:00",
+  "captured_at": "2026-10-26T10:11:10+00:00",
+  "vision_model": "gpt-4o-mini",
+  "reasoning_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "calls": [
+    {
+      "signature": "d1e22e0905e1b8c3eb75d9607a25a676416cbd847d11ac467fb1b6e69610de43",
+      "reply": "{\n  \"decision\": \"NO_MATCH\",\n  \"candidate_loop_id\": null,\n  \"trigger_type\": null,\n  \"relevant_context_ids\": [],\n  \"relevance_confidence\": 0.0,\n  \"concise_reason\": \"Calendar event for dry cleaning pickup in Fitzroy North does not clearly connect to any open loop; restaurant interest loop exists for same area but different activity with no dining indication.\",\n  \"material_uncertainty\": null,\n  \"verification_request\": null\n}",
+      "receipt": {
+        "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia"
+      }
+    }
+  ],
+  "memory_calls": [],
+  "input_label": "Synthetic test input over historical snapshot; real Nightshift model decisions",
+  "observed_action": "STAY_SILENT"
+}
