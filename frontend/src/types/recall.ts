@@ -8,6 +8,8 @@ export interface RecallEntity {
   screenshotCount: number
   inferredIntention: string
   imageUrl?: string
+  /** The user's own supporting screenshots, when the backend provides them. */
+  screenshots?: { id: string; thumbUrl: string; fullUrl: string; summary: string }[]
 }
 
 export interface TriggeredRecall {

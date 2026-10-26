@@ -1,11 +1,13 @@
 import { useSearchParams } from 'react-router-dom'
-import { categories, mockEntities } from '../../data/mockData'
+import { categories } from '../../data/mockData'
+import { useRecallEntities } from '../../data/useRecallEntities'
 import RecallIcon from './RecallIcon'
 import EntityRow from '../category/EntityRow'
 
 // Owner: Daffa. Category tabs show entities directly, ready to open their details.
 export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const data = useRecallEntities()
   const selectedCategory = searchParams.get('category')
   const filter = categories.some((category) => category.id === selectedCategory) ? selectedCategory : 'all'
   const visibleCategories = categories.filter((category) => filter === 'all' || category.id === filter)
@@ -22,8 +24,10 @@ export default function HomePage() {
         ))}
       </div>
       <div className="home-entities" aria-live="polite">
+        {data.status === 'loading' && <p className="home-status">Loading your intentions…</p>}
+        {data.status === 'error' && <p className="home-status" role="alert">{data.message} Is the Recall backend running?</p>}
         {visibleCategories.map((category) => {
-          const entities = mockEntities.filter((entity) => entity.category === category.id)
+          const entities = data.entities.filter((entity) => entity.category === category.id)
           return (
             <section className="home-entity-group" key={category.id} aria-labelledby={`home-${category.id}-heading`}>
               <header className="home-entity-heading">

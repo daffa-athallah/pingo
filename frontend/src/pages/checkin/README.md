@@ -1,6 +1,6 @@
 # Check-in
 
-The `/check-in` route presents one question at a time, with positive/negative answers, optional clarification, progress, retry, empty, and completion states. This is an extension of Recall's existing visual system. No backend is implemented in this repository.
+The `/check-in` route presents one question at a time, with positive/negative answers, optional clarification, progress, retry, empty, and completion states. This is an extension of Recall's existing visual system. The backend lives in `backend/` (see the root README).
 
 ## Data modes
 
@@ -8,10 +8,10 @@ The `/check-in` route presents one question at a time, with positive/negative an
 
 | Environment | Mode |
 | --- | --- |
-| `VITE_CHECKIN_DEMO=true` | Explicit browser demo in development or production |
-| Vite development with no `VITE_API_BASE_URL` | Browser demo |
-| Development with `VITE_API_BASE_URL` configured | API |
-| Production without an explicit demo flag | API |
+| `VITE_CHECKIN_DEMO=true` | Explicit browser demo |
+| Anything else | API (`GET /api/check-ins`, `POST /api/check-ins/:id/respond`) |
+
+Questions are daily: each belongs to one calendar day, and `GET /api/check-ins` returns only today's unanswered ones. An unanswered question does not carry over; the backend's `daily_check_ins.py` creates the next day's. Today the backend produces "are these the same thing?" questions when the Critic is unsure whether two Open Loops are duplicates (supporting images are the two loops' screenshots). Answering "Yes, same thing" merges them; "No, keep both" and "Related, keep both" leave both loops alone.
 
 The API base comes from `src/services/api.ts`: `VITE_API_BASE_URL`, defaulting to `http://localhost:8000`. Configure it for a deployed backend before using production API mode. Configured backend failures remain visible errors; they never fall back to sample questions. Requests time out after 15 seconds.
 

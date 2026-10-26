@@ -3,6 +3,7 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
 import type { RecallCategory, RecallEntity } from '../types/recall'
+import type { RunResult } from '../features/agent-activity/types'
 
 export interface EntityResponse {
   id: string
@@ -59,9 +60,48 @@ export function getAgentEvents(runId: string, signal?: AbortSignal): Promise<unk
   return get(`/agent-events/${encodeURIComponent(runId)}`, signal)
 }
 
-export function getIntegrationStatus(signal?: AbortSignal): Promise<{
+export interface IntegrationStatusResponse {
   repository: string; mode: string; status: string;
   real_roundtrip_verified: boolean; real_orchestrator_verified: boolean;
-}> {
+  /** Live counts read from Zetaris. null outside real mode. */
+  zetaris: { connected: boolean; evidence: number; entities: number; open_loops: number } | null
+}
+
+export function getIntegrationStatus(signal?: AbortSignal): Promise<IntegrationStatusResponse> {
   return get('/integration-status', signal)
+}
+
+export interface OpenLoopViewResponse {
+  loop_id: string
+  title: string
+  domain: string
+  status: OpenLoopResponse['status']
+  confidence: number
+  location: string | null
+  entities: { entity_id: string; name: string }[]
+  screenshot_count: number
+  screenshots: { evidence_id: string; summary: string; timestamp: string; image_url: string }[]
+}
+
+/** Backend-served JPEG of a supporting screenshot, scaled to `width` pixels. */
+export const imageUrl = (path: string, width: number) => `${API_BASE_URL.replace(/\/$/, '')}${path}?w=${width}`
+
+export function getOpenLoopViews(signal?: AbortSignal): Promise<OpenLoopViewResponse[]> {
+  return get('/open-loops', signal)
+}
+
+export interface SavedRunResponse {
+  run_id: string
+  kind: 'context_critic' | 'revision_fixture'
+  scenario: string
+  synthetic_context: boolean
+  result: RunResult
+  context_event?: { title?: string; occurs_at?: string; location_name?: string; city?: string }
+  loop_title?: string
+  original_title?: string
+  final_title?: string
+}
+
+export function getRuns(signal?: AbortSignal): Promise<SavedRunResponse[]> {
+  return get('/runs', signal)
 }

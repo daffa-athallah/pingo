@@ -21,6 +21,10 @@ interface Props {
   annotations?: Annotations
   /** True while events are still arriving (e.g. from a stream). New steps animate in without restarting the playback. */
   live?: boolean
+  /** Saved real runs shown as selectable traces instead of the local demo traces. */
+  demos?: DemoRun[]
+  /** Live Zetaris counts. When present the footer reports the real connection instead of a placeholder. */
+  zetaris?: { connected: boolean; evidence: number; entities: number; open_loops: number } | null
 }
 
 function usePrefersReducedMotion() {
@@ -50,12 +54,13 @@ function useMediaQuery(query: string) {
 
 const STEP_MS: Record<string, number> = { input: 260, state: 260, event: 900, result: 800 }
 
-export default function AgentActivity({ runs, annotations, live = false }: Props) {
+export default function AgentActivity({ runs, annotations, live = false, demos, zetaris }: Props) {
+  const sets = demos && demos.length ? demos : demoRuns
   const reduced = usePrefersReducedMotion()
   const [params, setParams] = useSearchParams()
-  const demoId = params.get('demo') ?? demoRuns[0].id
+  const demoId = params.get('demo') ?? sets[0].id
   const setDemoId = (id: string) => setParams({ demo: id }, { replace: true })
-  const demo: DemoRun | undefined = runs ? undefined : demoRuns.find((d) => d.id === demoId) ?? demoRuns[0]
+  const demo: DemoRun | undefined = runs ? undefined : sets.find((d) => d.id === demoId) ?? sets[0]
   const timeline = useMemo(() => buildTimeline(runs ?? demo!.runs, annotations ?? demo?.annotations), [runs, annotations, demo])
   const total = timeline.nodes.length
   const [visibleCount, setVisibleCount] = useState(reduced ? total : 1)
@@ -111,7 +116,7 @@ export default function AgentActivity({ runs, annotations, live = false }: Props
       <header className="aa-header">
         <div className="aa-title-row">
           <h1>Agent Activity</h1>
-          {demo ? <span className="aa-demo-badge">Demo trace</span> : <span className="aa-demo-badge is-live">{live ? 'Live' : 'Run trace'}</span>}
+          {demo ? <span className={`aa-demo-badge${demos ? ' is-live' : ''}`}>{demos ? 'Real run' : 'Demo trace'}</span> : <span className="aa-demo-badge is-live">{live ? 'Live' : 'Run trace'}</span>}
         </div>
         <p className="aa-tagline">No single model call decides what the user sees.</p>
         <ul className="aa-architecture" aria-label="Architecture">
@@ -121,7 +126,7 @@ export default function AgentActivity({ runs, annotations, live = false }: Props
 
       {demo ? (
         <div className="aa-demos" role="tablist" aria-label="Demo runs">
-          {demoRuns.map((d) => (
+          {sets.map((d) => (
             <button key={d.id} type="button" role="tab" aria-selected={d.id === demo.id} className={d.id === demo.id ? 'is-active' : ''} onClick={() => setDemoId(d.id)}>{d.label}</button>
           ))}
         </div>
@@ -151,13 +156,15 @@ export default function AgentActivity({ runs, annotations, live = false }: Props
           <ExecutionGraph timeline={timeline} visibleCount={visibleCount} selectedKey={selected?.key ?? null} onSelect={select} animate={!reduced} playing={playing} />
         )}
         <div className="aa-side" ref={inspectorRef}>
-          <EventInspector node={selected ?? null} demo={Boolean(demo)} />
+          <EventInspector node={selected ?? null} demo={Boolean(demo) && !demos} />
         </div>
       </div>
 
       <footer className="aa-footer">
         <p>No Recall without evidence. No interruption without context.</p>
-        <p>Zetaris integration is a placeholder in this view. Steps shown as shared state are not claimed as Zetaris queries.</p>
+        {zetaris?.connected
+          ? <p>Connected to Zetaris: {zetaris.evidence} evidence, {zetaris.entities} entities, {zetaris.open_loops} open loops.</p>
+          : <p>Zetaris integration is a placeholder in this view. Steps shown as shared state are not claimed as Zetaris queries.</p>}
       </footer>
     </div>
   )

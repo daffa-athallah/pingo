@@ -2,8 +2,8 @@ import { API_BASE_URL } from '../../services/api'
 import type { CheckInQuestion, CheckInResponse } from './checkInTypes'
 import { sampleQuestions } from './sampleQuestions'
 
+// Demo questions only when asked for explicitly. Otherwise Check-in reads today's questions from the backend, like the rest of the app.
 export const isCheckInDemo = import.meta.env.VITE_CHECKIN_DEMO === 'true'
-  || (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL)
 const storageKey = 'recall.checkin.demo.responses.v1'
 
 function readDemoResponses(): Record<string, CheckInResponse> {
