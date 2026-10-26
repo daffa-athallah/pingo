@@ -47,8 +47,8 @@ The API returns structured decisions, evidence references, concise reasons and r
 | Mode | Start | Open | Needs |
 | --- | --- | --- | --- |
 | **Sample** (default, offline) | `docker compose up --build` | http://localhost:5175 | Nothing. No keys. |
-| **Sample + your own input, real models** | Create `.env` at the repo root (below), then `docker compose up --build` again | http://localhost:5175, then **Try it → your own screenshot** (`/demo`) | A Meterless Nightshift instance |
-| **Demo** (no Docker; real models, resettable) | `backend/.env` with `METERLESS_*`, then the two commands below | http://localhost:5175/demo | Nightshift, Python, Node |
+| **Sample + your own input, real models** | Create `.env` at the repo root (below), then `docker compose up --build` again | http://localhost:5175, then the **+ Save screenshot** button (bottom right, opens `/demo`) | A Meterless Nightshift instance |
+| **Demo** (no Docker; real models, resettable) | `backend/.env` with `METERLESS_*`, then the two commands below | http://localhost:5175 (**+ Save screenshot** opens `/demo`) | Nightshift, Python, Node |
 | **Full** (real Zetaris data) | `docker compose -f compose.yaml -f compose.zetaris.yaml up --build` or `serve.py --env-file backend/.env` | http://localhost:5175 | Zetaris platform + Nightshift |
 
 ```sh
@@ -64,6 +64,10 @@ METERLESS_REASONING_MODEL=nvidia/nemotron-3-ultra-550b-a55b
 backend/.venv/bin/python backend/scripts/serve.py --demo
 cd frontend && npm ci && VITE_API_BASE_URL=http://localhost:8100 npm run dev -- --host 127.0.0.1 --port 5175
 ```
+
+The **+ Save screenshot** button only appears where uploading is allowed (demo workspace, or sample with live models). The real-data backend (Zetaris) never shows it, because Evidence there is append-only and permanent.
+
+**Docker and Nightshift:** the container reaches a Nightshift on your machine through `host.docker.internal` (verified on Docker with Colima, macOS). On Linux that name points to the Docker bridge, so a Nightshift bound only to `127.0.0.1` is not reachable; bind it to `0.0.0.0`, or use the Python demo mode above.
 
 **Back to sample:** delete (or rename) the root `.env` and run `docker compose up --build` again, or stop the demo servers. The page header says which mode you are in, and every run is labelled `recorded` (replayed capture) or `live` (real model calls). `POST /api/sample/reset` (sample) and `POST /api/demo/reset` (demo) restore the saved history.
 
@@ -82,7 +86,7 @@ SAMPLE_MODE=true backend/.venv/bin/python backend/scripts/serve.py --host 127.0.
 
 The first sample command prints all seven runs as JSON. The second serves the API at http://localhost:8120. No Java/JDBC service is started in sample mode.
 
-Optional frontend development, in a second terminal (Node 22.12+):
+Optional frontend development, in a second terminal (Node 22.12+; this points the UI at the sample server above):
 
 ```sh
 cd frontend
