@@ -58,6 +58,16 @@ class ReplayBoundary(unittest.TestCase):
         self.assertTrue(any(e['agent'] == 'H-MEM' and e['action'] == 'QUERY' and e['detail']['hits'] for e in events))
         self.assertTrue(any(e['agent'] == 'H-MEM' and e['action'] == 'STORE' for e in events))
 
+    def test_sample_clarify_asks_in_check_in_and_saves_the_answer_without_a_model(self):
+        with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), TestClient(app) as client:
+            record = client.post('/api/sample/cases/clarify/replay').json()
+            self.assertEqual(record['result']['final_action'], 'ASK')
+            question = client.get('/api/check-ins').json()['questions'][0]
+            self.assertEqual(question['response_mode'], 'options')
+            saved = client.post(f"/api/check-ins/{question['id']}/respond", json={'response': 'go'}).json()
+            self.assertEqual(saved['agent_review']['state'], 'RECORDED')
+            self.assertEqual(client.get('/api/check-ins').json()['questions'], [])
+
     def test_sample_reads_history_without_agents_or_canned_context_answers(self):
         with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), patch('backend.app.bootstrap.build_orchestrator', side_effect=AssertionError('No agent should execute')), TestClient(app) as client:
             before = deepcopy(client.get('/open-loops').json())
@@ -66,7 +76,7 @@ class ReplayBoundary(unittest.TestCase):
             self.assertFalse(history['model_calls'])
             self.assertTrue(history['records'])
             self.assertTrue(all(r['cached'] and r['provenance'] == 'recorded' for r in history['records']))
-            self.assertEqual({c['case'] for c in client.get('/api/sample/cases').json()}, set(CASES))
+            self.assertEqual({c['case'] for c in client.get('/api/sample/cases').json()}, set(CASES) | {'clarify'})
             self.assertEqual(client.post('/api/sample/cases/unknown/replay').status_code, 404)
             self.assertEqual(client.get('/api/sample/cases/sensitive/image').status_code, 404)
             self.assertEqual(client.post('/api/screenshots', content=b'arbitrary').status_code, 501)

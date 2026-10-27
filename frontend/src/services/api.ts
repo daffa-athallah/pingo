@@ -157,7 +157,7 @@ export interface PingoNotification {
     title: string; message: string; reason: string; run_id: string; sources: string[]; trigger_types: string[]
     delivery_status: 'APPROVED' | 'DELIVERED'; read: boolean; dismissed: boolean; feedback: string | null
     feedback_review?: {
-      state: 'RUNNING' | 'COMPLETED' | 'FAILED_SAFE' | 'SKIPPED'
+      state: 'RUNNING' | 'COMPLETED' | 'FAILED_SAFE' | 'SKIPPED' | 'RECORDED'
       run_id: string
       decision?: { decision: 'KEEP' | 'REVISE' | 'RESOLVE' | 'DORMANT'; concise_reason: string }
     }

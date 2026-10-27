@@ -327,7 +327,7 @@ class ContextService:
         try:
             loop = repo.get_open_loop(notification.loop_id)
             if sample_mode() and not live_models():
-                state = 'SKIPPED'
+                state = 'RECORDED'
                 raise ValueError('Recorded sample mode does not call models.')
             if loop is None or (loop.status not in ACTIVE and not (action == 'DONE' and loop.status == LoopStatus.RESOLVED)):
                 state = 'SKIPPED'
@@ -385,11 +385,12 @@ class ContextService:
             self._save_feedback_review(notification, review, 'FAILED_SAFE', traces)
             raise
         except Exception:
-            if state != 'SKIPPED':
+            if state not in ('SKIPPED', 'RECORDED'):
                 state = 'FAILED_SAFE'
-            error = ('Feedback saved. Agent review was unavailable or unsafe; no inferred update was applied.'
-                     if state != 'SKIPPED' else 'Feedback saved. No eligible non-sensitive live agent review was available.')
-            record('OPEN_LOOP', 'FAILED' if state != 'SKIPPED' else 'SKIPPED', error)
+            error = ('Feedback saved. Agent review was unavailable or unsafe; no inferred update was applied.' if state == 'FAILED_SAFE'
+                     else 'Feedback saved. This offline example makes no model call; the live app has the Open Loop Agent review it.' if state == 'RECORDED'
+                     else 'Feedback saved. No eligible non-sensitive live agent review was available.')
+            record('OPEN_LOOP', 'FAILED' if state == 'FAILED_SAFE' else state, error)
         return self._save_feedback_review(notification, review, state, traces, error=error)
 
     def _save_feedback_review(self, notification, review, state, traces, decision=None, error=None):

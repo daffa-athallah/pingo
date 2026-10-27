@@ -40,8 +40,10 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
     try {
       const saved = await submit(question.id, answer)
       if (mounted.current) {
-        setReviewNote(saved.agent_review?.state === 'FAILED_SAFE' || saved.agent_review?.state === 'SKIPPED'
-          ? 'Your answer is saved. Pingo couldn’t update your intention right now.' : '')
+        setReviewNote(saved.agent_review?.state === 'RECORDED'
+          ? 'Your answer is saved. In the live app the Open Loop Agent now reads it and updates your intention; this offline example makes no model call.'
+          : saved.agent_review?.state === 'FAILED_SAFE' || saved.agent_review?.state === 'SKIPPED'
+            ? 'Your answer is saved. Pingo couldn’t update your intention right now.' : '')
         setIndex(value => value + 1)
       }
     } catch { if (mounted.current) setError(true) }

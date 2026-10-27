@@ -179,7 +179,7 @@ class ClarificationService:
                 return finish('DEFERRED')
             try:
                 if sample_mode() and not live_models():
-                    return finish('SKIPPED')
+                    return finish('RECORDED')  # offline example: the answer is saved, no model reads it
                 evidence, entities = grounding(repo, item.question['_evidence_ids'], item.question['_entity_ids'])
                 target = repo.get_open_loop(item.loop_id) if item.loop_id else None
                 if not item.loop_id:

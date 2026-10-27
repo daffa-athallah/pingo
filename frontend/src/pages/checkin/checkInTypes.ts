@@ -27,5 +27,5 @@ export interface CheckInResponse {
 
 export interface CheckInSubmission {
   ok: boolean
-  agent_review?: { state: 'COMPLETED' | 'FAILED_SAFE' | 'SKIPPED' | 'DEFERRED' | 'RUNNING' }
+  agent_review?: { state: 'COMPLETED' | 'FAILED_SAFE' | 'SKIPPED' | 'RECORDED' | 'DEFERRED' | 'RUNNING' }
 }

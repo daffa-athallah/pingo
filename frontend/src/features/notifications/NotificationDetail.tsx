@@ -39,6 +39,7 @@ export default function NotificationDetail({ previewNotice }: { previewNotice?: 
         ? review.decision?.decision === 'REVISE' ? ' Pingo updated your saved intention.'
           : review.decision?.decision === 'DORMANT' ? ' Pingo paused this intention.' : ' Pingo reviewed your feedback.'
         : review?.state === 'RUNNING' ? ' Pingo is reviewing your feedback.'
+          : review?.state === 'RECORDED' ? ' In the live app the Open Loop Agent reviews this; the offline example makes no model call.'
           : ' Your feedback is saved, but Pingo couldn’t review the intention right now.'
       setFeedback(message + outcome)
       window.dispatchEvent(new Event('pingo-notifications-changed'))

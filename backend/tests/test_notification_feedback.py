@@ -204,7 +204,7 @@ class FeedbackTests(unittest.IsolatedAsyncioTestCase):
     async def test_sample_without_models_stays_offline(self):
         with patch.dict('os.environ', {'SAMPLE_MODE': 'true', 'METERLESS_BASE_URL': ''}):
             result = await self.service().action('notice_test', 'DONE')
-        self.assertEqual(result['payload']['feedback_review']['state'], 'SKIPPED')
+        self.assertEqual(result['payload']['feedback_review']['state'], 'RECORDED')
         self.assertEqual(self.gateway.calls, [])
 
     async def test_sql_repository_persists_review_without_new_tables(self):

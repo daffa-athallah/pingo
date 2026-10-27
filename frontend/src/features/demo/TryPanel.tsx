@@ -13,10 +13,11 @@ const TEXT: Record<string, { title: string; hint: string }> = {
   restraint: { title: 'Pick up dry cleaning', hint: 'An unrelated errand. Does Pingo stay quiet?' },
   revision: { title: 'An intention that is too specific', hint: 'Can the Critic send it back before Pingo speaks?' },
   duplicates: { title: 'Look-alike saves', hint: 'The Critic merges, separates, or asks you.' },
+  clarify: { title: 'A save Pingo is unsure about', hint: 'The Open Loop Agent asks instead of guessing. Answer it in Check-in.' },
 }
 const GROUPS: { heading: string; cases: string[] }[] = [
   { heading: 'Save a screenshot', cases: ['attach', 'create', 'sensitive'] },
-  { heading: 'Daily Check-in', cases: ['duplicates'] },
+  { heading: 'Daily Check-in', cases: ['clarify', 'duplicates'] },
   { heading: 'Simulate where you are', cases: ['surface', 'restraint'] },
   { heading: 'Self-correction', cases: ['revision'] },
 ]
@@ -105,6 +106,16 @@ function tourFor(run: RunRecord): TourStep[] {
   const open = out?.open_loop
   const loop = open?.loop
   const kase = run.run_id.replace('run_sample_', '')
+  if (kase === 'clarify') {
+    return [
+      { title: 'The Open Loop Agent is not sure', route: '/check-in', find: () => document.querySelector<HTMLElement>('.checkin-card'),
+        by: run.result.trace_events.filter(e => e.agent === 'OPEN_LOOP').map(e => `Open Loop Agent → ${AGENT_NAME[e.next_step ?? ''] ?? 'Check-in'} (${e.action.replaceAll('_', ' ').toLowerCase()}): ${short(e.reason)}`),
+        text: 'The saved screenshot does not say whether you plan to go or only wanted to remember it. Pingo does not guess an intention, it asks one specific question here.' },
+      { title: 'Your answer goes back to the agent', route: '/check-in', find: () => document.querySelector<HTMLElement>('.checkin-card'),
+        by: ['you → Check-in: your choice, saved first', 'Check-in → Open Loop Agent: reads the answer with the screenshot (live app only)'],
+        text: 'Answer it. In the live app the Open Loop Agent then reads your answer and creates or updates the intention; this offline example only saves the answer and makes no model call.' },
+    ]
+  }
   if (kase === 'duplicates') {
     const c = (run as RunRecord & { consolidation?: { merged: unknown[]; asked: unknown[]; kept_separate: number } }).consolidation
     return [
