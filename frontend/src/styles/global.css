@@ -1055,7 +1055,13 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .pingo-page-actions .checkin-text-button { padding-inline: var(--space-2); color: var(--pingo-muted); font-size: var(--type-sm); font-weight: 500; }
 .checkin-trace { display: inline-block; margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--primary, #ff7a1a); text-decoration: none; }
 
-.checkin-pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 4px; }
-.checkin-pager span { font-size: 12px; color: var(--muted, #8a7f76); }
-.checkin-pager button { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid rgba(214, 117, 40, 0.35); background: #fff; color: #b9561a; font-weight: 600; font-size: 14px; }
-.checkin-pager button:disabled { opacity: 0.35; }
+.checkin-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none; margin: 0 -24px; }
+.checkin-track::-webkit-scrollbar { display: none; }
+.checkin-slide { flex: 0 0 100%; min-width: 0; padding: 0 24px; box-sizing: border-box; scroll-snap-align: center; scroll-snap-stop: always; }
+.checkin-answered { text-align: center; opacity: 0.7; }
+.checkin-pager { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 12px 0 4px; }
+.checkin-pager button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(214, 117, 40, 0.35); background: #fff; color: #b9561a; font-size: 18px; line-height: 1; }
+.checkin-pager button:disabled { opacity: 0.3; }
+.checkin-dots { display: flex; gap: 7px; }
+.checkin-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(214, 117, 40, 0.25); transition: width 0.2s, background 0.2s; }
+.checkin-dots i.is-current { width: 20px; border-radius: 4px; background: #d67528; }

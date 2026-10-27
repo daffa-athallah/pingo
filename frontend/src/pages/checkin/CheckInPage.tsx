@@ -53,17 +53,21 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
     setError(false)
     setIndex(value => Math.min(Math.max(value + step, 0), questions.length - 1))
   }
-  const touch = useRef<{ x: number; y: number } | null>(null)
-  const swipe = {
-    onTouchStart: (event: React.TouchEvent) => { const t = event.touches[0]; touch.current = { x: t.clientX, y: t.clientY } },
-    onTouchEnd: (event: React.TouchEvent) => {
-      const start = touch.current; touch.current = null
-      const t = event.changedTouches[0]
-      if (!start || (event.target as HTMLElement).closest('textarea, input')) return
-      const dx = t.clientX - start.x, dy = t.clientY - start.y
-      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1)  // swipe left = next, right = back
-    },
+  const track = useRef<HTMLDivElement>(null)
+  const frame = useRef(0)
+  function onScroll() {  // the finger drives the track; when it settles on a card, that card is the current question
+    cancelAnimationFrame(frame.current)
+    frame.current = requestAnimationFrame(() => {
+      const el = track.current
+      if (!el || !el.clientWidth) return
+      const next = Math.round(el.scrollLeft / el.clientWidth)
+      if (next !== index && next >= 0 && next < questions.length) { setError(false); setIndex(next) }
+    })
   }
+  useEffect(() => {  // buttons, dots and answering move the track to the current card
+    const el = track.current
+    if (el && el.clientWidth && Math.abs(el.scrollLeft - index * el.clientWidth) > 4) el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
+  }, [index])
   function skip() {
     if (lock.current || !question) return
     setSkipped(previous => [...previous, question.id])
@@ -84,14 +88,17 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
         <h1 ref={focusTarget} tabIndex={-1}>Check-in</h1>
         <p>A few questions to help me understand you better.</p>
       </div>
-      <div {...swipe}>
-        <QuestionCard key={question.id} question={question} onRespond={respond} busy={busy} error={error} />
-        {questions.length > 1 && <nav className="checkin-pager" aria-label="Move between questions">
-          <button onClick={() => move(-1)} disabled={busy || index === 0}>← Back</button>
-          <span>Swipe or tap</span>
-          <button onClick={() => move(1)} disabled={busy || index === questions.length - 1}>Next →</button>
-        </nav>}
+      <div className="checkin-track" ref={track} onScroll={onScroll}>
+        {questions.map((item, step) => <div className="checkin-slide" key={item.id} aria-hidden={step !== index}>
+          {responses[item.id] ? <article className="checkin-card checkin-answered"><h2 className="checkin-summary">{item.summary}</h2><p>Answered. Thank you.</p></article>
+            : <QuestionCard question={item} onRespond={respond} busy={busy && step === index} error={error && step === index} />}
+        </div>)}
       </div>
+      {questions.length > 1 && <nav className="checkin-pager" aria-label="Move between questions">
+        <button aria-label="Previous question" onClick={() => move(-1)} disabled={busy || index === 0}>←</button>
+        <span className="checkin-dots">{questions.map((item, step) => <i key={item.id} className={step === index ? 'is-current' : ''} />)}</span>
+        <button aria-label="Next question" onClick={() => move(1)} disabled={busy || index === questions.length - 1}>→</button>
+      </nav>}
       <p className="checkin-sr-only" role="status">Question {index + 1} of {questions.length}. {question.summary}</p>
     </> : <div className="checkin-result">
       <span className="checkin-result-icon"><CheckInIcon name={questions.length ? 'check' : 'message'} /></span>
