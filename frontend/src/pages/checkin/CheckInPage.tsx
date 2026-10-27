@@ -48,6 +48,22 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
       if (mounted.current) setBusy(false)
     }
   }
+  function move(step: number) {
+    if (lock.current) return
+    setError(false)
+    setIndex(value => Math.min(Math.max(value + step, 0), questions.length - 1))
+  }
+  const touch = useRef<{ x: number; y: number } | null>(null)
+  const swipe = {
+    onTouchStart: (event: React.TouchEvent) => { const t = event.touches[0]; touch.current = { x: t.clientX, y: t.clientY } },
+    onTouchEnd: (event: React.TouchEvent) => {
+      const start = touch.current; touch.current = null
+      const t = event.changedTouches[0]
+      if (!start || (event.target as HTMLElement).closest('textarea, input')) return
+      const dx = t.clientX - start.x, dy = t.clientY - start.y
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1)  // swipe left = next, right = back
+    },
+  }
   function skip() {
     if (lock.current || !question) return
     setSkipped(previous => [...previous, question.id])
@@ -68,7 +84,14 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
         <h1 ref={focusTarget} tabIndex={-1}>Check-in</h1>
         <p>A few questions to help me understand you better.</p>
       </div>
-      <QuestionCard key={question.id} question={question} onRespond={respond} busy={busy} error={error} />
+      <div {...swipe}>
+        <QuestionCard key={question.id} question={question} onRespond={respond} busy={busy} error={error} />
+        {questions.length > 1 && <nav className="checkin-pager" aria-label="Move between questions">
+          <button onClick={() => move(-1)} disabled={busy || index === 0}>← Back</button>
+          <span>Swipe or tap</span>
+          <button onClick={() => move(1)} disabled={busy || index === questions.length - 1}>Next →</button>
+        </nav>}
+      </div>
       <p className="checkin-sr-only" role="status">Question {index + 1} of {questions.length}. {question.summary}</p>
     </> : <div className="checkin-result">
       <span className="checkin-result-icon"><CheckInIcon name={questions.length ? 'check' : 'message'} /></span>
