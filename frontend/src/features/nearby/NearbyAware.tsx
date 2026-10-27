@@ -24,7 +24,7 @@ export default function NearbyAware() {
   const [status, setStatus] = useState('')
   const [enabled, setEnabled] = useState(false)  // the offline sample has no location to watch, so it never asks a judge for theirs
   const placesRef = useRef<VerifiedPlace[]>([])
-  const inside = useRef(false)
+  const inside = useRef(new Set<string>())  // places the person is currently within reach of; each re-arms when they leave it
   const busy = useRef(false)
   const wake = useRef<Wake | null>(null)
 
@@ -63,12 +63,15 @@ export default function NearbyAware() {
     }
     const id = navigator.geolocation.watchPosition((pos) => {
       const { latitude, longitude, accuracy } = pos.coords
-      const ranked = placesRef.current.map((p) => ({ p, d: metres(latitude, longitude, p.latitude, p.longitude) })).sort((a, b) => a.d - b.d)
+      const ranked = placesRef.current.map((p) => ({ p, d: metres(latitude, longitude, p.latitude, p.longitude) })).sort((x, y) => x.d - y.d)
       const near = ranked[0]
       if (!near) { setStatus('Aware of where you are · no saved place has a map location yet'); return }
-      if (!inside.current && near.d + accuracy <= ENTER_METERS) { inside.current = true; void ask(latitude, longitude, accuracy, pos.timestamp, near.p.name, near.d) }
-      else if (inside.current && near.d > EXIT_METERS) { inside.current = false; setStatus(`Watching · ${Math.round(near.d)} m from ${near.p.name}`) }
-      else if (!inside.current) setStatus(`Watching · ${Math.round(near.d)} m from ${near.p.name}`)
+      const entered = ranked.filter(({ p, d }) => !inside.current.has(p.entityId) && d + accuracy <= ENTER_METERS)
+      for (const { p, d } of ranked) if (inside.current.has(p.entityId) && d > EXIT_METERS) inside.current.delete(p.entityId)
+      if (entered.length) {
+        entered.forEach(({ p }) => inside.current.add(p.entityId))
+        void ask(latitude, longitude, accuracy, pos.timestamp, entered[0].p.name, entered[0].d)  // one check covers every saved place near this point
+      } else setStatus(`Watching ${ranked.length} place${ranked.length === 1 ? '' : 's'} · nearest ${near.p.name}, ${Math.round(near.d)} m`)
     }, (e) => setStatus(e.code === 1 ? 'Location is off for Pingo. Turn it on in Settings → Privacy → Location Services' : 'Looking for your location…'), { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 })
     // Keep the screen awake once the person touches the app (a browser needs a gesture for this).
     const keepAwake = async () => {
@@ -79,7 +82,7 @@ export default function NearbyAware() {
     document.addEventListener('visibilitychange', reacquire)
     return () => {
       navigator.geolocation.clearWatch(id); window.removeEventListener('pointerdown', keepAwake); document.removeEventListener('visibilitychange', reacquire)
-      void wake.current?.release().catch(() => undefined); wake.current = null; inside.current = false
+      void wake.current?.release().catch(() => undefined); wake.current = null; inside.current.clear()
     }
   }, [enabled])
 
