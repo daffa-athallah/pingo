@@ -39,7 +39,7 @@ export default function EntityDetailPage() {
             </div>
           </section>
         )}
-        {entity && <DeleteIntention loopId={entity.id} name={entity.name} />}
+        {entity && <DeleteIntention loopId={entity.id} name={entity.name} count={entity.screenshots?.length ?? 0} />}
         {entity?.catalogueImage && <p className="catalogue-credit">Catalogue photo source: {entity.catalogueImage.source}</p>}
       </div>
     </section>

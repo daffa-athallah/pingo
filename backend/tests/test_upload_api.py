@@ -299,6 +299,7 @@ class DeleteIntentionTests(unittest.TestCase):
             after = client.get('/open-loops').json()
             self.assertEqual(len(after), len(before) - 1)
             self.assertNotIn(target['loop_id'], {l['loop_id'] for l in after})
+            self.assertEqual(response.json()['screenshots_deleted'], len(target['screenshots']))
             self.assertEqual(client.post(f"/api/open-loops/{target['loop_id']}/delete").status_code, 404)
             self.assertEqual(client.post('/api/open-loops/missing/delete').status_code, 404)
 

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { getHealth, deleteIntention } from '../../services/runsApi'
 import './delete-intention.css'
 
-/** Remove an intention from Pingo (two taps). The saved Evidence stays in Zetaris (append-only) but is no longer shown, and the same screenshots can be synced again. */
-export default function DeleteIntention({ loopId, name }: { loopId: string; name: string }) {
+/** Delete an intention and all its screenshots (two taps). Uploaded image files are erased; the append-only Zetaris records stay but are hidden. The same images can be synced again. */
+export default function DeleteIntention({ loopId, name, count }: { loopId: string; name: string; count: number }) {
   const [allowed, setAllowed] = useState(false)
   const [armed, setArmed] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -26,7 +26,7 @@ export default function DeleteIntention({ loopId, name }: { loopId: string; name
   }
   return <div className="delete-intention">
     {armed
-      ? <><p>Delete “{name}”? Its reminders stop and it disappears from Home. The screenshots stay stored, but are hidden, and can be synced again.</p>
+      ? <><p>Delete “{name}” and {count === 1 ? 'its screenshot' : `all ${count} of its screenshots`}? Its reminders stop and it disappears from Home. The images you uploaded are erased from this computer. Pingo’s text notes about them stay in Zetaris (it is append-only), hidden. You can sync them again.</p>
         <div><button type="button" className="demo-button is-quiet" disabled={busy} onClick={() => setArmed(false)}>Keep it</button>
           <button type="button" className="delete-confirm" disabled={busy} onClick={() => void remove()}>{busy ? 'Deleting…' : 'Delete'}</button></div></>
       : <button type="button" className="delete-link" onClick={() => setArmed(true)}>Delete this intention</button>}
