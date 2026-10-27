@@ -5,7 +5,7 @@
 .demo-badge.is-demo { color: var(--color-primary); background: var(--color-primary-soft); border-color: var(--color-primary-soft); font-weight: 600; }
 .demo-badge.is-warn { border-style: dashed; color: var(--color-text); }
 .demo-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.demo-button { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--color-primary); color: #fff; font: 600 0.9375rem inherit; cursor: pointer; }
+.demo-button { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--color-primary); color: var(--pingo-charcoal); font: 700 0.9375rem inherit; cursor: pointer; }
 .demo-button input { display: none; }
 .demo-button.is-quiet { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
 .demo-button.is-disabled, .demo-button:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -20,7 +20,8 @@ export default function CategoryPage() {
         <div><h1>{selectedCategory.name}</h1><p>{entities.length} {selectedCategory.itemLabel}</p></div>
       </header>
       {data.status === 'loading' && <p className="home-status">Loading your intentions…</p>}
-      {data.status === 'error' && <p className="home-status" role="alert">{data.message}</p>}
+      {data.status === 'error' && <div className="collection-state" role="alert"><h2>Your collection couldn’t load.</h2><p>Give it another try in a moment.</p><button type="button" onClick={data.retry}>Retry</button></div>}
+      {data.status === 'ready' && !entities.length && <div className="collection-state"><h2>A little room for discovery.</h2><p>Nothing saved here yet. Your next find might belong here.</p></div>}
       <div className="category-entities">
         {entities.map((entity) => <EntityRow entity={entity} key={entity.id} />)}
       </div>

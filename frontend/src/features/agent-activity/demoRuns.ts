@@ -73,7 +73,7 @@ export const demoRuns: DemoRun[] = [
   {
     id: 'restraint',
     label: 'Restraint',
-    blurb: 'Something nearby is technically related, and Recall correctly decides not to interrupt.',
+    blurb: 'Something nearby is technically related, and pingo correctly decides not to interrupt.',
     annotations: {
       headlines: { '0:0': 'Pick up dry cleaning · Carlton', '0:1': 'Try restaurants in Carlton' },
       inputs: { 0: { title: 'Calendar event', detail: 'Pick up dry cleaning · 08:30' } },

@@ -34,7 +34,7 @@ async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${path}`, {
     signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
   })
-  if (!response.ok) throw new Error(`Recall data request failed (${response.status}).`)
+  if (!response.ok) throw new Error(`pingo data request failed (${response.status}).`)
   return response.json() as Promise<T>
 }
 
@@ -84,7 +84,11 @@ export interface OpenLoopViewResponse {
   entities: { entity_id: string; name: string }[]
   screenshot_count: number
   screenshots: { evidence_id: string; summary: string; timestamp: string; image_url: string }[]
-
+  /** Optional presentation extension. See docs/frontend-catalogue.md; absent on current backend. */
+  catalogue_images?: {
+    entity_id: string; catalogue_image_url: string; catalogue_image_source: string;
+    catalogue_image_verified: boolean; alt: string; object_position?: string
+  }[]
 }
 
 /** Backend-served JPEG of a supporting screenshot, scaled to `width` pixels. */

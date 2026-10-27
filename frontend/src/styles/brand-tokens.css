@@ -1,0 +1,25 @@
+/* Pingo — locked direction; implement as design tokens, not as an image-based UI. */
+:root {
+  --pingo-orange: #FF763B;
+  --pingo-peach: #FFC7A8;
+  --pingo-cream: #FFF6ED;
+  --pingo-charcoal: #292522;
+  --pingo-sand: #E8DCCF;
+  --pingo-white: #FFFFFF;
+  --pingo-text: var(--pingo-charcoal);
+  --pingo-muted: #766E68;
+  --pingo-canvas: #FFFFFF;
+  --pingo-surface: var(--pingo-cream);
+  --pingo-line: #EDE6DE;
+  --pingo-radius-sm: 12px;
+  --pingo-radius-md: 18px;
+  --pingo-radius-lg: 24px;
+  --pingo-radius-pill: 999px;
+  --pingo-shadow-card: 0 5px 24px rgba(41,37,34,.06);
+  --pingo-focus: 0 0 0 3px rgba(255,118,59,.24);
+  --pingo-motion-fast: 160ms;
+  --pingo-motion-standard: 240ms;
+  /* Suggested, NOT exact font from AI-generated reference. Avoid Picsart-like rounded geometric p. */
+  --pingo-font: 'Manrope', 'Inter', system-ui, -apple-system, sans-serif;
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after {scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;} }

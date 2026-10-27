@@ -12,13 +12,13 @@ export interface AgentMeta {
 export const AGENTS: Record<AgentKey, AgentMeta> = {
   SOURCE: { label: 'Input', role: 'Input', question: 'What triggered this run?' },
   EVIDENCE: { label: 'Evidence', role: 'Perception', question: 'What am I looking at?' },
-  ZETARIS: { label: 'Zetaris', role: 'Shared state', question: 'What does Recall already know?' },
+  ZETARIS: { label: 'Zetaris', role: 'Shared state', question: 'What does pingo already know?' },
   MEMORY: { label: 'H-MEM', role: 'Memory', question: 'What do I already remember about this?' },
   OPEN_LOOP: { label: 'Open Loop', role: 'Intention', question: 'What is this person still trying to do?' },
   CONTEXT: { label: 'Context', role: 'Relevance', question: 'Does something happening now make this relevant?' },
   VERIFIER: { label: 'Verifier', role: 'Verification', question: 'Is this context actually true right now?' },
   CRITIC: { label: 'Critic', role: 'Judgment', question: 'Is this actually worth bothering the user about?' },
-  RESULT: { label: 'Result', role: 'Outcome', question: 'What did Recall decide?' },
+  RESULT: { label: 'Result', role: 'Outcome', question: 'What did pingo decide?' },
   OTHER: { label: 'Step', role: 'Step', question: '' },
 }
 

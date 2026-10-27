@@ -1,6 +1,6 @@
 # Check-in
 
-The `/check-in` route presents one question at a time, with positive/negative answers, optional clarification, progress, retry, empty, and completion states. This is an extension of Recall's existing visual system. The backend lives in `backend/` (see the root README).
+The `/check-in` route presents one question at a time, with positive/negative answers, optional clarification, progress, retry, empty, and completion states. It uses pingo's shared visual system. The backend lives in `backend/` (see the root README).
 
 ## Data modes
 
@@ -71,4 +71,4 @@ Skip advances without saving an answer or making a POST. Skipped questions remai
 
 `App.tsx` mounts the provider so `BottomNav.tsx` can show pending questions across routes. `AppShell.tsx` adds `checkin-shell` only on `/check-in`. Check-in styles and media queries belong to Ica's section 9 in the single `src/styles/global.css`, using `checkin-` prefixes and scoped shell overrides.
 
-The visual brief preserves Recall's warm background (`#faf9f6`), red (`#e32636`), and soft pink (`#fce8e8`), with Georgia serif headings, a narrow shell capped at 480px, circular response controls, and overlapping rotated image previews. Existing root CSS tokens remain the source of truth. This extension leaves those tokens, Daffa's Home/Category/Entity files, and CSS sections 6–8 unchanged relative to the starting commit. No separate design system or page stylesheet is introduced.
+The visual brief follows pingo's white canvas, warm cream surfaces, orange accent, charcoal typography, narrow mobile shell, circular response controls, and overlapping screenshot previews. Shared tokens in `global.css` remain the source of truth; no separate design system or page stylesheet is introduced.

@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { categories } from '../../data/mockData'
 import { useRecallEntities } from '../../data/useRecallEntities'
 import RecallIcon from '../home/RecallIcon'
+import CatalogueImage from '../../components/CatalogueImage'
 
 // Owner: Daffa. Unknown IDs retain the safe detail placeholder.
 export default function EntityDetailPage() {
@@ -11,18 +12,19 @@ export default function EntityDetailPage() {
   const categoryName = categories.find((category) => category.id === entity?.category)?.name
   return (
     <section className={`page entity-detail${entity ? '' : ' entity-detail--empty'}`}>
-      {entity && <img className="entity-detail-hero" src={entity.imageUrl} alt={entity.name} />}
+      {entity && <CatalogueImage className="entity-detail-hero" entity={entity} />}
       <Link className="entity-detail-back" to={entity ? `/?category=${entity.category}` : '/'} aria-label={entity ? `Back to ${categoryName} on Home` : 'Back to Home'}><RecallIcon name="back" /></Link>
       <div className="entity-detail-sheet">
         <span className="entity-detail-handle" aria-hidden="true" />
         <header className="entity-detail-header"><h1>{entity?.name ?? 'Saved intention'}</h1>{entity?.location && <p>{entity.location}</p>}</header>
         <section className="entity-detail-intention" aria-labelledby="intention-heading">
-          <h2 id="intention-heading"><span><RecallIcon name="target" /></span>Your intention</h2>
-          <p>{entity?.inferredIntention ?? 'Intent detail will go here.'}</p>
+          <h2 id="intention-heading"><span><RecallIcon name="target" /></span>pingo’s hunch</h2>
+          <p>{entity?.inferredIntention ?? (data.status === 'loading' ? 'Loading your saved thing…' : 'This saved thing is unavailable. Return to your collection and try again.')}</p>
+          {entity && <small>Inferred from your saved screenshots—not a reminder you created.</small>}
         </section>
         {entity?.screenshots && entity.screenshots.length > 0 && (
           <section className="entity-detail-shots" aria-labelledby="shots-heading">
-            <h2 id="shots-heading">Your screenshots ({entity.screenshots.length})</h2>
+            <h2 id="shots-heading">Your saved screenshots ({entity.screenshots.length})</h2>
             <div className="entity-detail-shot-list">
               {entity.screenshots.map((shot) => (
                 <a key={shot.id} href={shot.fullUrl} target="_blank" rel="noreferrer" title={shot.summary}>
@@ -32,6 +34,7 @@ export default function EntityDetailPage() {
             </div>
           </section>
         )}
+        {entity?.catalogueImage && <p className="catalogue-credit">Catalogue photo source: {entity.catalogueImage.source}</p>}
       </div>
     </section>
   )

@@ -2,26 +2,8 @@ import { useEffect, useState } from 'react'
 import { getOpenLoopViews, imageUrl } from '../services/api'
 import type { OpenLoopViewResponse } from '../services/api'
 import { mockEntities } from './mockData'
-import restaurant from '../assets/images/recall/restaurant.jpg'
-import jacket from '../assets/images/recall/jacket.jpg'
-import japan from '../assets/images/recall/japan.jpg'
-import tokyo from '../assets/images/recall/tokyo.jpg'
-import gallery from '../assets/images/recall/gallery.jpg'
 import type { RecallCategory, RecallEntity } from '../types/recall'
-
-// Stock photographs are decorative placeholders by category, not the user's screenshots.
-const STOCK: Record<RecallCategory, string[]> = {
-  food: [restaurant], // one neutral venue photo: a specific dish would often contradict the place
-  shopping: [jacket],
-  travel: [japan, tokyo, gallery],
-}
-
-function stockFor(category: RecallCategory, id: string): string {
-  const pool = STOCK[category]
-  let hash = 0
-  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
-  return pool[hash % pool.length]
-}
+import { verifiedCatalogueImage } from './collectionPresentation'
 
 /** "Elmo's Hamburger Restaurant (Fitzroy North, Melbourne)" -> subject and a short place; qualifiers stay in the full title. */
 function splitTitle(title: string, fallbackPlace: string | null): { name: string; place?: string } {
@@ -35,15 +17,19 @@ function splitTitle(title: string, fallbackPlace: string | null): { name: string
 
 export function entityFromLoop(loop: OpenLoopViewResponse): RecallEntity {
   const category = loop.domain as RecallCategory
+  const distinctShots = [...new Map(loop.screenshots.map(shot => [shot.evidence_id, shot])).values()]
+  const screenshots = distinctShots.map((shot) => ({ id: shot.evidence_id, thumbUrl: imageUrl(shot.image_url, 400), fullUrl: imageUrl(shot.image_url, 1600), summary: shot.summary, timestamp: shot.timestamp }))
+  const latest = distinctShots.map(shot => Date.parse(shot.timestamp)).filter(Number.isFinite).sort((a, b) => b - a)[0]
   return {
     id: loop.loop_id,
     category,
     // Loop titles are hypotheses phrased "Interested in ..."; the card shows the subject, the detail keeps the full sentence.
     ...(({ name, place }) => ({ name, location: place }))(splitTitle(loop.title, loop.location)),
-    screenshotCount: loop.screenshot_count,
+    screenshotCount: distinctShots.length,
     inferredIntention: loop.title,
-    imageUrl: stockFor(category, loop.loop_id),
-    screenshots: loop.screenshots.map((shot) => ({ id: shot.evidence_id, thumbUrl: imageUrl(shot.image_url, 400), fullUrl: imageUrl(shot.image_url, 1600), summary: shot.summary })),
+    catalogueImage: verifiedCatalogueImage(loop),
+    latestScreenshotAt: latest === undefined ? undefined : new Date(latest).toISOString(),
+    screenshots,
   }
 }
 
@@ -55,10 +41,12 @@ export type EntitiesState =
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 /** Open Loops from the backend (Zetaris in real mode). Mock data only when VITE_USE_MOCK=true; never a silent fallback. */
-export function useRecallEntities(): EntitiesState {
+export function useRecallEntities(): EntitiesState & { retry: () => void } {
+  const [revision, setRevision] = useState(0)
   const [state, setState] = useState<EntitiesState>(USE_MOCK ? { status: 'ready', entities: mockEntities, source: 'mock' } : { status: 'loading', entities: [] })
   useEffect(() => {
     if (USE_MOCK) return undefined
+    setState({ status: 'loading', entities: [] })
     const controller = new AbortController()
     getOpenLoopViews(controller.signal)
       .then((loops) => setState({ status: 'ready', entities: loops.map(entityFromLoop), source: 'zetaris' }))
@@ -66,6 +54,6 @@ export function useRecallEntities(): EntitiesState {
         if (!controller.signal.aborted) setState({ status: 'error', entities: [], message: error instanceof Error ? error.message : 'Could not load intentions.' })
       })
     return () => controller.abort()
-  }, [])
-  return state
+  }, [revision])
+  return { ...state, retry: () => setRevision(value => value + 1) }
 }
