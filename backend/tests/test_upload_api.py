@@ -301,3 +301,23 @@ class DeleteIntentionTests(unittest.TestCase):
             self.assertNotIn(target['loop_id'], {l['loop_id'] for l in after})
             self.assertEqual(client.post(f"/api/open-loops/{target['loop_id']}/delete").status_code, 404)
             self.assertEqual(client.post('/api/open-loops/missing/delete').status_code, 404)
+
+
+class DeleteScreenshotTests(unittest.TestCase):
+    def test_a_deleted_screenshot_disappears_from_its_intention(self):
+        import os
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        from fastapi.testclient import TestClient
+        from backend.app.main import app
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'RECALL_MODE': 'demo'}, clear=True), \
+                patch('backend.app.intentions_api.hidden_path', lambda state: Path(directory) / 'hidden.json'), TestClient(app) as client:
+            loops = client.get('/open-loops').json()
+            target = next(l for l in loops if len(l['screenshots']) >= 1)
+            shot = target['screenshots'][0]['evidence_id']
+            self.assertEqual(client.post(f'/api/evidence/{shot}/delete').status_code, 200)
+            after = next(l for l in client.get('/open-loops').json() if l['loop_id'] == target['loop_id'])
+            self.assertNotIn(shot, [s['evidence_id'] for s in after['screenshots']])
+            self.assertEqual(after['screenshot_count'], target['screenshot_count'] - 1)
+            self.assertEqual(client.post('/api/evidence/missing/delete').status_code, 404)

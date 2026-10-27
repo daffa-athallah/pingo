@@ -107,3 +107,6 @@ export const deleteIntention = (loopId: string) =>
 export const findLocation = (entityId: string) =>
   json<{ entity_id: string; name: string; status: string; reason?: string; latitude?: string; longitude?: string; location_id?: string }>(
     `/api/entities/${encodeURIComponent(entityId)}/find-location`, { method: 'POST' }, 300000)
+
+export const deleteScreenshot = (evidenceId: string) =>
+  json<{ hidden: string; can_sync_again: number }>(`/api/evidence/${encodeURIComponent(evidenceId)}/delete`, { method: 'POST' }, 120000)

@@ -4,6 +4,7 @@ import { useRecallEntities } from '../../data/useRecallEntities'
 import RecallIcon from '../home/RecallIcon'
 import CatalogueImage from '../../components/CatalogueImage'
 import DeleteIntention from '../../features/demo/DeleteIntention'
+import DeleteScreenshot from '../../features/demo/DeleteScreenshot'
 
 // Owner: Daffa. Unknown IDs retain the safe detail placeholder.
 export default function EntityDetailPage() {
@@ -28,9 +29,12 @@ export default function EntityDetailPage() {
             <h2 id="shots-heading">Your saved screenshots ({entity.screenshots.length})</h2>
             <div className="entity-detail-shot-list">
               {entity.screenshots.map((shot) => (
-                <a key={shot.id} href={shot.fullUrl} target="_blank" rel="noreferrer" title={shot.summary}>
-                  <img src={shot.thumbUrl} alt={shot.summary} loading="lazy" />
-                </a>
+                <div key={shot.id}>
+                  <a href={shot.fullUrl} target="_blank" rel="noreferrer" title={shot.summary}>
+                    <img src={shot.thumbUrl} alt={shot.summary} loading="lazy" />
+                  </a>
+                  <DeleteScreenshot evidenceId={shot.id} />
+                </div>
               ))}
             </div>
           </section>

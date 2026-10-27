@@ -4,3 +4,10 @@
 .delete-link { justify-self: start; border: 0; background: none; padding: 6px 0; color: #b3402a; font-size: 13px; text-decoration: underline; cursor: pointer; }
 .delete-confirm { border: 0; border-radius: 999px; padding: 10px 18px; background: #c9432b; color: #fff; font-weight: 600; font-size: 13px; cursor: pointer; }
 .delete-confirm:disabled { opacity: .6; }
+
+.entity-detail-shot-list > div { position: relative; }
+.shot-delete { position: absolute; top: 6px; right: 6px; z-index: 2; width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgb(40 25 15 / 62%); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.shot-delete.is-armed { width: auto; height: auto; padding: 4px; border-radius: 12px; display: flex; gap: 4px; background: rgb(40 25 15 / 82%); }
+.shot-delete.is-armed button { border: 0; background: none; color: #fff; font-size: 11px; padding: 4px 7px; cursor: pointer; border-radius: 8px; }
+.shot-delete.is-armed button:first-child { background: #c9432b; }
+.entity-detail-shot-list > div { flex: 0 0 auto; scroll-snap-align: start; }

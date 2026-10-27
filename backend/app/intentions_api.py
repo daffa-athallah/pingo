@@ -66,3 +66,30 @@ async def delete_intention(request: Request, loop_id: str):
         if hasattr(state, 'on_data_changed'):
             state.on_data_changed()
     return {'deleted': loop_id, 'title': loop.title, 'screenshots_hidden': len(evidence_ids), 'can_sync_again': freed}
+
+
+@router.post('/api/evidence/{evidence_id}/delete')
+async def delete_screenshot(request: Request, evidence_id: str):
+    """Hide one screenshot (see the module note: Evidence itself is append-only and stays stored) and allow the same image to be synced again."""
+    state = request.app.state
+    if state.mode == 'sample' and not live_models():
+        raise HTTPException(status_code=404, detail='Deleting is available on the real backend and the demo workspace.')
+    async with state.write_lock:
+        if state.repository.get_evidence(evidence_id) is None:
+            raise HTTPException(status_code=404, detail='Screenshot not found.')
+        write_hidden(state, read_hidden(state) | {evidence_id})
+        index_path = state.uploads_dir / 'index.json'
+        freed = 0
+        try:
+            index = json.loads(index_path.read_text())
+            keep = {digest: row for digest, row in index.items() if row.get('evidence_id') != evidence_id}
+            freed = len(index) - len(keep)
+            if freed:
+                temporary = index_path.with_suffix('.tmp')
+                temporary.write_text(json.dumps(keep, indent=2, sort_keys=True))
+                temporary.replace(index_path)
+        except (OSError, ValueError):
+            pass
+        if hasattr(state, 'on_data_changed'):
+            state.on_data_changed()
+    return {'hidden': evidence_id, 'can_sync_again': freed}
