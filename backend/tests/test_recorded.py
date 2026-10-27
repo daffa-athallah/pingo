@@ -99,3 +99,18 @@ class ReplayBoundary(unittest.TestCase):
             client.post('/api/sample/reset')
             self.assertEqual({v['loop_id']: v['screenshot_count'] for v in client.get('/open-loops').json()}, baseline)
             self.assertEqual(client.get('/api/check-ins').json()['questions'], [])
+
+    def test_replayed_reminder_appears_as_an_unread_in_app_notification_and_never_as_a_system_one(self):
+        with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), TestClient(app) as client:
+            before = len(client.get('/notifications').json())
+            record = client.post('/api/sample/cases/surface/replay').json()
+            notice = client.get(f"/notifications/{record['notification_id']}").json()
+            self.assertFalse(notice['payload']['read'])
+            self.assertIn('CACHED', notice['payload']['sources'])  # the browser raises no OS notification for these
+            self.assertTrue(notice['payload']['reason'] and notice['payload']['evidence'])
+            self.assertEqual(len(client.get('/notifications').json()), before + 1)
+            self.assertIsNone(client.post('/api/sample/cases/restraint/replay').json().get('notification_id'))
+            self.assertEqual(len(client.get('/notifications').json()), before)  # silence leaves nothing behind
+            client.post('/api/sample/cases/surface/replay')
+            client.post('/api/sample/reset')
+            self.assertEqual(len(client.get('/notifications').json()), before)

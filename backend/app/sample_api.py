@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse
 from backend.app import tracelog
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.demo_workspace import read_snapshot, seed
+from backend.app.sample import notification_for
 from backend.app.sample_cases import CASES, IMAGES, replay_case
 
 router = APIRouter()
@@ -71,10 +72,27 @@ def _apply(state, case, result):
     state.on_data_changed()
 
 
+def _clear_announcements(repository):
+    for key in [k for k in repository.notifications if k.startswith('replay_')]:
+        del repository.notifications[key]
+
+
+def _announce(state, record):
+    """A replayed SURFACE decision becomes an unread in-app notification (the banner), like a live ping. Never an OS notification."""
+    repository = state.repository
+    _clear_announcements(repository)
+    notice = notification_for(repository, record, read=False, prefix='replay_')
+    if notice is not None:
+        notice = replace(notice, created_at=datetime.now(ZoneInfo('UTC')).isoformat(timespec='seconds'))  # a ping that just arrived, not the capture time
+        repository.save_notification(notice)
+        record['notification_id'] = notice.notification_id
+
+
 @router.post('/api/sample/reset')
 def reset(request: Request):
     _sample_only(request)
     seed(request.app.state.repository, read_snapshot())
+    _clear_announcements(request.app.state.repository)
     request.app.state.on_data_changed()
     return {'ok': True}
 
@@ -89,8 +107,9 @@ async def replay(request: Request, case: str):
         record = await replay_case(case, capture=captured)
     except (ModelGatewayError, ValueError) as exc:
         raise HTTPException(status_code=409, detail=f'The recording no longer matches its inputs ({exc}).') from None
-    request.app.state.runs.add_finished(record)
     _apply(request.app.state, case, captured[0])
+    _announce(request.app.state, record)
+    request.app.state.runs.add_finished(record)
     return record
 
 

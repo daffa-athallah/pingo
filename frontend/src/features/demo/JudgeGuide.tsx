@@ -73,12 +73,12 @@ export default function JudgeGuide() {
   }
   const title = recall ? subject(recall.title) : 'Your saved history'
   const copy = !recall ? 'Browse the saved intentions and their original screenshots. No stored reminder decision matches this snapshot, so this guide will not invent one.'
-    : step === 0 ? `You saved ${title} for later. It is one of the interests already in this history. Open it to see what Recall actually knows.`
-      : step === 1 ? `These ${recall.evidence_ids.length} screenshots are the source. Recall keeps them attached to the interest, so you can go back to what you saved.`
+    : step === 0 ? `You saved ${title} for later. It is one of the interests already in this history. Open it to see what Pingo actually knows.`
+      : step === 1 ? `These ${recall.evidence_ids.length} screenshots are the source. Pingo keeps them attached to the interest, so you can go back to what you saved.`
         : step === 2 ? 'Saving a place does not mean you booked it or decided to go. This is a tentative interest, grounded in the screenshots above.'
           : step === 3 ? `In the saved run, “${recall.context?.title ?? 'a context event'}”${recall.context?.location_name ? ` in ${recall.context.location_name}` : ''} made that interest relevant. The saved reminder keeps the reason and the supporting screenshots together.`
             : quiet ? `A separate saved event, “${quietContext?.title ?? 'an unrelated event'}”, ended in ${quiet.result.final_action?.replaceAll('_', ' ')}. No reminder was approved. The system does not need to interrupt for every saved interest.`
-              : 'This history has no saved restraint decision to show. Recall’s trace is available below; no additional outcome is invented.'
+              : 'This history has no saved restraint decision to show. Pingo’s trace is available below; no additional outcome is invented.'
 
   return <>
     <div className="guide-status" role="status"><span className="guide-status-dot" />Recorded examples <span>· No live model runs</span><button onClick={() => setOpen(value => !value)}>{open ? 'Hide guide' : 'Show guide'}</button></div>
@@ -86,8 +86,8 @@ export default function JudgeGuide() {
       <strong>Recorded example.</strong> A Check-in only appears when the Critic is unsure whether two saves are the same thing.
       <button onClick={() => { setOpen(true); setTab('try'); window.dispatchEvent(new CustomEvent('recall:play', { detail: 'duplicates' })) }}>See how one is made →</button>
     </div>}
-    <aside className="history-guide" hidden={!open} aria-label="Guide to Recall">
-      <div className="history-guide-meta"><span>Explore Recall</span><span>{step + 1} / {STEPS.length}</span><button aria-label="Close guide" onClick={close}>×</button></div>
+    <aside className="history-guide" hidden={!open} aria-label="Guide to Pingo">
+      <div className="history-guide-meta"><span>Explore Pingo</span><span>{step + 1} / {STEPS.length}</span><button aria-label="Close guide" onClick={close}>×</button></div>
       <div className="history-guide-tabs" role="tablist">
         <button role="tab" aria-selected={tab === 'tour'} onClick={() => setTab('tour')}>Tour</button>
         <button role="tab" aria-selected={tab === 'try'} onClick={() => setTab('try')}>Try it</button>

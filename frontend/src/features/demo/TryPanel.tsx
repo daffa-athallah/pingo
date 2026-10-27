@@ -6,12 +6,12 @@ import type { RunRecord, SampleCase } from '../../services/runsApi'
 
 const AGENT: Record<string, string> = { UPLOAD: 'Upload', EVIDENCE: 'Evidence Agent', REPOSITORY: 'Saved history', 'H-MEM': 'Memory (H-MEM)', OPEN_LOOP: 'Open Loop Agent', CONTEXT: 'Context Agent', CRITIC: 'Critic', ZETARIS: 'Storage', RUN: 'Result' }
 const TEXT: Record<string, { title: string; hint: string }> = {
-  attach: { title: "Elmo's burger, another screenshot", hint: 'Does Recall see it is the same interest?' },
-  create: { title: 'A venue you have never saved', hint: 'Does Recall start a new intention?' },
-  sensitive: { title: 'A screenshot with a password', hint: 'Does Recall look at it?' },
-  surface: { title: 'Dinner in Fitzroy North tonight', hint: 'Is a saved place relevant here? (Replay only: the interactive location simulator is separate.)' },
-  restraint: { title: 'Pick up dry cleaning', hint: 'Does Recall stay quiet? (Replay only.)' },
-  revision: { title: 'An intention that is too specific', hint: 'Can the Critic send it back for a fix?' },
+  attach: { title: "Elmo's burger, another screenshot", hint: 'Does Pingo see it is the same interest?' },
+  create: { title: 'A venue you have never saved', hint: 'Does Pingo start a new intention?' },
+  sensitive: { title: 'A screenshot with a password', hint: 'Does Pingo look at it?' },
+  surface: { title: 'Dinner in Fitzroy North tonight', hint: 'A calendar event near a saved place. Does Pingo speak up?' },
+  restraint: { title: 'Pick up dry cleaning', hint: 'An unrelated errand. Does Pingo stay quiet?' },
+  revision: { title: 'An intention that is too specific', hint: 'Can the Critic send it back before Pingo speaks?' },
   duplicates: { title: 'Look-alike saves', hint: 'The Critic merges, separates, or asks you.' },
 }
 const GROUPS: { heading: string; cases: string[] }[] = [
@@ -75,6 +75,31 @@ function reviewFlow(run: RunRecord) {
   })
 }
 
+const AGENT_NAME: Record<string, string> = { CONTEXT: 'Context Agent', CRITIC: 'Critic', OPEN_LOOP: 'Open Loop Agent', REPOSITORY: 'Saved history', OUTPUT: 'you', STOP: 'nobody' }
+const talk = (run: RunRecord) => run.result.trace_events.filter(e => ['CONTEXT', 'CRITIC', 'OPEN_LOOP'].includes(e.agent))
+  .map(e => `${AGENT_NAME[e.agent]} → ${AGENT_NAME[e.next_step ?? ''] ?? e.next_step ?? 'end'} (${e.action.replaceAll('_', ' ').toLowerCase()}): ${short(e.reason)}`)
+
+function contextTour(run: RunRecord, kase: string): TourStep[] {
+  const event = run.context_event ?? run.context_events?.[0]
+  const where = event ? `“${event.title}”${event.location_name ? ` in ${event.location_name}` : ''}` : 'a calendar event'
+  if (kase === 'restraint') {
+    return [{ title: 'Nothing appears, on purpose', route: '/', by: talk(run),
+      text: `${where} came in. No saved intention clearly applies, so Pingo stays silent: no banner, no notification. Restraint is a decision the agents make and record.` }]
+  }
+  const id = run.notification_id
+  const steps: TourStep[] = [{ title: kase === 'revision' ? 'The Critic sends it back, then agrees' : 'The agents agree to speak up', route: '/', by: talk(run),
+    text: kase === 'revision'
+      ? `${where} matched a saved intention, but its title promised a booking the screenshots never showed. The Critic requested a revision, the Open Loop Agent rewrote it as an interest, and only then did the Critic approve.`
+      : `${where} matched a saved interest. The Critic checked the evidence and approved a reminder.` }]
+  if (id) {
+    steps.push({ title: 'The ping reaches you', route: '/', text: 'It appears in the app as a banner, with the reason in one line. In a real session it can also arrive as a phone notification.',
+      find: () => document.querySelector<HTMLElement>(`a[href="/recalls/${id}"]`) ?? document.querySelector<HTMLElement>('.pingo-notice') })
+    steps.push({ title: 'Why now, with the evidence', route: `/recalls/${id}`, text: 'Open the ping to see the reason it appeared and the screenshots behind it. Nothing is claimed without evidence.',
+      find: () => document.querySelector<HTMLElement>('.pingo-why-now') })
+  }
+  return steps
+}
+
 function tourFor(run: RunRecord): TourStep[] {
   const out = run.outcome
   const open = out?.open_loop
@@ -86,13 +111,14 @@ function tourFor(run: RunRecord): TourStep[] {
       { title: 'The Critic reviews look-alike saves', route: '/', by: reviewFlow(run),
         text: `Six synthetic look-alike intentions were added to Home for this example. The Critic judged each close pair: ${c?.merged.length ?? 0} merged, ${c?.kept_separate ?? 0} kept separate, ${c?.asked.length ?? 0} it was not sure about.` },
       { title: 'Where it is unsure, it asks you', route: '/check-in', find: () => document.querySelector<HTMLElement>('.checkin-card'),
-        by: ['Critic → Check-in: the question below, with its reason', 'Check-in → you: one question a day, never a guess'],
+        by: ['Critic → Check-in: the question above, with its reason', 'Check-in → you: one question a day, never a guess'],
         text: 'The Critic does not decide on its own when two saves might be one thing. The question is waiting here, in the real daily Check-in.' },
       { title: 'Your answer is what merges', route: '/check-in', find: () => document.querySelector<HTMLElement>('.checkin-card'),
         by: ['you → Check-in: “Yes, same thing”', 'Check-in → Saved history: the two intentions become one'],
         text: 'Try it: answer the question. Only your “same thing” folds the two intentions together; “keep both” or “related” leaves them as they are.' },
     ]
   }
+  if (kase === 'surface' || kase === 'revision' || kase === 'restraint') return contextTour(run, kase)
   if (!out || !out.evidence) return []
   if (out.evidence.sensitive) return [{ title: 'Nothing appears', route: '/', text: 'Home has no new intention. The screenshot was saved as Evidence and flagged sensitive, so no reasoning model read it, memory did not keep it, and its image was never shown.' }]
   if (!loop) return []
@@ -103,8 +129,8 @@ function tourFor(run: RunRecord): TourStep[] {
   return [
     { title: created ? 'A new intention on Home' : 'The same intention, one more screenshot', route: '/', find: target,
       by: [said(run, 'OPEN_LOOP', 'ATTACH') ?? said(run, 'OPEN_LOOP', 'CREATE'), said(run, 'H-MEM', 'QUERY')].filter((x): x is string => !!x),
-      text: created ? `Recall started “${loop.title}” from this screenshot, because nothing saved matched it.`
-        : `Recall recognised this as the same interest, not a new one: “${loop.title}” now has ${change?.after.screenshots} screenshots, up from ${before}.` },
+      text: created ? `Pingo started “${loop.title}” from this screenshot, because nothing saved matched it.`
+        : `Pingo recognised this as the same interest, not a new one: “${loop.title}” now has ${change?.after.screenshots} screenshots, up from ${before}.` },
     { title: created ? 'Open it: the source is there' : 'Here is the new screenshot', route: `/entity/${loop.loop_id}`, mark: true,
       find: () => document.querySelector<HTMLElement>(`img[src*="/evidence/${out.evidence?.evidence_id}/image"]`)?.parentElement ?? null,
       by: [said(run, 'EVIDENCE', 'EXTRACT'), said(run, 'REPOSITORY', 'STORE')].filter((x): x is string => !!x),
@@ -142,7 +168,7 @@ export default function TryPanel() {
       let count = 0
       timer.current = window.setInterval(() => {
         count += 1; setShown(count)
-        if (count >= record.result.trace_events.length) { window.clearInterval(timer.current); setActive(null) }
+        if (count >= record.result.trace_events.length) { window.clearInterval(timer.current); setActive(null); window.dispatchEvent(new Event('pingo-notifications-changed')) }
       }, STEP_MS)
     } catch (e) { setActive(null); setError(e instanceof Error ? e.message : 'Replay failed.') }
   }
@@ -156,6 +182,7 @@ export default function TryPanel() {
     window.clearInterval(timer.current)
     try { await resetSample() } catch { /* the page still works without it */ }
     window.dispatchEvent(new Event('recall:data-changed'))
+    window.dispatchEvent(new Event('pingo-notifications-changed'))
     setRun(null); setStep(-1); setShown(0); setActive(null)
     navigate('/')
   }

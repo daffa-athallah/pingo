@@ -17,6 +17,7 @@ export interface RunRecord {
   context_event?: { title?: string; location_name?: string; city?: string }
   context_events?: { title?: string; context_type?: string; location_name?: string; city?: string; evaluated?: boolean }[]
   check_ins?: { id: string; question: string }[]
+  notification_id?: string
   cached?: boolean
   recording_note?: string
   loop_title?: string
