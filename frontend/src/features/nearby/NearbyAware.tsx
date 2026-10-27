@@ -14,6 +14,7 @@ import './nearby.css'
 const ENTER_METERS = 200
 const EXIT_METERS = 260
 const PLACE_REFRESH_MS = 60_000
+const SHOW_WITHIN_METERS = 1000  // a place further than this is not worth a mention
 
 function metres(aLat: number, aLon: number, bLat: number, bLon: number) {
   const r = (v: number) => (v * Math.PI) / 180
@@ -25,6 +26,7 @@ type Wake = { release: () => Promise<void> }
 export default function NearbyAware() {
   const [, setPlaces] = useState<VerifiedPlace[]>([])
   const [status, setStatus] = useState('')
+  const [far, setFar] = useState(false)  // the nearest saved place is beyond SHOW_WITHIN_METERS: nothing to show
   const [enabled, setEnabled] = useState(false)  // the offline sample has no location to watch, so it never asks a judge for theirs
   const placesRef = useRef<VerifiedPlace[]>([])
   const inside = useRef(new Set<string>())  // places the person is currently within reach of; each re-arms when they leave it
@@ -73,13 +75,14 @@ export default function NearbyAware() {
       const { latitude, longitude, accuracy } = pos.coords
       const ranked = placesRef.current.map((p) => ({ p, d: metres(latitude, longitude, p.latitude, p.longitude) })).sort((x, y) => x.d - y.d)
       const near = ranked[0]
+      setFar(!!near && near.d > SHOW_WITHIN_METERS)
       if (!near) { setStatus('Location on · no saved place pinned yet'); return }
       const entered = ranked.filter(({ p, d }) => !inside.current.has(p.entityId) && d + accuracy <= ENTER_METERS)
       for (const { p, d } of ranked) if (inside.current.has(p.entityId) && d > EXIT_METERS) inside.current.delete(p.entityId)
       if (entered.length) {
         entered.forEach(({ p }) => inside.current.add(p.entityId))
         void ask(latitude, longitude, accuracy, pos.timestamp, entered[0].p.name, entered[0].d)  // one check covers every saved place near this point
-      } else setStatus(`${near.p.name} · ${Math.round(near.d) >= 1000 ? (near.d / 1000).toFixed(1) + ' km' : Math.round(near.d) + ' m'} away`)
+      } else setStatus(`${near.p.name} · ${Math.round(near.d)} m away`)
     }, (e) => setStatus(e.code === 1 ? 'Location off · enable it in Settings' : 'Locating you…'), { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 })
     // Keep the screen awake once the person touches the app (a browser needs a gesture for this).
     const keepAwake = async () => {
@@ -94,6 +97,6 @@ export default function NearbyAware() {
     }
   }, [enabled])
 
-  if (!enabled || !slot) return null
+  if (!enabled || !slot || far) return null
   return createPortal(<div className="nearby-chip" role="status"><span className="nearby-dot" />{status || 'Locating you…'}</div>, slot)
 }
