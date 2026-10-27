@@ -18,6 +18,7 @@ export interface CheckInQuestion {
   negative?: CheckInOption
   context?: string
   response_mode?: 'options'
+  run_id?: string | null
 }
 
 export interface CheckInResponse {

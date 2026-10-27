@@ -63,7 +63,7 @@ def available(repo, entity_ids, stamp):
     return True
 
 
-def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_id=None, model_receipt=None, clock=now):
+def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_id=None, model_receipt=None, run_id=None, clock=now):
     stamp = clock()
     if not available(repo, [e.entity_id for e in entities], stamp):
         return None
@@ -72,7 +72,7 @@ def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_
     domain = evidence[0].domain
     if domain not in {'shopping', 'food', 'travel', 'destination'}:
         return None
-    question = {'id': qid, 'loop_id': loop_id or '', 'type': 'CLARIFY', 'response_mode': 'options',
+    question = {'id': qid, 'loop_id': loop_id or '', 'type': 'CLARIFY', 'response_mode': 'options', 'run_id': run_id,  # the run whose trace shows why this was asked
         'domain': 'destination' if domain == 'travel' else domain,
         'summary': evidence[0].summary, 'question': text, 'context': 'A quick clarification about what you saved.',
         'supporting_images': [], 'options': [*options,
@@ -86,7 +86,7 @@ def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_
     return qid
 
 
-async def after_upload(agent, repo, decision, result, emit):
+async def after_upload(agent, repo, decision, result, emit, run_id=None):
     """Called only when the real Open Loop decision reports material uncertainty."""
     if not decision or not decision.material_uncertainty or not result.evidence_id:
         return None
@@ -110,7 +110,7 @@ async def after_upload(agent, repo, decision, result, emit):
                     emit('OPEN_LOOP', 'RETRY', 'Clarification generation failed; retrying once.', next_step='OPEN_LOOP')
         with scope(repo):
             qid = queue(repo, evidence, entities, text=generated['question'], options=generated['options'],
-                uncertainty=decision.material_uncertainty, origin='OPEN_LOOP', loop_id=result.loop_id, model_receipt=routing)
+                uncertainty=decision.material_uncertainty, origin='OPEN_LOOP', loop_id=result.loop_id, model_receipt=routing, run_id=run_id)
         if qid:
             emit('OPEN_LOOP', 'ASK', 'A material uncertainty needs the person’s answer.',
                  input_refs=[f'evidence:{result.evidence_id}'], output_ref=f'checkin:{qid}', next_step='CHECK_IN', receipt=routing)

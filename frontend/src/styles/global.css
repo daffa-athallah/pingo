@@ -1,7 +1,6 @@
 @import './brand-tokens.css';
 
-/* ========================================
-   1. Design Tokens — SHARED
+/* =================================   1. Design Tokens — SHARED
 ======================================== */
 :root {
   /* Inter is the approved application face; the kit's optional Manrope fallback is not used. */
@@ -35,8 +34,7 @@
   --content-width: 720px;
 }
 
-/* ========================================
-   2. Reset / Base — SHARED
+/* =================================   2. Reset / Base — SHARED
 ======================================== */
 * { box-sizing: border-box; }
 
@@ -63,8 +61,7 @@ svg { display: block; flex-shrink: 0; }
   box-shadow: 0 0 0 4px rgba(255, 118, 59, .2);
 }
 
-/* ========================================
-   3. App Layout — SHARED
+/* =================================   3. App Layout — SHARED
 ======================================== */
 .app-shell {
   max-width: var(--content-width);
@@ -92,8 +89,7 @@ svg { display: block; flex-shrink: 0; }
 
 .skip-link:focus { top: 16px; }
 
-/* ========================================
-   4. Shared Components — SHARED
+/* =================================   4. Shared Components — SHARED
 ======================================== */
 .page-header { display: grid; gap: 12px; }
 .page-header p, .empty-state p { color: var(--color-text-secondary); }
@@ -102,8 +98,7 @@ svg { display: block; flex-shrink: 0; }
 .back-link { width: fit-content; font-size: 0.875rem; }
 .back-link:hover { text-decoration: underline; }
 
-/* ========================================
-   5. Bottom Navigation — SHARED
+/* =================================   5. Bottom Navigation — SHARED
 ======================================== */
 .bottom-nav {
   position: fixed;
@@ -136,8 +131,7 @@ svg { display: block; flex-shrink: 0; }
 .bottom-nav-link:hover { background: var(--color-background); }
 .bottom-nav-link.is-active { background: var(--color-primary-soft); color: var(--color-primary); }
 
-/* ========================================
-   6. Homepage — OWNER: DAFFA
+/* =================================   6. Homepage — OWNER: DAFFA
 ======================================== */
 .home-page {
   max-width: 420px;
@@ -272,8 +266,7 @@ svg { display: block; flex-shrink: 0; }
   }
 }
 
-/* ========================================
-   7. Categories — OWNER: DAFFA
+/* =================================   7. Categories — OWNER: DAFFA
 ======================================== */
 .category-page {
   max-width: 420px;
@@ -422,8 +415,7 @@ svg { display: block; flex-shrink: 0; }
   }
 }
 
-/* ========================================
-   8. Entity Detail — OWNER: DAFFA
+/* =================================   8. Entity Detail — OWNER: DAFFA
 ======================================== */
 .entity-detail {
   position: relative;
@@ -572,8 +564,7 @@ svg { display: block; flex-shrink: 0; }
   }
 }
 
-/* ========================================
-   9. Check-in — OWNER: ICA
+/* =================================   9. Check-in — OWNER: ICA
 ======================================== */
 .checkin-shell { max-width: var(--content-width); }
 .checkin-shell .app-main { padding: max(26px, env(safe-area-inset-top)) 24px calc(112px + env(safe-area-inset-bottom)); }
@@ -679,8 +670,7 @@ svg { display: block; flex-shrink: 0; }
   .checkin-page *, .checkin-page *::before, .checkin-page *::after { transition: none; }
 }
 
-/* ========================================
-   10. Responsive — SHARED
+/* =================================   10. Responsive — SHARED
    Keep page-specific media queries in their owner's section above.
 ======================================== */
 @media (min-width: 640px) {
@@ -688,8 +678,7 @@ svg { display: block; flex-shrink: 0; }
   .bottom-nav { padding-right: 40px; padding-left: 40px; }
 }
 
-/* ========================================
-   11. Pingo brand layer — locked 2026 direction
+/* =================================   11. Pingo brand layer — locked 2026 direction
 ======================================== */
 ::selection { background: var(--pingo-peach); color: var(--pingo-charcoal); }
 button, a { -webkit-tap-highlight-color: rgba(255, 118, 59, .12); }
@@ -771,8 +760,7 @@ button, a { -webkit-tap-highlight-color: rgba(255, 118, 59, .12); }
   .home-intentions-heading h2 { font-size: 1.5rem; }
 }
 
-/* ========================================
-   12. Consumer surface correction
+/* =================================   12. Consumer surface correction
    Shared type, spacing, cards and navigation
 ======================================== */
 body { font-size: var(--type-body); font-weight: 400; }
@@ -1065,3 +1053,4 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .pingo-page-home { display: grid; place-items: center; width: 44px; height: 44px; margin-left: -4px; border-radius: 12px; }
 .pingo-page-actions { display: flex; align-items: center; gap: var(--space-3); }
 .pingo-page-actions .checkin-text-button { padding-inline: var(--space-2); color: var(--pingo-muted); font-size: var(--type-sm); font-weight: 500; }
+.checkin-trace { display: inline-block; margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--primary, #ff7a1a); text-decoration: none; }
