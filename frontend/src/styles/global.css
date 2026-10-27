@@ -1045,3 +1045,5 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .catalogue-shot-label svg { width: 26px; height: 26px; stroke-width: 1.5; }
 
 .home-sort { justify-content: space-between; gap: 10px; }
+
+.checkin-trace { display: inline-block; margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--primary, #ff7a1a); text-decoration: none; }

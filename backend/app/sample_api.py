@@ -145,7 +145,7 @@ def _clarify(request: Request):
     uncertainty = f'The screenshot of {entity.name} does not say whether you plan to go or only wanted to remember it.'
     qid = queue(repository, [evidence], [entity], text=f'Is {entity.name} somewhere you want to go, or just something you wanted to remember?',
                 options=[{'value': 'go', 'label': 'I want to go'}, {'value': 'remember', 'label': 'Just remembering it'}],
-                uncertainty=uncertainty, origin='OPEN_LOOP', loop_id=None, model_receipt=None)
+                uncertainty=uncertainty, origin='OPEN_LOOP', loop_id=None, model_receipt=None, run_id='run_sample_clarify')
     recorder = RunStore('sample').start('run_sample_clarify', kind='recorded_sample', provenance='recorded', run_type='EVIDENCE_INGESTION',
                                         label=CLARIFY_LABEL, synthetic_inputs=True)
     recorder.emit('EVIDENCE', 'EXTRACT', f'Read the saved screenshot of {entity.name}.', next_step='OPEN_LOOP')

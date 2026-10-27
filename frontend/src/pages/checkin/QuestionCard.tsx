@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { CheckInQuestion, CheckInResponse } from './checkInTypes'
+import { Link } from 'react-router-dom'
 import CheckInIcon from './CheckInIcon'
 
 interface Props {
@@ -36,6 +37,7 @@ export default function QuestionCard({ question, busy, error, onRespond }: Props
     <h2 id={`${id}-summary`} className="checkin-summary">{question.summary}</h2>
     {images.length > 0 && <div className="checkin-previews">{images.map(image => <img key={image.url} src={image.url} alt={image.alt} width="120" height="148" onError={() => setFailedImages(previous => [...previous, image.url])} />)}</div>}
     <p className="checkin-question">{question.question}</p>
+    {question.run_id && <Link className="checkin-trace" to={`/agent-activity?run=${encodeURIComponent(question.run_id)}`}>See why Pingo asked →</Link>}
     {question.response_mode !== 'options' && <div className="checkin-response-actions">
       <button className={`checkin-response checkin-response-no${busy && attempt?.response === negative.value ? ' checkin-selected' : ''}`} disabled={busy} aria-label={negative.label} onClick={() => respond({ response: negative.value, comment: null })}><CheckInIcon name="close" /></button>
       <button className={`checkin-response checkin-response-yes${busy && attempt?.response === positive.value ? ' checkin-selected' : ''}`} disabled={busy} aria-label={positive.label} onClick={() => respond({ response: positive.value, comment: null })}><CheckInIcon name="check" /></button>

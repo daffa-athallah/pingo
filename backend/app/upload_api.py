@@ -151,7 +151,7 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                 observer.wrap_decide(orchestrator.open_loop_agent)
                 result = await orchestrator.ingest_screenshot(path)
                 from backend.app.checkin_clarifications import after_upload
-                check_in_id = await after_upload(orchestrator.open_loop_agent, repository, observer.decision, result, recorder.emit)
+                check_in_id = await after_upload(orchestrator.open_loop_agent, repository, observer.decision, result, recorder.emit, recorder.run_id)
                 await _cover(state, recorder, gateway, result)
             if result.evidence_id is None:  # nothing was stored: do not keep an orphan file
                 path.unlink(missing_ok=True)
