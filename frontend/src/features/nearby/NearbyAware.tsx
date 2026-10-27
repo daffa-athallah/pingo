@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useLocation } from 'react-router-dom'
 import { evaluateContext, getContextEntities, getOpenLoopViews } from '../../services/api'
 import { getHealth } from '../../services/runsApi'
 import type { ContextInput } from '../../services/api'
@@ -27,6 +29,9 @@ export default function NearbyAware() {
   const inside = useRef(new Set<string>())  // places the person is currently within reach of; each re-arms when they leave it
   const busy = useRef(false)
   const wake = useRef<Wake | null>(null)
+  const { pathname } = useLocation()
+  const [slot, setSlot] = useState<HTMLElement | null>(null)  // the chip is drawn on Home, under the sort row; the watching itself runs on every screen
+  useEffect(() => { setSlot(document.getElementById('nearby-slot')) }, [pathname, status])
 
   useEffect(() => {
     getHealth().then((h) => setEnabled(!(h.mode === 'sample' && !h.live_models))).catch(() => setEnabled(false))
@@ -86,6 +91,6 @@ export default function NearbyAware() {
     }
   }, [enabled])
 
-  if (!enabled) return null
-  return <div className="nearby-chip" role="status"><span className="nearby-dot" />{status || 'Pingo is aware of where you are'}</div>
+  if (!enabled || !slot) return null
+  return createPortal(<div className="nearby-chip" role="status"><span className="nearby-dot" />{status || 'Locating you…'}</div>, slot)
 }

@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react'
 import BottomNav from './BottomNav'
 import NotificationCenter from '../../features/notifications/NotificationCenter'
 import JudgeGuide from '../../features/demo/JudgeGuide'
-import SaveScreenshotButton from '../../features/demo/SaveScreenshotButton'
 import NearbyAware from '../../features/nearby/NearbyAware'
 
 export default function AppShell() {
@@ -26,10 +25,7 @@ export default function AppShell() {
       {!visualPreview && !(import.meta.env.DEV && pathname === '/dev/notifications') && <NotificationCenter />}
       <BottomNav />
       <JudgeGuide />
-      <div className="floating-row">
-        <NearbyAware />
-        <SaveScreenshotButton />
-      </div>
+      <NearbyAware />
     </div>
   )
 }

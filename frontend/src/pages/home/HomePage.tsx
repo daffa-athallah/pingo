@@ -1,3 +1,4 @@
+import SaveScreenshotButton from '../../features/demo/SaveScreenshotButton'
 import { Link, useSearchParams } from 'react-router-dom'
 import { categories } from '../../data/mockData'
 import { useRecallEntities } from '../../data/useRecallEntities'
@@ -43,7 +44,8 @@ export default function HomePage() {
       <div className="home-sort"><label className="home-sort-control"><span className="checkin-sr-only">Sort saved things</span>
         <select value={sort} onChange={event => changeParam('sort', event.target.value, 'recent')}><option value="recent">Most recent</option><option value="screenshots">Most screenshots</option></select>
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
-      </label></div>
+      </label><SaveScreenshotButton /></div>
+      <div id="nearby-slot" />
       <div className="home-collection" aria-live="polite" aria-busy={data.status === 'loading'}>
         {data.status === 'loading' && <p className="home-status" role="status">Finding your saved things…</p>}
         {data.status === 'error' && <div className="collection-state" role="alert"><h2>Your collection couldn’t load.</h2><p>Give it another try in a moment.</p><button type="button" onClick={data.retry}>Retry</button></div>}
