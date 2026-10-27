@@ -174,7 +174,7 @@ export default function AgentActivity({ runs, annotations, live = false, demos, 
       </div>
 
       <footer className="aa-footer">
-        <p>No Recall without evidence. No interruption without context.</p>
+        <p>No pingo without evidence. No interruption without context.</p>
         {zetaris?.connected
           ? <p>Connected to Zetaris: {zetaris.evidence} evidence, {zetaris.entities} entities, {zetaris.open_loops} open loops.</p>
           : workspaceNote ? <p>{workspaceNote}</p>

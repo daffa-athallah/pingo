@@ -14,6 +14,9 @@ export interface EntityResponse {
   screenshot_count: number
   thumbnail_ref: string | null
   inferred_intention: string | null
+  metadata?: Record<string, string>
+  brand?: string | null
+  entity_type?: string
 }
 
 export interface OpenLoopResponse {
@@ -31,7 +34,7 @@ async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${path}`, {
     signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
   })
-  if (!response.ok) throw new Error(`Recall data request failed (${response.status}).`)
+  if (!response.ok) throw new Error(`pingo data request failed (${response.status}).`)
   return response.json() as Promise<T>
 }
 
@@ -81,6 +84,11 @@ export interface OpenLoopViewResponse {
   entities: { entity_id: string; name: string }[]
   screenshot_count: number
   screenshots: { evidence_id: string; summary: string; timestamp: string; image_url: string }[]
+  /** Optional presentation extension. See docs/frontend-catalogue.md; absent on current backend. */
+  catalogue_images?: {
+    entity_id: string; catalogue_image_url: string; catalogue_image_source: string;
+    catalogue_image_verified: boolean; alt: string; object_position?: string
+  }[]
 }
 
 /** Backend-served JPEG of a supporting screenshot, scaled to `width` pixels. */
@@ -88,6 +96,13 @@ export const imageUrl = (path: string, width: number) => `${API_BASE_URL.replace
 
 export function getOpenLoopViews(signal?: AbortSignal): Promise<OpenLoopViewResponse[]> {
   return get('/open-loops', signal)
+}
+
+export type ContextEntityResponse = Pick<EntityResponse, 'entity_id' | 'name' | 'domain' | 'metadata'>
+
+/** Thin metadata projection avoids the existing /entities endpoint's per-entity count queries. */
+export function getContextEntities(signal?: AbortSignal): Promise<ContextEntityResponse[]> {
+  return get('/context-simulator/places', signal)
 }
 
 export interface SavedRunResponse {
@@ -154,6 +169,11 @@ async function post<T>(path: string, body: unknown, timeout: number): Promise<T>
   return response.json() as Promise<T>
 }
 export const evaluateContext = (events: ContextInput[], now: string) => post<ContextEvaluation>('/context-simulator/evaluate', { events, now }, 600000)
+export async function getContextEvaluation(id: string, signal?: AbortSignal): Promise<ContextEvaluation> {
+  const record = await get<Partial<ContextEvaluation>>(`/context/evaluations/${encodeURIComponent(id)}`, signal)
+  return { ...record, evaluation_id: record.evaluation_id ?? id, state: record.state ?? 'FAILED_SAFE',
+    source: record.source ?? [], notification_id: record.notification_id ?? null, delivery: record.delivery ?? 'PENDING' }
+}
 export const getNotifications = (signal?: AbortSignal) => get<PingoNotification[]>('/notifications', signal)
 export const getNotification = (id: string, signal?: AbortSignal) => get<PingoNotification>(`/notifications/${encodeURIComponent(id)}`, signal)
 export const actOnNotification = (id: string, action: NoticeAction) => post<PingoNotification>(`/notifications/${encodeURIComponent(id)}/actions`, { action }, 30000)

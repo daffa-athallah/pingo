@@ -1,5 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#faf9f6"/>
-  <circle cx="300" cy="256" r="104" fill="#f27680"/>
-  <circle cx="212" cy="256" r="104" fill="#e32636"/>
+  <defs>
+    <linearGradient id="petal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFC7A8"/>
+      <stop offset=".58" stop-color="#FF8C55"/>
+      <stop offset="1" stop-color="#FF6328"/>
+    </linearGradient>
+    <linearGradient id="petal-soft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE0CC"/>
+      <stop offset="1" stop-color="#FF9B68"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#9A4B28" flood-opacity=".16"/>
+    </filter>
+  </defs>
+  <rect x="18" y="18" width="476" height="476" rx="112" fill="#FFF6ED"/>
+  <g transform="translate(64 94) scale(5.9)" filter="url(#soft-shadow)">
+    <path d="M39 22C35 17 25 4 29 1c4-4 12 3 15 9 2 5 2 10 2 14Z" fill="url(#petal)"/>
+    <path d="M39 25C31 21 12 15 5 21c-6 6 4 12 13 12 8 0 15-3 23-6Z" fill="url(#petal)"/>
+    <path d="M41 29c-6 3-18 12-16 18 2 6 10 2 15-4 4-5 5-10 7-14Z" fill="url(#petal-soft)"/>
+    <circle cx="54" cy="27" r="5" fill="#FF763B"/>
+  </g>
 </svg>

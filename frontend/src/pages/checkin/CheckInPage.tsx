@@ -5,9 +5,10 @@ import { isCheckInDemo } from './checkInService'
 import type { CheckInQuestion, CheckInResponse } from './checkInTypes'
 import CheckInIcon from './CheckInIcon'
 import QuestionCard from './QuestionCard'
+import PingoBrand from '../../components/brand/PingoBrand'
 
 function Brand() {
-  return <Link to="/" className="checkin-brand" aria-label="Recall home"><span className="checkin-brand-mark" aria-hidden="true"><span /><span /></span>Recall</Link>
+  return <Link to="/" className="checkin-brand" aria-label="pingo home"><PingoBrand /></Link>
 }
 
 function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] }) {
@@ -68,7 +69,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
     </> : <div className="checkin-result">
       <span className="checkin-result-icon"><CheckInIcon name={questions.length ? 'check' : 'message'} /></span>
       <h1 ref={focusTarget} tabIndex={-1}>{questions.length ? skipped.length ? 'You’re done for now.' : 'All caught up.' : 'Nothing to check in on.'}</h1>
-      <p>{questions.length ? 'Thanks for helping Recall understand you better.' : "Recall doesn't need anything from you right now."}</p>
+      <p>{questions.length ? 'Thanks for helping pingo understand you better.' : "pingo doesn't need anything from you right now."}</p>
       {(!questions.length || skipped.length > 0) && <p className="checkin-result-detail">{skipped.length ? 'Anything you skipped will be here when you’re ready.' : "We'll ask when there's something worth clarifying."}</p>}
       <Link to="/" className="checkin-primary">Back to Home</Link>
     </div>}

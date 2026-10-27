@@ -8,6 +8,20 @@ from backend.app.context.service import ContextConflict, ContextService
 router = APIRouter()
 
 
+@router.get('/context-simulator/places')
+def context_places(request: Request):
+    """Single repository read for verified-location inputs, without per-entity count/loop queries.
+
+    These are stored coordinates, not geocoding or claims of current eligibility.
+    The frontend separately requires active loop/evidence links before enabling presets.
+    """
+    keys = {'latitude', 'longitude', 'location_verified', 'location_source', 'location_role', 'store_name'}
+    return [{'entity_id': entity.entity_id, 'name': entity.name, 'domain': entity.domain,
+             'metadata': {key: value for key, value in entity.metadata.items() if key in keys}}
+            for entity in request.app.state.repository.list_entities()
+            if entity.domain in {'food', 'travel', 'shopping'}]
+
+
 def service(request):
     repo = request.app.state.repository
     current = getattr(request.app.state, 'context_service', None)

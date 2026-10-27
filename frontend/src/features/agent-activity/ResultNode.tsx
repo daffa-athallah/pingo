@@ -3,11 +3,11 @@ import { AgentIcon } from './agentMeta'
 import type { TimelineNode } from './traceAdapter'
 
 const RESULT_COPY: Record<string, { title: string; body: string }> = {
-  SURFACE: { title: 'Recall surfaced this intention', body: 'Evidence and context both supported interrupting.' },
-  STAY_SILENT: { title: 'Recall stayed silent', body: 'No interruption was warranted.' },
-  ASK: { title: 'Recall needs clarification', body: 'A small answer would improve the interpretation.' },
-  FAILED_SAFE: { title: 'Recall stopped safely', body: 'Something went wrong, so nothing was shown.' },
-  STORED: { title: 'Recall saved this', body: 'Saving does not interrupt anyone.' },
+  SURFACE: { title: 'pingo surfaced this intention', body: 'Evidence and context both supported interrupting.' },
+  STAY_SILENT: { title: 'pingo stayed silent', body: 'No interruption was warranted.' },
+  ASK: { title: 'pingo needs clarification', body: 'A small answer would improve the interpretation.' },
+  FAILED_SAFE: { title: 'pingo stopped safely', body: 'Something went wrong, so nothing was shown.' },
+  STORED: { title: 'pingo saved this', body: 'Saving does not interrupt anyone.' },
 }
 
 const QUIET_ICON = new Set(['SURFACE', 'ASK'])

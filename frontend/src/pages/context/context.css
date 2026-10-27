@@ -1,41 +1,49 @@
 .context-simulator { gap: 28px; }
-.context-simulator h1 { font-family: Georgia, serif; font-weight: 500; }
+.context-simulator h1 { font-family: var(--pingo-font); font-weight: 600; }
 .context-simulator p { max-width: 65ch; }
-.context-disclosure { background: var(--color-primary-soft); padding: 16px 20px; border-radius: 12px; color: #6e252c; font-size: .9rem; }
+.context-test-modes { display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: var(--pingo-cream); }
+.context-test-modes button { flex: 1; min-height: 44px; padding: 9px 12px; border: 0; border-radius: 11px; background: transparent; color: var(--pingo-muted); font-size: 13px; cursor: pointer; }
+.context-test-modes button[aria-pressed=true] { background: var(--pingo-charcoal); color: white; }
+.context-test-modes button:disabled { cursor: wait; }
+.context-presets { display: grid; gap: 14px; padding-bottom: 24px; border-bottom: 1px solid var(--pingo-sand); }
+.context-presets > p { color: var(--pingo-muted); font-size: 14px; }
+.context-presets details { overflow-wrap: anywhere; }
+.context-presets details p, .context-presets li { margin-block: 8px; font-size: 13px; }
+.context-disclosure { background: var(--pingo-cream); padding: 16px 20px; border-radius: 12px; color: #68483a; font-size: .9rem; }
 .context-clock, .context-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .context-simulator label { display: grid; align-content: start; gap: 7px; font-size: .875rem; font-weight: 500; min-width: 0; }
-.context-simulator input, .context-simulator textarea { width: 100%; min-width: 0; background: white; border: 1px solid #d5d0c9; border-radius: 10px; min-height: 46px; padding: 10px 12px; color: var(--color-text); caret-color: var(--color-primary); }
+.context-simulator input, .context-simulator textarea { width: 100%; min-width: 0; background: white; border: 1px solid var(--pingo-sand); border-radius: 12px; min-height: 46px; padding: 10px 12px; color: var(--color-text); caret-color: var(--color-primary); }
 .context-simulator textarea { resize: vertical; }
 .context-simulator input::placeholder, .context-simulator textarea::placeholder { color: #6b625d; }
 .context-simulator input[type=number] { font-variant-numeric: tabular-nums; }
 .context-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; }
 .context-tabs button { border: 0; background: transparent; border-radius: 24px; padding: 10px 18px; min-height: 44px; cursor: pointer; }
-.context-tabs button[aria-pressed=true] { background: #151515; color: white; }
-.context-tabs button:hover { background: #ede7e0; color: #151515; }
+.context-tabs button[aria-pressed=true] { background: var(--pingo-charcoal); color: white; }
+.context-tabs button:hover { background: var(--pingo-cream); color: var(--pingo-charcoal); }
 .context-form, .context-queue, .context-live, .context-result { display: grid; gap: 16px; }
 .context-queue, .context-live, .context-movement, .context-result { padding-top: 24px; border-top: 1px solid var(--color-border); }
 .context-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .context-primary, .context-secondary { display: inline-flex; justify-content: center; align-items: center; text-align: center; width: fit-content; padding: 12px 20px; min-height: 46px; border-radius: 24px; border: 0; cursor: pointer; font-weight: 500; }
-.context-primary { background: #ca1e2c; color: white; }
-.context-secondary { background: #eeeae5; color: #151515; }
-.context-primary:hover { background: #ad1623; }
-.context-secondary:hover { background: #e5ded6; }
+.context-primary { background: var(--pingo-orange); color: var(--pingo-charcoal); }
+.context-secondary { background: var(--pingo-cream); color: var(--pingo-charcoal); }
+.context-primary:hover { background: #e9612d; }
+.context-secondary:hover { background: #f5e7da; }
 .context-simulator button:disabled { opacity: .5; cursor: not-allowed; }
-.context-simulator small { font-size: .8rem; color: #625c58; }
+.context-simulator small { font-size: .8rem; color: var(--pingo-muted); }
 .context-queue ul { margin: 0; padding-left: 20px; }
 .context-queue li { padding: 6px 0; overflow-wrap: anywhere; }
-.context-queue li button { min-height: 44px; margin-left: 8px; border: 0; color: #bb1826; background: transparent; cursor: pointer; text-decoration: underline; }
+.context-queue li button { min-height: 44px; margin-left: 8px; border: 0; color: #b64d22; background: transparent; cursor: pointer; text-decoration: underline; }
 .context-movement summary, .context-result summary { cursor: pointer; padding: 8px 0; }
 .context-movement[open] { display: grid; gap: 16px; }
 .context-movement label { margin: 12px 0; }
-.context-error { color: #a71b27; overflow-wrap: anywhere; }
+.context-error { color: #96371f; overflow-wrap: anywhere; }
 .context-result h3 { margin: 12px 0 0; font-size: 1rem; }
 .context-candidates { list-style: none; margin: 0; padding: 0; }
 .context-candidates li { display: grid; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--color-border); }
-.context-candidates span { font-size: .875rem; color: #625c58; }
+.context-candidates span { font-size: .875rem; color: var(--pingo-muted); }
 .context-trace { padding-left: 22px; margin: 0; display: grid; gap: 16px; }
-.context-simulator pre { max-width: 100%; overflow: auto; font-size: .75rem; background: #f0ece7; border-radius: 12px; padding: 16px; }
-.context-simulator ::selection { background: #f7bfc3; color: #151515; }
+.context-simulator pre { max-width: 100%; overflow: auto; font-size: .75rem; background: var(--pingo-cream); border-radius: 12px; padding: 16px; }
+.context-simulator ::selection { background: var(--pingo-peach); color: var(--pingo-charcoal); }
 @media (max-width: 480px) { .context-clock, .context-fields { grid-template-columns: minmax(0, 1fr); } .context-actions > button { width: 100%; } .context-tabs { gap: 0; } .context-tabs button { flex: 1; padding-inline: 10px; } }
-.context-simulator .page-header p { color: #625c58; }
-body:has(.context-simulator) .bottom-nav-link { color: #625c58; }
+.context-simulator .page-header p { color: var(--pingo-muted); }
+body:has(.context-simulator) .bottom-nav-link { color: var(--pingo-muted); }

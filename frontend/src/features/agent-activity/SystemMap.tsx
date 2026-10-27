@@ -102,7 +102,7 @@ export default function SystemMap({ timeline, visibleCount, focusKey, animateFoc
 
   return (
     <figure className="aa-map" aria-label="Live system map">
-      <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} role="img" aria-label="How Recall's agents, shared state and model routing connect">
+      <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} role="img" aria-label="How pingo's agents, shared state and model routing connect">
         <defs>
           {(['idle', 'used', 'active'] as const).map((s) => (
             <marker key={s} id={`aa-map-arrow-${s}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -111,9 +111,9 @@ export default function SystemMap({ timeline, visibleCount, focusKey, animateFoc
           ))}
         </defs>
 
-        {/* Recall boundary */}
+        {/* pingo boundary */}
         <rect className="aa-map-boundary" x="186" y="82" width="712" height="342" rx="28" />
-        <text x="884" y="104" textAnchor="end" className="aa-map-boundary-label">RECALL</text>
+        <text x="884" y="104" textAnchor="end" className="aa-map-boundary-label">pingo</text>
 
         {(Object.keys(EDGE_PATHS) as EdgeId[]).map((id) => <Wire key={id} id={id} edge={view.edges[id]} />)}
 

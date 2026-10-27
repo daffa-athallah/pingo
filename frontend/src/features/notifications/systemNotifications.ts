@@ -2,6 +2,18 @@ import type { PingoNotification } from '../../services/api'
 
 const shownKey = 'pingo.system-notifications.shown.v1'
 
+export function notificationCopy(notice: PingoNotification) {
+  const entityTitle = notice.payload.entities.length === 1 ? notice.payload.entities[0].name : ''
+  const title = entityTitle || notice.payload.title.replace(/^Interested in\s+/i, '') || 'Saved intention'
+  // Concise approved delivery copy belongs in the banner; the Critic's full reason stays in Why now?.
+  const message = notice.payload.message.trim()
+  const body = !message || message === 'An intention you saved may be relevant now. Revisit the evidence behind it.'
+    ? 'Something you saved might fit this moment. Take another look?' : message
+  const triggers = notice.payload.trigger_types.map(type => type.charAt(0) + type.slice(1).toLowerCase()).join(' + ')
+  const mode = notice.payload.sources.includes('SIMULATED') ? 'Simulated' : 'Live'
+  return { title, body, context: triggers ? `${mode} · ${triggers}` : `${mode} context` }
+}
+
 function shown(): Set<string> {
   try {
     const value: unknown = JSON.parse(localStorage.getItem(shownKey) ?? '[]')
@@ -16,7 +28,7 @@ export function notificationSupport(): 'insecure' | 'unsupported' | Notification
 }
 
 export async function enableSystemNotifications(): Promise<NotificationPermission> {
-  if (notificationSupport() === 'insecure' || notificationSupport() === 'unsupported') throw new Error('Notifications need the installed Pingo app over HTTPS.')
+  if (notificationSupport() === 'insecure' || notificationSupport() === 'unsupported') throw new Error('Notifications need the installed pingo app over HTTPS.')
   return Notification.requestPermission()
 }
 
@@ -25,11 +37,12 @@ export async function showSystemNotification(notice: PingoNotification): Promise
   if (notificationSupport() !== 'granted') return false
   const history = shown()
   if (history.has(notice.notification_id)) return false
+  const copy = notificationCopy(notice)
   const registration = await navigator.serviceWorker.ready
-  await registration.showNotification(notice.payload.title, {
-    body: notice.payload.message,
-    icon: '/pwa/icon-192.png',
-    badge: '/pwa/icon-192.png',
+  await registration.showNotification(copy.title, {
+    body: copy.body,
+    icon: '/brand/production/pingo-icon-192.png',
+    badge: '/brand/production/pingo-icon-192.png',
     tag: notice.notification_id,
     data: { url: `/recalls/${encodeURIComponent(notice.notification_id)}` },
   })
