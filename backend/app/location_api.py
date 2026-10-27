@@ -14,6 +14,8 @@ router = APIRouter()
 
 class PinBody(BaseModel):
     link: str = Field(min_length=3, max_length=2000, description='A Google Maps link, or "latitude, longitude"')
+    location_id: str | None = Field(default=None, max_length=80, pattern=r'^osm:(node|way|relation):\d+$', description='Set when confirming a place the map search proposed')
+    label: str | None = Field(default=None, max_length=300)
 
 
 @router.post('/api/entities/{entity_id}/location')
@@ -29,7 +31,7 @@ async def set_location(request: Request, entity_id: str, body: PinBody):
         entity = found[0] if found else None
         if entity is None or entity.domain not in ('food', 'travel'):
             raise HTTPException(status_code=404, detail='Only a saved restaurant or destination can be given a location.')
-        updated = replace(entity, metadata=geocode.metadata_from_pin(entity, point[0], point[1], how='Google Maps pin or link'))
+        updated = replace(entity, metadata=geocode.metadata_from_pin(entity, point[0], point[1], how=(f"OpenStreetMap place '{body.label or body.location_id}' proposed by the map search and confirmed" if body.location_id else 'Google Maps pin or link'), location_id=body.location_id))
         state.repository.save_entity(updated)
         if hasattr(state, 'on_data_changed'):
             state.on_data_changed()

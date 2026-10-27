@@ -112,46 +112,72 @@ def eligible(entity) -> bool:
         (entity.metadata or {}).get('location_verified', '').lower() != 'true'
 
 
+def _candidates(results) -> list[dict]:
+    seen, out = set(), []
+    for r in results:
+        key = (r.get('osm_type'), r.get('osm_id'))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append({'label': r.get('display_name'), 'name': r.get('name'), 'lat': float(r['lat']), 'lon': float(r['lon']),
+                    'location_id': f"osm:{r.get('osm_type')}:{r.get('osm_id')}"})
+    return out[:5]
+
+
 def resolve(entity, *, search=_search) -> dict:
-    """{'status': 'resolved', ...} | {'status': 'ambiguous'|'not_found'|'unavailable', 'reason': str, 'candidates': [...]}."""
-    place = ', '.join(p for p in (entity.name, entity.location_name, entity.city, entity.country) if p)
-    if entity.location_name and entity.city and _norm(entity.location_name) == _norm(entity.city):
-        place = ', '.join(p for p in (entity.name, entity.city, entity.country) if p)
-    try:
-        results = search(place)
-        if not results:
-            results = search(', '.join(p for p in (entity.name, entity.city or entity.location_name) if p))
-        if not results:  # a small business is often missing from a broad search: look for it only inside its suburb
-            box = _area_box(entity, search)
-            results = search(entity.name, viewbox=box) if box else []
-    except (urllib.error.URLError, OSError, ValueError):
-        return {'status': 'unavailable', 'reason': 'The geocoder could not be reached; the place stays unlocated.', 'candidates': []}
+    """{'status': 'resolved', ...} | {'status': 'ambiguous'|'not_found'|'unavailable', 'reason': str, 'candidates': [...]}.
+
+    The agent searches the map several ways (name and suburb, name and city, the street address read from the screenshot, name inside the suburb)
+    and accepts a result by itself only when it is unambiguous. Everything it found but could not accept is returned as candidates for the person to confirm."""
+    meta = entity.metadata or {}
+    same = entity.location_name and entity.city and _norm(entity.location_name) == _norm(entity.city)
+    queries = [', '.join(p for p in (entity.name, None if same else entity.location_name, entity.city, entity.country) if p),
+               ', '.join(p for p in (entity.name, entity.city or entity.location_name) if p)]
+    if meta.get('address'):
+        queries.insert(1, f"{entity.name}, {meta['address']}")
     name_tokens = _tokens(entity.name)
-    area_tokens = _tokens(entity.location_name or '') | _tokens(entity.city or '')
-    area_tokens = {t for t in area_tokens if t not in name_tokens}
-    good = []
-    for item in results:
-        text = _norm(f"{item.get('name', '')} {item.get('display_name', '')}")
-        have = set(text.split())
-        # The result's own name must be the saved name, not a longer one ("Biomedical Learning and Teaching Building" is not "Learning and Teaching Building").
-        named = _tokens(item.get('name') or '') == name_tokens if item.get('name') else name_tokens <= have
-        if name_tokens and named and name_tokens <= have and (not area_tokens or area_tokens & have):
-            good.append(item)
-    summary = [{'display_name': r.get('display_name'), 'lat': r.get('lat'), 'lon': r.get('lon')} for r in results[:3]]
-    if not good:
-        return {'status': 'not_found', 'reason': f'No result matched both the name and the suburb of "{entity.name}".', 'candidates': summary}
-    first = (float(good[0]['lat']), float(good[0]['lon']))
-    if any(_metres(first, (float(g['lat']), float(g['lon']))) > SPREAD_METERS for g in good[1:]):
-        return {'status': 'ambiguous', 'reason': f'"{entity.name}" matches several different places; not choosing one.', 'candidates': summary}
-    best = good[0]
-    return {'status': 'resolved', 'lat': float(best['lat']), 'lon': float(best['lon']), 'display_name': best.get('display_name'),
-            'location_id': f"osm:{best.get('osm_type')}:{best.get('osm_id')}", 'candidates': summary}
+    area_tokens = {t for t in _tokens(entity.location_name or '') | _tokens(entity.city or '') if t not in name_tokens}
+    pool: list[dict] = []
+
+    def judge(items):
+        good = []
+        for item in items:
+            have = set(_norm(f"{item.get('name', '')} {item.get('display_name', '')}").split())
+            # The result's own name must be the saved name, not a longer one ("Biomedical Learning and Teaching Building" is not "Learning and Teaching Building").
+            named = _tokens(item.get('name') or '') == name_tokens if item.get('name') else name_tokens <= have
+            if name_tokens and named and name_tokens <= have and (not area_tokens or area_tokens & have):
+                good.append(item)
+        if not good:
+            return None
+        first = (float(good[0]['lat']), float(good[0]['lon']))
+        if any(_metres(first, (float(g['lat']), float(g['lon']))) > SPREAD_METERS for g in good[1:]):
+            return {'status': 'ambiguous', 'reason': f'"{entity.name}" matches several different places; not choosing one.'}
+        best = good[0]
+        return {'status': 'resolved', 'lat': float(best['lat']), 'lon': float(best['lon']), 'display_name': best.get('display_name'),
+                'location_id': f"osm:{best.get('osm_type')}:{best.get('osm_id')}"}
+
+    try:
+        for query in queries:
+            found = search(query)
+            pool.extend(found)
+            verdict = judge(pool)
+            if verdict:
+                return {**verdict, 'candidates': _candidates(pool)}
+        box = _area_box(entity, search)  # a small business is often missing from a broad search: look for it only inside its suburb
+        if box:
+            pool.extend(search(entity.name, viewbox=box))
+            verdict = judge(pool)
+            if verdict:
+                return {**verdict, 'candidates': _candidates(pool)}
+    except (urllib.error.URLError, OSError, ValueError):
+        return {'status': 'unavailable', 'reason': 'The geocoder could not be reached; the place stays unlocated.', 'candidates': _candidates(pool)}
+    return {'status': 'not_found', 'reason': f'The map has no exact match for "{entity.name}".', 'candidates': _candidates(pool)}
 
 
-def metadata_from_pin(entity, lat: float, lon: float, *, how: str) -> dict:
+def metadata_from_pin(entity, lat: float, lon: float, *, how: str, location_id: str | None = None) -> dict:
     """A coordinate the person supplied (a map pin or link they checked themselves)."""
     return {**(entity.metadata or {}), 'latitude': f'{lat:.7f}', 'longitude': f'{lon:.7f}', 'location_verified': 'true',
-            'location_id': f'pin:{lat:.5f},{lon:.5f}', 'location_source': f"{how}, supplied by the user ({time.strftime('%Y-%m-%d')})"}
+            'location_id': location_id or f'pin:{lat:.5f},{lon:.5f}', 'location_source': f"{how}, supplied by the user ({time.strftime('%Y-%m-%d')})"}
 
 
 def metadata_for(entity, found: dict) -> dict:

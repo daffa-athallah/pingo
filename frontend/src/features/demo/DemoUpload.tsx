@@ -117,7 +117,11 @@ export default function DemoUpload() {
                 <div key={place.entity_id} className="demo-location">
                   {place.status === 'unresolved' ? (
                     <>
-                      <p><strong>{place.name}</strong>: the map has no match, so nearby reminders are off for it. Paste a Google Maps link (or “lat, lon”) to turn them on.</p>
+                      <p><strong>{place.name}</strong>: {place.candidates?.length ? 'the map has no exact match. Is it one of these?' : 'the map has no match, so nearby reminders are off for it.'}</p>
+                      {!pinned[place.entity_id] && place.candidates?.map((c) => (
+                        <button key={c.location_id} type="button" className="demo-candidate" onClick={async () => { try { const r = await setEntityLocation(place.entity_id, `${c.lat}, ${c.lon}`, { location_id: c.location_id, label: c.label }); setPinned((v) => ({ ...v, [place.entity_id]: `${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)}` })) } catch (err) { setPinError((v) => ({ ...v, [place.entity_id]: err instanceof Error ? err.message : 'Could not save.' })) } }}>Use this place: {c.label}</button>
+                      ))}
+                      {!pinned[place.entity_id] ? <p className="demo-note">Not there? Paste a Google Maps link (or “lat, lon”) to turn nearby reminders on.</p> : null}
                       {pinned[place.entity_id] ? <p className="demo-ok">Saved: {pinned[place.entity_id]}</p> : (
                         <form onSubmit={async (e) => { e.preventDefault(); setPinError((v) => ({ ...v, [place.entity_id]: '' })); try { const r = await setEntityLocation(place.entity_id, pins[place.entity_id] ?? ''); setPinned((v) => ({ ...v, [place.entity_id]: `${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)}` })) } catch (err) { setPinError((v) => ({ ...v, [place.entity_id]: err instanceof Error ? err.message : 'Could not save.' })) } }}>
                           <input value={pins[place.entity_id] ?? ''} onChange={(e) => setPins((v) => ({ ...v, [place.entity_id]: e.target.value }))} placeholder="https://maps.app.goo.gl/… or -37.9187, 145.1286" aria-label={`Location of ${place.name}`} />

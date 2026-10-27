@@ -90,9 +90,9 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
 
-def _location_row(entity, status: str, reason: str | None = None) -> dict:
+def _location_row(entity, status: str, reason: str | None = None, candidates: list | None = None) -> dict:
     meta = entity.metadata or {}
-    return {'entity_id': entity.entity_id, 'name': entity.name, 'status': status, 'reason': reason,
+    return {'entity_id': entity.entity_id, 'name': entity.name, 'status': status, 'reason': reason, 'candidates': candidates or [],
             'latitude': meta.get('latitude'), 'longitude': meta.get('longitude'), 'location_id': meta.get('location_id')}
 
 
@@ -119,9 +119,9 @@ async def _locate(state, recorder, evidence_id: str) -> list[dict]:
                               detail={'location_id': found['location_id'], 'latitude': found['lat'], 'longitude': found['lon'], 'source': 'OpenStreetMap Nominatim'})
                 rows.append(_location_row(updated, 'resolved'))
             else:
-                recorder.emit('LOCATION', 'UNRESOLVED', found['reason'] + ' Add a map pin to enable nearby reminders for it.',
+                recorder.emit('LOCATION', 'UNRESOLVED', found['reason'] + (' Pick one of the places it found, or add a map pin, to enable nearby reminders.' if found['candidates'] else ' Add a map pin to enable nearby reminders for it.'),
                               input_refs=[f'entity:{entity.entity_id}'], next_step='STOP', detail={'status': found['status'], 'candidates': found['candidates']})
-                rows.append(_location_row(entity, 'unresolved', found['reason']))
+                rows.append(_location_row(entity, 'unresolved', found['reason'], found['candidates']))
     except Exception as exc:  # noqa: BLE001 - locating a place never affects the saved screenshot
         recorder.emit('LOCATION', 'UNRESOLVED', f'Place lookup failed safely ({type(exc).__name__}).', next_step='STOP')
     return rows

@@ -37,7 +37,7 @@ export interface UploadOutcome {
   }
   receipts: { agent: string; action: string; receipt: { requested_model: string | null; routed_model: string | null; provider: string | null } }[]
   error: string | null
-  locations?: { entity_id: string; name: string; status: 'resolved' | 'located' | 'unresolved'; reason: string | null; latitude: string | null; longitude: string | null; location_id: string | null }[]
+  locations?: { entity_id: string; name: string; status: 'resolved' | 'located' | 'unresolved'; reason: string | null; candidates?: { label: string; lat: number; lon: number; location_id: string }[]; latitude: string | null; longitude: string | null; location_id: string | null }[]
 }
 
 export interface Health {
@@ -95,7 +95,7 @@ export interface ZetarisProof {
 }
 export const getZetarisProof = (signal?: AbortSignal) => json<ZetarisProof>('/api/sample/zetaris', { signal })
 
-export const setEntityLocation = (entityId: string, link: string) =>
+export const setEntityLocation = (entityId: string, link: string, pick?: { location_id: string; label: string }) =>
   json<{ entity_id: string; name: string; latitude: number; longitude: number; location_id: string }>(`/api/entities/${encodeURIComponent(entityId)}/location`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link }),
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link, ...(pick ? { location_id: pick.location_id, label: pick.label } : {}) }),
   })
