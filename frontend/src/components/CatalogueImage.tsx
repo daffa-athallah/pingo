@@ -18,7 +18,7 @@ export default function CatalogueImage({ entity, className }: { entity: RecallEn
   if (shot && !shotFailed) return <span className={`${className} catalogue-shot`} role="img" aria-label={`${LABEL(entity)}: your saved screenshot`}>
     <img src={shot.thumbUrl} alt="" loading="lazy" onError={() => setShotFailed(true)} />
     <span className="catalogue-shot-tint" aria-hidden="true" />
-    <span className="catalogue-shot-label"><RecallIcon name={entity.category} /><span>{LABEL(entity)}</span></span>
+    <span className="catalogue-shot-label"><RecallIcon name={entity.category} /></span>
   </span>
   return <span className={`${className} catalogue-placeholder`} role="img" aria-label={`No verified ${entity.category === 'travel' ? 'destination' : entity.category} photo available`}>
     <RecallIcon name={entity.category} /><span>{LABEL(entity)}</span>
