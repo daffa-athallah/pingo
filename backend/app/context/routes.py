@@ -66,7 +66,7 @@ def notification(notification_id: str, request: Request):
 async def notification_action(notification_id: str, body: NotificationAction, request: Request):
     try:
         result = await service(request).action(notification_id, body.action)
-        if body.action == 'DONE':
+        if body.action in {'DONE', 'SNOOZE', 'NOT_RELEVANT', 'JUST_INSPIRATION'}:
             # Existing Home reads must see the resolved state after explicit feedback.
             from backend.app.main import _view_cache, _view_lock
             with _view_lock:

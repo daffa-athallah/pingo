@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../../services/api'
-import type { CheckInQuestion, CheckInResponse } from './checkInTypes'
+import type { CheckInQuestion, CheckInResponse, CheckInSubmission } from './checkInTypes'
 import { sampleQuestions } from './sampleQuestions'
 
 // Demo questions only when asked for explicitly. Otherwise Check-in reads today's questions from the backend, like the rest of the app.
@@ -25,13 +25,14 @@ function isQuestion(value: unknown): value is CheckInQuestion {
     && ['shopping', 'food', 'destination'].includes(String(q.domain))
     && typeof q.summary === 'string' && typeof q.question === 'string'
     && (q.context === undefined || typeof q.context === 'string')
+    && (q.response_mode === undefined || q.response_mode === 'options')
     && Array.isArray(q.options) && q.options.every(option)
     && (q.positive === undefined || option(q.positive)) && (q.negative === undefined || option(q.negative))
     && Array.isArray(q.supporting_images) && q.supporting_images.every(image => image && typeof image.url === 'string' && typeof image.alt === 'string')
 }
 
 async function request(path: string, init?: RequestInit) {
-  const timeout = AbortSignal.timeout(15000)
+  const timeout = AbortSignal.timeout(init?.method === 'POST' ? 60000 : 15000)
   const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${path}`, { ...init, signal: init?.signal ? AbortSignal.any([init.signal, timeout]) : timeout })
   if (!response.ok) throw new Error('Check-in request failed')
   return response
@@ -50,12 +51,13 @@ export async function getCheckIns(signal: AbortSignal): Promise<CheckInQuestion[
   return questions
 }
 
-export async function respondToCheckIn(id: string, answer: CheckInResponse): Promise<void> {
+export async function respondToCheckIn(id: string, answer: CheckInResponse): Promise<CheckInSubmission> {
   if (isCheckInDemo) {
     localStorage.setItem(storageKey, JSON.stringify({ ...readDemoResponses(), [id]: answer }))
-    return
+    return { ok: true }
   }
-  await request(`/api/check-ins/${encodeURIComponent(id)}/respond`, {
+  const response = await request(`/api/check-ins/${encodeURIComponent(id)}/respond`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(answer),
   })
+  return response.json() as Promise<CheckInSubmission>
 }

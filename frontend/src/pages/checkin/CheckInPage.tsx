@@ -18,6 +18,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
   const [skipped, setSkipped] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(false)
+  const [reviewNote, setReviewNote] = useState('')
   const lock = useRef(false)
   const focusTarget = useRef<HTMLHeadingElement>(null)
   const mounted = useRef(true)
@@ -37,8 +38,12 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
     setBusy(true)
     setError(false)
     try {
-      await submit(question.id, answer)
-      if (mounted.current) setIndex(value => value + 1)
+      const saved = await submit(question.id, answer)
+      if (mounted.current) {
+        setReviewNote(saved.agent_review?.state === 'FAILED_SAFE' || saved.agent_review?.state === 'SKIPPED'
+          ? 'Your answer is saved. Pingo couldn’t update your intention right now.' : '')
+        setIndex(value => value + 1)
+      }
     } catch { if (mounted.current) setError(true) }
     finally {
       lock.current = false
@@ -55,6 +60,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
 
   return <section className="checkin-page">
     <div className="checkin-topbar"><Brand />{question && <button className="checkin-text-button" onClick={skip} disabled={busy}>Skip</button>}</div>
+    {reviewNote && <p role="status">{reviewNote}</p>}
     {question ? <>
       <div className="checkin-intro">
         <div className="checkin-progress" role="progressbar" aria-label="Check-in progress" aria-valuenow={index + 1} aria-valuemin={1} aria-valuemax={questions.length} aria-valuetext={`Question ${index + 1} of ${questions.length}`}>
@@ -79,6 +85,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
 
 export default function CheckInPage() {
   const { questions, loading, loadError, reload } = useCheckIns()
+  useEffect(() => { reload() }, [reload])
   if (loading || loadError) return <section className="checkin-page"><div className="checkin-topbar"><Brand /></div><div className="checkin-result">
     <h1>Check-in</h1>
     {loading ? <p role="status">Finding a few things to check in on…</p> : <div className="checkin-load-error" role="alert"><p>We couldn’t load your questions.</p><p>Please try again in a moment.</p><button className="checkin-primary" onClick={reload}>Try again</button><Link className="checkin-text-button" to="/">Back to Home</Link></div>}

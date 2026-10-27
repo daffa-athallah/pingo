@@ -2,6 +2,7 @@ export interface CheckInOption {
   value: string
   label: string
   allows_comment?: boolean
+  comment_required?: boolean
 }
 
 export interface CheckInQuestion {
@@ -16,9 +17,15 @@ export interface CheckInQuestion {
   positive?: CheckInOption
   negative?: CheckInOption
   context?: string
+  response_mode?: 'options'
 }
 
 export interface CheckInResponse {
   response: string
   comment: string | null
+}
+
+export interface CheckInSubmission {
+  ok: boolean
+  agent_review?: { state: 'COMPLETED' | 'FAILED_SAFE' | 'SKIPPED' | 'DEFERRED' | 'RUNNING' }
 }

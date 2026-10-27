@@ -64,7 +64,8 @@ export default function NearbyAware() {
         const response = await evaluateContext([event], iso)
         finishCheck(response, name)
         window.dispatchEvent(new Event('pingo-notifications-changed'))
-        setStatus(response.notification_id ? `Pinged you about ${name}` : `${name}: nothing to say`)
+        if (response.check_in_id) window.dispatchEvent(new Event('recall:data-changed'))
+        setStatus(response.check_in_id ? 'Pingo has a question for you in Check-in' : response.notification_id ? `Pinged you about ${name}` : `${name}: nothing to say`)
       } catch { failCheck(); setStatus('Could not check just now') }
       finally { busy.current = false }
     }

@@ -107,6 +107,7 @@ export default function ContextSimulator() {
       if (!events.length) throw new Error('Add a context event first.')
       const response = await evaluateContext(events, instant ?? zonedInstant(now, zone))
       setResult(response)
+      if (response.check_in_id) window.dispatchEvent(new Event('recall:data-changed'))
       setParams({ mode: 'agents', evaluation: response.evaluation_id }, { replace: true })
       if (response.notification_id) window.dispatchEvent(new Event('pingo-notifications-changed'))
     } catch (e) { setError(e instanceof Error ? e.message : 'Evaluation could not finish. Check the backend and try again.') }
@@ -125,6 +126,7 @@ export default function ContextSimulator() {
       // This request contains only the browser observation, never staged simulation inputs.
       evaluateContext([event], instant).then(response => {
         setResult(response); if (response.notification_id) window.dispatchEvent(new Event('pingo-notifications-changed'))
+        if (response.check_in_id) window.dispatchEvent(new Event('recall:data-changed'))
         setGpsStatus(response.state === 'FAILED_SAFE' || response.result?.final_action === 'FAILED_SAFE'
           ? 'Evaluation could not finish. No notification was created.'
           : response.notification_id ? 'A relevant ping is available.'
@@ -221,6 +223,8 @@ export default function ContextSimulator() {
       <p>{result.error || (result.result?.final_action === 'STAY_SILENT' ? 'No notification was approved.' : result.delivery === 'APPROVED_PENDING_DELIVERY' ? 'Approved. Waiting for the open app to acknowledge delivery.' : result.delivery === 'NOT_APPROVED' ? 'No notification was approved.' : `Delivery: ${result.delivery}`)}</p>
       <p className="pingo-source">{result.source.join(', ')} context{result.replayed ? ' · Saved result, no new agent calls' : ''}</p>
       {result.notification_id && <Link className="context-primary" to={`/recalls/${result.notification_id}`}>Open approved ping</Link>}
+      {result.check_in_id && <Link className="context-primary" to="/check-in">Answer Pingo’s question</Link>}
+      {result.check_in_error && <p role="alert">{result.check_in_error}</p>}
       {result.result?.question && <p><strong>Clarification requested:</strong> {result.result.question} <span>The current Check-in contract does not accept context answers yet.</span></p>}
       <h3>Candidate intentions</h3>
       {!result.candidates?.length ? <p>No eligible evidence-backed intentions were found.</p> : <ul className="context-candidates">{result.candidates.map(c => <li key={c.loop_id}><strong>{c.title}</strong><span>{c.eligible ? 'Offered to Context Agent' : `Excluded: ${c.exclusion?.replaceAll('_', ' ')}`}</span>{c.geography.map((g, i) => <small key={`${g.entity_id}-${i}`}>{g.entity_id}: {g.match}{g.distance_meters === null ? ' · no verified distance' : ` · ${g.distance_meters} m`}</small>)}</li>)}</ul>}

@@ -195,13 +195,16 @@ class ContextNotificationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result['delivery'], 'BLOCKED_UNVERIFIED_MODEL_RECEIPT')
         self.assertFalse(self.repo.notifications)
 
-    async def test_ask_is_reported_without_inventing_merge_feedback(self):
+    async def test_ask_is_saved_as_clarification_without_inventing_merge_feedback(self):
         self.gateway.decisions = ['MATCH', 'ASK']
         result = await self.service.evaluate(request())
         self.assertEqual(result['result']['final_action'], 'ASK')
         self.assertTrue(result['result']['question'])
         self.assertFalse(self.repo.notifications)
-        self.assertFalse(self.repo.check_ins)
+        item = self.repo.get_check_in(result['check_in_id'])
+        self.assertEqual(item.kind, 'AGENT_CLARIFICATION')
+        self.assertEqual(item.question['question'], result['result']['question'])
+        self.assertIsNone(item.response)
 
     async def test_sensitive_chain_never_enters_models_or_results(self):
         self.repo.evidence['ev_0'] = replace(self.repo.evidence['ev_0'], sensitive=True, summary='PRIVATE_SCREENSHOT')
