@@ -93,6 +93,10 @@ async def after_upload(agent, repo, decision, result, emit, run_id=None):
     try:
         links = repo.get_evidence_entities([result.evidence_id])
         entity_ids = sorted({link.entity_id for link in links})
+        shown = repo.get_evidence(result.evidence_id)
+        if shown is not None and not shown.sensitive and (shown.domain not in {'shopping', 'food', 'travel', 'destination'} or not entity_ids):
+            emit('CHECK_IN', 'NOT_QUEUED', 'The Open Loop Agent was unsure, but Pingo only asks about food, shopping and places, and this screenshot has no such subject, so no question is asked.', next_step='STOP')
+            return None
         evidence, entities = grounding(repo, [result.evidence_id], entity_ids)
         if not available(repo, entity_ids, now()):
             emit('CHECK_IN', 'NOT_QUEUED', 'The Open Loop Agent was unsure, but a question is already waiting for this or too many are open (at most 3), so no new one is added.', next_step='STOP')
