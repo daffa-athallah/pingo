@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { evaluateContext, getContextEntities, getOpenLoopViews } from '../../services/api'
+import { getHealth } from '../../services/runsApi'
 import type { ContextInput } from '../../services/api'
 import { contextPlaces } from '../../pages/context/contextPresets'
 import type { VerifiedPlace } from '../../pages/context/contextPresets'
@@ -19,12 +20,17 @@ function metres(aLat: number, aLon: number, bLat: number, bLon: number) {
 type Wake = { release: () => Promise<void> }
 
 export default function NearbyAware() {
-  const [places, setPlaces] = useState<VerifiedPlace[]>([])
+  const [, setPlaces] = useState<VerifiedPlace[]>([])
   const [status, setStatus] = useState('')
+  const [enabled, setEnabled] = useState(false)  // the offline sample has no location to watch, so it never asks a judge for theirs
   const placesRef = useRef<VerifiedPlace[]>([])
   const inside = useRef(false)
   const busy = useRef(false)
   const wake = useRef<Wake | null>(null)
+
+  useEffect(() => {
+    getHealth().then((h) => setEnabled(!(h.mode === 'sample' && !h.live_models))).catch(() => setEnabled(false))
+  }, [])
 
   useEffect(() => {
     let alive = true
@@ -38,9 +44,10 @@ export default function NearbyAware() {
     return () => { alive = false; window.clearInterval(timer) }
   }, [])
 
-  const watching = places.length > 0
   useEffect(() => {
-    if (!watching || !window.isSecureContext || !navigator.geolocation) return undefined
+    if (!enabled) return undefined
+    if (!window.isSecureContext || !navigator.geolocation) { setStatus('Location needs the secure (https) address'); return undefined }
+    setStatus('Allow location so Pingo can notice when you are near a saved place')
     async function ask(latitude: number, longitude: number, accuracy: number, at: number, name: string, distance: number) {
       if (busy.current) return
       busy.current = true; setStatus(`Near ${name} (${Math.round(distance)} m): asking the agents…`)
@@ -58,11 +65,11 @@ export default function NearbyAware() {
       const { latitude, longitude, accuracy } = pos.coords
       const ranked = placesRef.current.map((p) => ({ p, d: metres(latitude, longitude, p.latitude, p.longitude) })).sort((a, b) => a.d - b.d)
       const near = ranked[0]
-      if (!near) return
+      if (!near) { setStatus('Aware of where you are · no saved place has a map location yet'); return }
       if (!inside.current && near.d + accuracy <= ENTER_METERS) { inside.current = true; void ask(latitude, longitude, accuracy, pos.timestamp, near.p.name, near.d) }
       else if (inside.current && near.d > EXIT_METERS) { inside.current = false; setStatus(`Watching · ${Math.round(near.d)} m from ${near.p.name}`) }
       else if (!inside.current) setStatus(`Watching · ${Math.round(near.d)} m from ${near.p.name}`)
-    }, (e) => setStatus(e.code === 1 ? 'Location is off for Pingo' : 'Looking for your location…'), { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 })
+    }, (e) => setStatus(e.code === 1 ? 'Location is off for Pingo. Turn it on in Settings → Privacy → Location Services' : 'Looking for your location…'), { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 })
     // Keep the screen awake once the person touches the app (a browser needs a gesture for this).
     const keepAwake = async () => {
       try { wake.current = await (navigator as unknown as { wakeLock?: { request: (t: 'screen') => Promise<Wake> } }).wakeLock?.request('screen') ?? null } catch { /* optional */ }
@@ -74,8 +81,8 @@ export default function NearbyAware() {
       navigator.geolocation.clearWatch(id); window.removeEventListener('pointerdown', keepAwake); document.removeEventListener('visibilitychange', reacquire)
       void wake.current?.release().catch(() => undefined); wake.current = null; inside.current = false
     }
-  }, [watching])
+  }, [enabled])
 
-  if (!watching) return null
+  if (!enabled) return null
   return <div className="nearby-chip" role="status"><span className="nearby-dot" />{status || 'Pingo is aware of where you are'}</div>
 }
