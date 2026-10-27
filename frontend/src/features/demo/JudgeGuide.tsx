@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { getCachedHistory, getHealth } from '../../services/runsApi'
 import type { CachedHistory } from '../../services/runsApi'
 import Mascot from '../orchestra/Mascot'
+import PhoneLink from './PhoneLink'
 import TryPanel from './TryPanel'
 import ZetarisPanel from './ZetarisPanel'
 import './judge-guide.css'
@@ -102,6 +103,7 @@ export default function JudgeGuide() {
       <div hidden={tab !== 'try'}><TryPanel /></div>
       {tab === 'data' && <ZetarisPanel />}
       {tab === 'tour' && <>
+      <PhoneLink />
       <h2>{STEPS[step]}</h2>
       <p>{copy}</p>
       {step >= 3 && recall && <p className="history-guide-source">Saved {date(recall.captured_at)} · {recall.synthetic_inputs ? 'Simulated calendar input' : 'Saved context'} · feedback changes this local copy only. This view does not claim a notification was delivered.</p>}

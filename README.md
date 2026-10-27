@@ -34,6 +34,19 @@ Every example says **Recorded real run, replayed** (`provenance: recorded`, `wor
 | `revision` | Unsupported booking title → REQUEST_REVISION → REVISE → SURFACE |
 | `duplicates` | Synthetic look-alikes → ASK/Check-in, MERGE and KEEP_SEPARATE |
 
+### Try it on your phone (same Wi-Fi)
+
+pingo is built phone-first, so the sample is nicest on a phone. By default the server only listens on your own computer. To let a phone on the same Wi-Fi in, start it like this and a QR code appears in the guide (open the guide with the floating mascot, then the **Tour** tab):
+
+```sh
+# macOS
+RECALL_BIND=0.0.0.0 RECALL_PUBLIC_URL=http://$(ipconfig getifaddr en0):5175 docker compose up --build
+# Linux
+RECALL_BIND=0.0.0.0 RECALL_PUBLIC_URL=http://$(hostname -I | awk '{print $1}'):5175 docker compose up --build
+```
+
+On Windows, set `RECALL_BIND=0.0.0.0` and `RECALL_PUBLIC_URL=http://<your computer's IPv4 address>:5175` the same way. Only do this on a network you trust: the offline sample has no login. The phone cannot use location in sample mode (the sample has no live places to watch), and the guide's "Try it" replays work as on the laptop.
+
 API examples (Docker backend is on port 8000):
 
 ```sh
@@ -158,7 +171,7 @@ npm ci
 npm run build
 ```
 
-The Python suite has **379 tests**; six skip by default (two live Zetaris tests, and four real-engine tests that need the H-MEM Node dependencies; set `RECALL_SKIP_REAL_HMEM=1` to skip those on purpose). No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
+The Python suite has **380 tests**; six skip by default (two live Zetaris tests, and four real-engine tests that need the H-MEM Node dependencies; set `RECALL_SKIP_REAL_HMEM=1` to skip those on purpose). No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
 
 ## Evidence of behaviour
 

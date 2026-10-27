@@ -68,6 +68,14 @@ class ReplayBoundary(unittest.TestCase):
             self.assertEqual(saved['agent_review']['state'], 'RECORDED')
             self.assertEqual(client.get('/api/check-ins').json()['questions'], [])
 
+    def test_sample_phone_link_is_only_what_the_operator_supplied(self):
+        with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), TestClient(app) as client:
+            self.assertIsNone(client.get('/api/sample/phone-link').json()['url'])
+        with patch.dict(os.environ, {'SAMPLE_MODE': 'true', 'RECALL_PUBLIC_URL': 'http://192.168.1.20:5175'}, clear=True), TestClient(app) as client:
+            self.assertEqual(client.get('/api/sample/phone-link').json()['url'], 'http://192.168.1.20:5175')
+        with patch.dict(os.environ, {'SAMPLE_MODE': 'true', 'RECALL_PUBLIC_URL': 'javascript:alert(1)'}, clear=True), TestClient(app) as client:
+            self.assertIsNone(client.get('/api/sample/phone-link').json()['url'])
+
     def test_sample_reads_history_without_agents_or_canned_context_answers(self):
         with patch.dict(os.environ, {'SAMPLE_MODE': 'true'}, clear=True), patch('backend.app.bootstrap.build_orchestrator', side_effect=AssertionError('No agent should execute')), TestClient(app) as client:
             before = deepcopy(client.get('/open-loops').json())

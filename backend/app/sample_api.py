@@ -3,6 +3,7 @@
 Replay never calls a model. Unchanged agents run against replies captured earlier from Nightshift (see demo/recordings/README.md); a request that
 differs from the recording fails closed. There is no free-form input here, so nothing can be answered with a canned reply."""
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from dataclasses import replace
@@ -35,6 +36,14 @@ def history(request: Request):
     _sample_only(request)
     sample = request.app.state.sample
     return {k: sample[k] for k in ('cached_at', 'data_source', 'provenance', 'workspace', 'model_calls', 'agents_executed', 'records', 'recall_views')}
+
+
+@router.get('/api/sample/phone-link')
+def phone_link(request: Request):
+    """The address a phone on the same Wi-Fi should open, if the person who started the server supplied one (RECALL_PUBLIC_URL). Never guessed."""
+    _sample_only(request)
+    url = os.environ.get('RECALL_PUBLIC_URL', '').strip()
+    return {'url': url if url.startswith(('http://', 'https://')) and len(url) < 200 else None}
 
 
 @router.get('/api/sample/zetaris')

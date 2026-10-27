@@ -10,6 +10,8 @@ services:
       METERLESS_API_KEY: ${METERLESS_API_KEY:-}
       METERLESS_VISION_MODEL: ${METERLESS_VISION_MODEL:-gpt-4o-mini}
       METERLESS_REASONING_MODEL: ${METERLESS_REASONING_MODEL:-nvidia/nemotron-3-ultra-550b-a55b}
+      # Optional, to explore from a phone on the same Wi-Fi (see README "Try it on your phone"): the address the phone should open. Shown as a QR code in the sample UI.
+      RECALL_PUBLIC_URL: ${RECALL_PUBLIC_URL:-}
     volumes:
       - ./logs:/app/logs  # agent traces (trace.jsonl) appear here on the host
     extra_hosts:
@@ -29,7 +31,7 @@ services:
       args:
         VITE_CHECKIN_DEMO: "false"
     ports:
-      - "127.0.0.1:${RECALL_FRONTEND_PORT:-5175}:80"
+      - "${RECALL_BIND:-127.0.0.1}:${RECALL_FRONTEND_PORT:-5175}:80"  # localhost only by default; RECALL_BIND=0.0.0.0 lets a phone on your Wi-Fi in
     depends_on:
       backend:
         condition: service_healthy

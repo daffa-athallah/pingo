@@ -87,6 +87,7 @@ export const getCachedHistory = (signal?: AbortSignal) => json<CachedHistory>('/
 export interface SampleCase { case: string; label: string; kind: 'screenshot' | 'location' | 'review'; image_url: string | null; sensitive: boolean }
 export const getSampleCases = (signal?: AbortSignal) => json<SampleCase[]>('/api/sample/cases', { signal })
 export const replaySampleCase = (name: string) => json<RunRecord>(`/api/sample/cases/${encodeURIComponent(name)}/replay`, { method: 'POST' })
+export const getPhoneLink = (signal?: AbortSignal) => json<{ url: string | null }>('/api/sample/phone-link', { signal })
 export const resetSample = () => json<{ ok: boolean }>('/api/sample/reset', { method: 'POST' })
 
 export interface ZetarisProof {
