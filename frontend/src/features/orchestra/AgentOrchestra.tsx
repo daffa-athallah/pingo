@@ -10,6 +10,7 @@ import { useSync } from './syncStore'
 import { useNearby } from '../nearby/nearbyStore'
 import type { Frame } from './orchestraModel'
 import './orchestra.css'
+import PingoPageHeader from '../../components/layout/PingoPageHeader'
 
 const STEP_MS = 850
 const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
@@ -79,17 +80,14 @@ export default function AgentOrchestra() {
 
   const live = mode === 'Live'
   return <section className="page orchestra-page">
-    <div className="orchestra-top">
-      <img className="orchestra-lockup" src="/brand/production/pingo-lockup-transparent.png" alt="pingo" />
-      <Link className="orchestra-bell" to="/settings/notifications" aria-label="Notification settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.5 16v1.5h15V16L18 12.6V9a6 6 0 0 0-6-6Zm-2 16a2 2 0 0 0 4 0h-4Z" /></svg></Link>
-    </div>
+    <PingoPageHeader />
     <header className="orchestra-head">
       <h1>Agent Activity{mode ? <span className={`orchestra-mode is-${mode.toLowerCase().replace(/ /g, '-')}`}>{live ? <i /> : null}{mode}</span> : null}</h1>
       <p>See how Pingo’s agents work together to turn your screenshots into the right moments.</p>
     </header>
-    <div className="orchestra-tabs" role="tablist" aria-label="View">
-      <button role="tab" aria-selected={tab === 'orchestra'} onClick={() => setTab('orchestra')}>Orchestra</button>
-      <button role="tab" aria-selected={tab === 'trace'} onClick={() => setTab('trace')}>Trace</button>
+    <div className="orchestra-tabs" role="group" aria-label="Activity view">
+      <button aria-pressed={tab === 'orchestra'} onClick={() => setTab('orchestra')}>Orchestra</button>
+      <button aria-pressed={tab === 'trace'} onClick={() => setTab('trace')}>Trace</button>
     </div>
 
     {sync.busy ? <p className="orchestra-sync" role="status">Syncing screenshot {sync.index} of {sync.total}…</p> : null}
@@ -97,7 +95,7 @@ export default function AgentOrchestra() {
 
     {!run ? <>
       <OrchestraStage frame={null} simulated={false} />
-      <div className="trace-peek is-static"><span className="trace-peek-grip" aria-hidden="true" /><strong>Agents are ready</strong><span>Sync a screenshot from <Link to="/">Home</Link> and watch them work.</span></div>
+      <div className="trace-peek is-static"><strong>Agents are ready</strong><span>Sync a screenshot from <Link to="/">Home</Link> and watch them work.</span></div>
     </> : <>
       <div className="orchestra-meta" hidden={Boolean(working)}>
         <span>{run.label} · {clock(run.started_at)}{simulated ? ' · simulated context' : ''}</span>
@@ -106,10 +104,10 @@ export default function AgentOrchestra() {
       {tab === 'orchestra' ? <>
         <OrchestraStage frame={frame} simulated={simulated} />
         <button className="trace-peek" onClick={() => setTab('trace')} aria-label="Open the full reasoning trace">
-          <span className="trace-peek-grip" aria-hidden="true" />
+
           <strong>{words.title}</strong>
           <span>{words.subtitle}</span>
-          {frame?.finished ? <span className="trace-peek-go" aria-hidden="true">→</span> : <span className="trace-peek-bar" role="progressbar" aria-valuenow={Math.round(words.progress * 100)} aria-valuemin={0} aria-valuemax={100}><i style={{ width: `${words.progress * 100}%` }} /></span>}
+          {frame?.finished ? <span className="trace-peek-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-5-5 5 5-5 5" /></svg></span> : <span className="trace-peek-bar" role="progressbar" aria-valuenow={Math.round(words.progress * 100)} aria-valuemin={0} aria-valuemax={100}><i style={{ width: `${words.progress * 100}%` }} /></span>}
           {unresolved ? <em>{unresolved} place{unresolved === 1 ? ' needs' : 's need'} a location</em> : null}
         </button>
       </> : <div className="trace-view">

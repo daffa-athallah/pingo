@@ -575,9 +575,9 @@ svg { display: block; flex-shrink: 0; }
 /* ========================================
    9. Check-in — OWNER: ICA
 ======================================== */
-.checkin-shell { max-width: 480px; }
+.checkin-shell { max-width: var(--content-width); }
 .checkin-shell .app-main { padding: max(26px, env(safe-area-inset-top)) 24px calc(112px + env(safe-area-inset-bottom)); }
-.checkin-page { --checkin-muted: #6f6c69; }
+.checkin-page { --checkin-muted: var(--pingo-muted); }
 .checkin-page ::selection { background: var(--color-primary-soft); color: var(--color-text); }
 .checkin-topbar { display: flex; align-items: center; justify-content: space-between; min-height: 44px; margin-bottom: 28px; }
 .checkin-brand { display: inline-flex; align-items: center; gap: 10px; font: bold 28px / 1 Georgia, 'Times New Roman', serif; letter-spacing: -0.035em; }
@@ -590,9 +590,9 @@ svg { display: block; flex-shrink: 0; }
 .checkin-page h1 { font: 600 clamp(2.5rem, 9vw, 3rem) / 1.1 Georgia, 'Times New Roman', serif; letter-spacing: -0.04em; text-wrap: balance; }
 .checkin-intro h1 { width: fit-content; }
 .checkin-intro > p { margin-top: 10px; font-size: 18px; line-height: 1.35; color: var(--checkin-muted); }
-.checkin-progress { position: absolute; top: 0; right: 0; width: 122px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.checkin-progress { position: absolute; top: 2px; right: 0; width: 88px; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .checkin-progress-bars { display: flex; gap: 6px; margin-top: 6px; }
-.checkin-progress-bars > span { height: 6px; flex: 1; min-width: 0; border-radius: 6px; background: #e9e7e3; transition: background-color 180ms ease-out; }
+.checkin-progress-bars > span { height: 4px; flex: 1; min-width: 0; border-radius: 6px; background: #e9e7e3; transition: background-color 180ms ease-out; }
 .checkin-progress-bars .checkin-progress-current { background: var(--color-primary); }
 .checkin-progress-bars .checkin-progress-skipped { background: #ded9d3; }
 .checkin-card { padding: 24px 28px 22px; border-radius: 28px; background: var(--color-surface); box-shadow: 0 9px 36px rgba(62, 45, 32, 0.055); animation: checkin-arrive 180ms ease-out; }
@@ -910,21 +910,35 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .entity-detail--no-hero .entity-detail-handle { display: none; }
 
 .checkin-shell { width: 100%; overflow-x: clip; }
-.checkin-shell .app-main { width: 100%; min-width: 0; overflow-x: clip; padding: max(22px, env(safe-area-inset-top)) 20px calc(96px + env(safe-area-inset-bottom)); }
+.checkin-shell .app-main { width: 100%; min-width: 0; overflow-x: clip; padding: 28px 20px calc(96px + env(safe-area-inset-bottom)); }
 .checkin-page, .checkin-intro, .checkin-card { width: 100%; min-width: 0; max-width: 100%; }
 .checkin-topbar { margin-bottom: var(--space-5); }
 .checkin-brand .pingo-brand-mark { width: 29px; height: 29px; }
 .checkin-brand .pingo-wordmark { font-size: 23px; }
-.checkin-intro { margin: 0 4px var(--space-5); }
-.checkin-page h1 { font-size: var(--type-display); font-weight: 600; line-height: 1.12; letter-spacing: -.03em; }
-.checkin-intro > p { margin-top: var(--space-2); font-size: var(--type-body); line-height: 1.45; }
-.checkin-card { padding: var(--space-5); overflow: hidden; border-radius: var(--radius-md); box-shadow: 0 6px 20px rgba(41, 37, 34, .045); }
+.checkin-page { max-width: 480px; margin-inline: auto; }
+.checkin-intro { padding-top: 0; margin: var(--space-6) 0; }
+.checkin-intro h1 { padding-right: 100px; }
+.checkin-page h1 { font-size: var(--type-heading); font-weight: 600; line-height: 1.12; letter-spacing: -.03em; }
+.checkin-intro > p { max-width: 34ch; margin-top: var(--space-2); font-size: var(--type-sm); line-height: 1.5; }
+.checkin-card { padding: var(--space-5); overflow: hidden; border-radius: var(--radius-md); box-shadow: none; }
 .checkin-category { gap: var(--space-2); margin-bottom: var(--space-2); font-size: var(--type-xs); font-weight: 600; }
-.checkin-category-icon { width: 40px; height: 40px; border-radius: 12px; }
+.checkin-category-icon { width: 32px; height: 32px; border-radius: 10px; }
+.checkin-category-icon svg { width: 20px; height: 20px; }
 .checkin-summary { font-size: var(--type-title); font-weight: 500; line-height: 1.4; letter-spacing: -.015em; }
 .checkin-previews { max-width: 100%; min-width: 0; margin-inline: 0; }
 .checkin-question { max-width: 100%; font-size: var(--type-sm); overflow-wrap: anywhere; }
-.checkin-result { gap: var(--space-4); padding-top: 56px; }
+.checkin-card--options .checkin-question { text-align: left; color: var(--pingo-charcoal); }
+.checkin-card--options .checkin-clarification { margin-top: var(--space-4); padding-top: 0; border-top: 0; }
+.checkin-clarification { font-size: var(--type-sm); }
+.checkin-clarification legend { font-size: var(--type-sm); font-weight: 500; }
+.checkin-clarification > p { font-size: var(--type-xs); line-height: 1.5; margin-bottom: var(--space-4); }
+.checkin-option { min-height: 48px; font-size: var(--type-sm); }
+.checkin-result { justify-items: start; gap: var(--space-3); margin-top: var(--space-6); padding: var(--space-6); border-radius: var(--radius-md); background: var(--pingo-cream); text-align: left; }
+.checkin-result-icon { width: 48px; height: 48px; border-radius: 14px; background: white; margin-bottom: var(--space-2); color: #b84b1f; }
+.checkin-result-icon svg { width: 24px; height: 24px; }
+.checkin-result h1 { font-size: 24px; line-height: 1.25; text-wrap: pretty; }
+.checkin-result p { font-size: var(--type-sm); line-height: 1.5; }
+.checkin-result .checkin-primary { margin-top: var(--space-2); }
 
 .bottom-nav {
   gap: var(--space-2);
@@ -959,7 +973,7 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .checkin-shell .checkin-nav-badge { top: 2px; left: calc(50% + 7px); }
 
 @media (min-width: 640px) {
-  .app-main { padding: 44px 36px calc(100px + env(safe-area-inset-bottom)); }
+  .app-main, .checkin-shell .app-main { padding: 44px 36px calc(100px + env(safe-area-inset-bottom)); }
   .home-sticky { margin-top: -12px; }
   .entity-detail { margin-top: -20px; }
   .entity-detail-hero { height: 390px; }
@@ -1045,3 +1059,9 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .catalogue-shot-label svg { width: 26px; height: 26px; stroke-width: 1.5; }
 
 .home-sort { justify-content: space-between; gap: 10px; }
+
+/* Supporting pages use Home's approved symbol and header rhythm. */
+.pingo-page-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 8; min-height: 64px; margin-top: -8px; padding: 8px 0 12px; background: var(--pingo-white); }
+.pingo-page-home { display: grid; place-items: center; width: 44px; height: 44px; margin-left: -4px; border-radius: 12px; }
+.pingo-page-actions { display: flex; align-items: center; gap: var(--space-3); }
+.pingo-page-actions .checkin-text-button { padding-inline: var(--space-2); color: var(--pingo-muted); font-size: var(--type-sm); font-weight: 500; }

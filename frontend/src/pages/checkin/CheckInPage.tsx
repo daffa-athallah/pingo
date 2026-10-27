@@ -5,11 +5,7 @@ import { isCheckInDemo } from './checkInService'
 import type { CheckInQuestion, CheckInResponse } from './checkInTypes'
 import CheckInIcon from './CheckInIcon'
 import QuestionCard from './QuestionCard'
-import PingoBrand from '../../components/brand/PingoBrand'
-
-function Brand() {
-  return <Link to="/" className="checkin-brand" aria-label="pingo home"><PingoBrand /></Link>
-}
+import PingoPageHeader from '../../components/layout/PingoPageHeader'
 
 function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] }) {
   const { responses, submit } = useCheckIns()
@@ -61,7 +57,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
   }
 
   return <section className="checkin-page">
-    <div className="checkin-topbar"><Brand />{question && <button className="checkin-text-button" onClick={skip} disabled={busy}>Skip</button>}</div>
+    <PingoPageHeader action={question && <button className="checkin-text-button" onClick={skip} disabled={busy}>Skip</button>} />
     {reviewNote && <p role="status">{reviewNote}</p>}
     {question ? <>
       <div className="checkin-intro">
@@ -70,7 +66,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
           <div className="checkin-progress-bars" aria-hidden="true">{questions.map((item, step) => <span key={item.id} className={`${step <= index ? 'checkin-progress-current' : ''}${skipped.includes(item.id) ? ' checkin-progress-skipped' : ''}`} />)}</div>
         </div>
         <h1 ref={focusTarget} tabIndex={-1}>Check-in</h1>
-        <p>A few questions to help me<br className="checkin-intro-break" /> understand you better.</p>
+        <p>A few questions to help me understand you better.</p>
       </div>
       <QuestionCard key={question.id} question={question} onRespond={respond} busy={busy} error={error} />
       <p className="checkin-sr-only" role="status">Question {index + 1} of {questions.length}. {question.summary}</p>
@@ -88,7 +84,7 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
 export default function CheckInPage() {
   const { questions, loading, loadError, reload } = useCheckIns()
   useEffect(() => { reload() }, [reload])
-  if (loading || loadError) return <section className="checkin-page"><div className="checkin-topbar"><Brand /></div><div className="checkin-result">
+  if (loading || loadError) return <section className="checkin-page"><PingoPageHeader /><div className="checkin-result">
     <h1>Check-in</h1>
     {loading ? <p role="status">Finding a few things to check in on…</p> : <div className="checkin-load-error" role="alert"><p>We couldn’t load your questions.</p><p>Please try again in a moment.</p><button className="checkin-primary" onClick={reload}>Try again</button><Link className="checkin-text-button" to="/">Back to Home</Link></div>}
   </div></section>

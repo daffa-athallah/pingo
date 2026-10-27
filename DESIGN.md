@@ -26,7 +26,9 @@ Home foregrounds “Good things, saved.”: one curated catalogue of tentative i
 
 ## Asset status
 
-`PingoMark.tsx` renders the unmodified V2 production master at `/brand/production/pingo-symbol-transparent.png`. Home uses only this transparent symbol, 36px within a 44px header row. Check-in uses the supplied transparent lockup. The supplied cream-tile app icons, favicon and explicit maskable asset are wired into the web manifest and document head. No logo is redrawn or extracted by the application.
+`PingoMark.tsx` renders the unmodified V2 production master at `/brand/production/pingo-symbol-transparent.png`. Home, Agents, and Check-in use this same transparent symbol at 36px, with the same 44px profile action. Supporting pages share `PingoPageHeader`; no wordmark or lockup is used in those persistent headers. The supplied cream-tile app icons, favicon and explicit maskable asset are wired into the web manifest and document head. No logo is redrawn or extracted by the application.
+
+Agents and Check-in keep the same 480px reading column as Home, 28px semibold page headings, 14px body copy, cream surfaces, and charcoal selected pills. Agents preserves its four characters and event-driven states; the stage uses quieter cream/white surroundings and its run summary stays in document flow. Check-in keeps all response modes; options-only questions expose their choices directly, while confirmation questions retain yes/no and progressive clarification controls.
 
 The V2 asset notes still flag automatic alpha-edge extraction for visual review and call the Inter wordmark a reproducible draft. Keep those qualifications visible in delivery notes; the monochrome SVGs are simplified contours, not replacements for the shaded PNG. The original supplied assets remain byte-for-byte intact in `frontend/public/brand/production/`.
 
