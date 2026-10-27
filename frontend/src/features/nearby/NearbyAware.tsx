@@ -10,8 +10,8 @@ import './nearby.css'
 
 // Always aware while the app is open: no button. Getting this close (distance plus GPS uncertainty) wakes the agents; after leaving and coming back
 // it wakes them again. The backend decides whether to speak (and applies its own cooldown); a web page cannot watch while it is in the background.
-const ENTER_METERS = 1000
-const EXIT_METERS = 1300
+const ENTER_METERS = 200
+const EXIT_METERS = 260
 const PLACE_REFRESH_MS = 60_000
 
 function metres(aLat: number, aLon: number, bLat: number, bLon: number) {
