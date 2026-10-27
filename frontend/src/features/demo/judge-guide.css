@@ -94,6 +94,15 @@ body:has(.guide-status) .app-main { padding-top: 44px; }
 body.guide-touring .history-guide { max-height: min(40vh, 340px); }
 .try-panel { scroll-behavior: smooth; }
 
+/* While the guide is closed, the Open Loop mascot floats in the corner and offers it. */
+.guide-float { position: fixed; z-index: 14; right: 14px; bottom: calc(92px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 84px; padding: 0; border: 0; background: none; cursor: pointer; animation: guide-bob 3.2s ease-in-out infinite; filter: drop-shadow(0 8px 14px rgb(120 70 30 / 22%)); }
+.guide-float svg { width: 72px; height: auto; display: block; }
+.guide-float span { padding: 3px 9px; border-radius: 999px; background: var(--color-surface); border: 1px solid var(--color-border); font-size: 10px; font-weight: 700; color: var(--color-text); white-space: nowrap; }
+.guide-float:hover span, .guide-float:focus-visible span { border-color: var(--color-primary); color: var(--color-primary); }
+@keyframes guide-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
+@media (min-width: 1280px) { .guide-float { right: 28px; } }
+@media (prefers-reduced-motion: reduce) { .guide-float { animation: none; } }
+
 /* The toggle is an orange pill; it pulses while the guide is hidden so a judge knows where to get it back. */
 .guide-status button.guide-toggle { margin-left: auto; padding: 6px 14px; border-radius: 999px; background: var(--color-primary); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .02em; }
 .guide-status button.guide-toggle.is-attention, .history-guide-tabs button.is-attention { animation: guide-pulse 1.6s ease-out infinite; }

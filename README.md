@@ -114,6 +114,9 @@ flowchart TD
     O -->|revised hypothesis| K
     K -->|SURFACE / STAY_SILENT / ASK| OUT[Grounded reminder, silence or clarification]
     K -->|VERIFY_CONTEXT| V[Verifier boundary: currently unwired, safe silence]
+    O -->|unsure what you meant| Q[Check-in question: you answer, Open Loop reads it]
+    R --> L[Location Agent: web address, then OpenStreetMap check]
+    L --> R
     G[Nightshift model gateway] -.-> E
     G -.-> O
     G -.-> X
@@ -126,6 +129,8 @@ flowchart TD
 | Open Loop | CREATE / ATTACH / REVISE / RESOLVE / IGNORE / LEAVE_UNRESOLVED |
 | Context | MATCH / NO_MATCH / NEEDS_VERIFICATION over saved active loops |
 | Critic | SURFACE / STAY_SILENT / ASK / REQUEST_REVISION / VERIFY_CONTEXT; also duplicate review |
+
+Two more behaviours sit beside them. The **Location Agent** finds the street address of a saved place on the web and only keeps it once OpenStreetMap confirms the same house number, road and suburb. When the Open Loop Agent is genuinely unsure what a save means (or a scenery photo names only a city), it puts one specific question in **Check-in**; your answer is saved first, then read by the Open Loop Agent, and the trace shows the question entering Check-in. Nothing is asked when the agent is confident.
 
 `RecallOrchestrator` sequences these agents; it is not another agent. Calls retry once, revisions and verification are bounded to one each, unknown references are rejected, and failures end safely. Context evaluation uses a read-only overlay; the notification service persists only explicit delivery actions. Duplicate uncertainty becomes a daily Check-in; the person's answer settles a merge. [Agent docs](docs/agents/README.md) · [architecture and live proof](docs/architecture/agent-orchestration.md).
 
@@ -153,7 +158,7 @@ npm ci
 npm run build
 ```
 
-The Python suite has **287 tests**. Two live Zetaris tests skip by default. Four real-engine tests additionally require the H-MEM Node dependencies; without them those tests skip, or set `RECALL_SKIP_REAL_HMEM=1`. No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
+The Python suite has **379 tests**; six skip by default (two live Zetaris tests, and four real-engine tests that need the H-MEM Node dependencies; set `RECALL_SKIP_REAL_HMEM=1` to skip those on purpose). No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
 
 ## Evidence of behaviour
 
@@ -175,6 +180,10 @@ The three reflection documents are there too: [time saved](docs/usl/2a-time-save
 
 Zetaris stores grounded Evidence, entities, links, loops and feedback through the JDBC repository. Meterless **H-MEM** expands entity-linked retrieval with governed, provenance-bearing memory. **Nightshift** routes every model call; **NVIDIA Nemotron 3 Ultra** handles Open Loop, Context and Critic decisions, while GPT-4o-mini handles perception through Nightshift. [Detailed integration and verified evidence](docs/sponsors.md).
 
-Limitations: food/shopping/travel only; intentions remain hypotheses; privacy filtering for context is a word list; geographic matching needs verified coordinates; no web/news scout; VERIFY_CONTEXT currently ends safely without a real verifier. H-MEM's reference embedder is a hash mock, with noisy marginal matches—not advanced semantic search. Without Nightshift access, sample mode answers only its bundled examples. Live model output can fail schema validation and fail safely; the demo video must show an actual live run.
+Limitations: food/shopping/travel only; intentions remain hypotheses; privacy filtering for context is a word list; geographic matching needs verified coordinates; no web/news scout; VERIFY_CONTEXT currently ends safely without a real verifier. H-MEM's reference embedder is a hash mock, with noisy marginal matches—not advanced semantic search. Without Nightshift access, sample mode answers only its bundled examples. Live model output can fail schema validation and fail safely.
 
 Pre-existing components: Meterless H-MEM's Apache-2.0 reference source/tests are vendored unmodified at commit `1742dec56a66e58eef9dda2d2b865823758ca8cd` ([notice](engines/hmem/NOTICE.md)). Third-party Python/npm dependencies are declared in requirements and package files. Recall's adapter, agent integration and app code are the hackathon work. No claim of Cursor usage is made.
+
+## License
+
+[Apache License 2.0](LICENSE). The vendored Meterless H-MEM source keeps its own Apache-2.0 license and [notice](engines/hmem/NOTICE.md).

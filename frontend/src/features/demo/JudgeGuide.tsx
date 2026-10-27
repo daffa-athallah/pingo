@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { getCachedHistory, getHealth } from '../../services/runsApi'
 import type { CachedHistory } from '../../services/runsApi'
+import Mascot from '../orchestra/Mascot'
 import TryPanel from './TryPanel'
 import ZetarisPanel from './ZetarisPanel'
 import './judge-guide.css'
@@ -18,7 +19,7 @@ function date(value?: string) {
 export default function JudgeGuide() {
   const [history, setHistory] = useState<CachedHistory | null>(null)
   const [error, setError] = useState('')
-  const [open, setOpen] = useState(() => { try { return sessionStorage.getItem(KEY) !== 'closed' } catch { return true } })
+  const [open, setOpen] = useState(() => { try { return sessionStorage.getItem(KEY) === 'open' } catch { return false } })  // closed until asked: a judge sees the product first
   const [step, setStep] = useState(0)
   const [tab, setTab] = useState<'tour' | 'try' | 'data'>('tour')
   const [tried, setTried] = useState(false)  // the Try it tab pulses until it has been opened once
@@ -67,6 +68,7 @@ export default function JudgeGuide() {
 
   if (!history) return error ? <aside className="guide-status" role="status">{error}</aside> : null
   const close = () => { setOpen(false); try { sessionStorage.setItem(KEY, 'closed') } catch { /* optional preference */ } }
+  const reopen = () => { setOpen(true); try { sessionStorage.setItem(KEY, 'open') } catch { /* optional preference */ } }
   const move = (next: number) => {
     setStep(next)
     if (!recall) return
@@ -82,7 +84,10 @@ export default function JudgeGuide() {
               : 'This history has no saved restraint decision to show. Pingo’s trace is available below; no additional outcome is invented.'
 
   return <>
-    <div className="guide-status" role="status"><span className="guide-status-dot" />Recorded examples <span>· No live model runs</span><button className={`guide-toggle${open ? '' : ' is-attention'}`} onClick={() => setOpen(value => !value)}>{open ? 'Hide guide' : 'Show guide'}</button></div>
+    <div className="guide-status" role="status"><span className="guide-status-dot" />Recorded examples <span>· No live model runs</span><button className={`guide-toggle${open ? '' : ' is-attention'}`} onClick={() => (open ? close() : reopen())}>{open ? 'Hide guide' : 'Show guide'}</button></div>
+    {!open && <button className="guide-float" onClick={reopen} aria-label="Open the Pingo guide">
+      <Mascot id="openloop" state="idle" /><span>Need a guide?</span>
+    </button>}
     {location.pathname === '/check-in' && <div className="guide-hint" role="note">
       <strong>Recorded example.</strong> A Check-in only appears when the Critic is unsure whether two saves are the same thing.
       <button onClick={() => { setOpen(true); setTab('try'); window.dispatchEvent(new CustomEvent('recall:play', { detail: 'duplicates' })) }}>See how one is made →</button>
