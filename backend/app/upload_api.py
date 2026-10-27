@@ -21,6 +21,7 @@ from fastapi.responses import JSONResponse
 
 from backend.app import covers
 from backend.app.cover_service import ensure_cover
+from backend.app.intentions_api import HiddenEvidenceRepository, read_hidden
 from backend.app.location_web import find_and_save
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
@@ -143,7 +144,7 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                           input_refs=[f'image:{path.name}'], next_step='EVIDENCE')
         async with state.write_lock:
             async with _gateway() as gateway:
-                observed = ObservedRepository(repository, observer)
+                observed = ObservedRepository(HiddenEvidenceRepository(repository, lambda: read_hidden(state)), observer)  # a deleted screenshot is not read back into the agents
                 # H-MEM wraps OUTSIDE the observer, so the Evidence is stored (and reported) before memory is asked about it.
                 agent_repository = HMemRepository(observed, state.hmem, listener=observer.memory_event) if getattr(state, 'hmem', None) else observed
                 orchestrator = build_orchestrator(ObservedGateway(gateway, observer), agent_repository)

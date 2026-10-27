@@ -322,3 +322,19 @@ class DeleteScreenshotTests(unittest.TestCase):
             self.assertNotIn(shot, [s['evidence_id'] for s in after['screenshots']])
             self.assertEqual(after['screenshot_count'], target['screenshot_count'] - 1)
             self.assertEqual(client.post('/api/evidence/missing/delete').status_code, 404)
+
+
+class HiddenEvidenceTests(unittest.TestCase):
+    def test_deleted_screenshots_are_not_read_back_by_agents_or_the_context_service(self):
+        from backend.app.demo_workspace import open_demo_repository
+        from backend.app.intentions_api import HiddenEvidenceRepository
+        repo = open_demo_repository()
+        evidence = repo.list_evidence()
+        gone = {evidence[0].evidence_id}
+        wrapped = HiddenEvidenceRepository(repo, lambda: gone)
+        self.assertEqual(len(wrapped.list_evidence()), len(evidence) - 1)
+        self.assertIsNone(wrapped.get_evidence(evidence[0].evidence_id))
+        entity_ids = [k.entity_id for k in repo.get_evidence_entities([evidence[0].evidence_id])]
+        self.assertNotIn(evidence[0].evidence_id, [e.evidence_id for e in wrapped.get_related_evidence(entity_ids, limit=100)])
+        self.assertEqual(wrapped.get_evidence_entities([evidence[0].evidence_id]), [])
+        self.assertTrue(wrapped.get_open_loop is not None)  # everything else passes through

@@ -111,3 +111,29 @@ async def delete_screenshot(request: Request, evidence_id: str):
         if hasattr(state, 'on_data_changed'):
             state.on_data_changed()
     return {'hidden': evidence_id, 'image_files_erased': erased, 'can_sync_again': freed}
+
+
+class HiddenEvidenceRepository:
+    """A repository that no longer shows deleted screenshots. Used wherever agents or the context service read Evidence, so a deleted screenshot is not
+    quietly read back into a reminder or an Open Loop decision. Everything else passes through unchanged."""
+
+    def __init__(self, inner, hidden):
+        self._inner, self._hidden = inner, hidden
+
+    def __getattr__(self, name):
+        return getattr(self._inner, name)
+
+    def list_evidence(self, *args, **kwargs):
+        hidden = self._hidden()
+        return [e for e in self._inner.list_evidence(*args, **kwargs) if e.evidence_id not in hidden]
+
+    def get_evidence(self, evidence_id):
+        return None if evidence_id in self._hidden() else self._inner.get_evidence(evidence_id)
+
+    def get_evidence_entities(self, evidence_ids):
+        hidden = self._hidden()
+        return self._inner.get_evidence_entities([i for i in evidence_ids if i not in hidden])
+
+    def get_related_evidence(self, entity_ids, **kwargs):
+        hidden = self._hidden()
+        return [e for e in self._inner.get_related_evidence(entity_ids, **kwargs) if e.evidence_id not in hidden]

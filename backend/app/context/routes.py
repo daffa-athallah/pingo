@@ -23,11 +23,14 @@ def context_places(request: Request):
 
 
 def service(request):
-    repo = request.app.state.repository
-    current = getattr(request.app.state, 'context_service', None)
-    if current is None or current.repository is not repo:
-        current = ContextService(repo)
-        request.app.state.context_service = current
+    from backend.app.intentions_api import HiddenEvidenceRepository, read_hidden
+    state = request.app.state
+    repo = state.repository
+    current = getattr(state, 'context_service', None)
+    if current is None or getattr(current, 'source_repository', None) is not repo:
+        current = ContextService(HiddenEvidenceRepository(repo, lambda: read_hidden(state)))  # deleted screenshots are not read back into reminders
+        current.source_repository = repo
+        state.context_service = current
     return current
 
 
