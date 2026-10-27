@@ -162,6 +162,19 @@ class OpenLoopAgent:
         self._now = now or (lambda: datetime.now(timezone.utc).isoformat(timespec='seconds'))
         self._new_id = new_id or (lambda: 'loop_' + uuid.uuid4().hex[:12])
 
+    async def review_feedback(self, loop, evidence, entities, feedback):
+        """Separate explicit-feedback input; screenshot/reviewer prompts are unchanged."""
+        from backend.app.agents.feedback import review_feedback
+        return await review_feedback(self, loop, evidence, entities, feedback)
+
+    async def clarification_question(self, evidence, entities, uncertainty):
+        from backend.app.agents.clarification import ask
+        return await ask(self, evidence, entities, uncertainty)
+
+    async def decide_clarification(self, item, evidence, entities, target):
+        from backend.app.agents.clarification import answer
+        return await answer(self, item, evidence, entities, target)
+
     async def decide(self, evidence: m.Evidence, entities: Sequence[m.Entity],
                      revision: RevisionRequest | None = None) -> LoopDecision:
         if evidence.sensitive:

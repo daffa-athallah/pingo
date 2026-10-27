@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function QuestionCard({ question, busy, error, onRespond }: Props) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(question.response_mode === 'options')
   const [selected, setSelected] = useState('')
   const [comment, setComment] = useState('')
   const [attempt, setAttempt] = useState<CheckInResponse | null>(null)
@@ -27,7 +27,7 @@ export default function QuestionCard({ question, busy, error, onRespond }: Props
   const respond = (answer: CheckInResponse) => { setAttempt(answer); onRespond(answer) }
   function clarify(event: FormEvent) {
     event.preventDefault()
-    if (option) respond({ response: option.value, comment: option.allows_comment || option.value === 'other' ? comment.trim() || null : null })
+    if (option && (!option.comment_required || comment.trim())) respond({ response: option.value, comment: option.allows_comment || option.value === 'other' ? comment.trim() || null : null })
   }
   const images = question.supporting_images.slice(0, 3).filter(image => !failedImages.includes(image.url))
 
@@ -36,10 +36,10 @@ export default function QuestionCard({ question, busy, error, onRespond }: Props
     <h2 id={`${id}-summary`} className="checkin-summary">{question.summary}</h2>
     {images.length > 0 && <div className="checkin-previews">{images.map(image => <img key={image.url} src={image.url} alt={image.alt} width="120" height="148" onError={() => setFailedImages(previous => [...previous, image.url])} />)}</div>}
     <p className="checkin-question">{question.question}</p>
-    <div className="checkin-response-actions">
+    {question.response_mode !== 'options' && <div className="checkin-response-actions">
       <button className={`checkin-response checkin-response-no${busy && attempt?.response === negative.value ? ' checkin-selected' : ''}`} disabled={busy} aria-label={negative.label} onClick={() => respond({ response: negative.value, comment: null })}><CheckInIcon name="close" /></button>
       <button className={`checkin-response checkin-response-yes${busy && attempt?.response === positive.value ? ' checkin-selected' : ''}`} disabled={busy} aria-label={positive.label} onClick={() => respond({ response: positive.value, comment: null })}><CheckInIcon name="check" /></button>
-    </div>
+    </div>}
     <button className="checkin-more" disabled={busy} aria-expanded={expanded} aria-controls={`${id}-clarification`} onClick={() => setExpanded(value => !value)}><CheckInIcon name="message" />{expanded ? 'A little less' : 'Tell me more'}</button>
     {expanded && <div className="checkin-clarification" id={`${id}-clarification`}>
       <p>{question.context ?? question.question}</p>
@@ -48,9 +48,9 @@ export default function QuestionCard({ question, busy, error, onRespond }: Props
           {question.options.map(item => <label className={`checkin-option${selected === item.value ? ' checkin-option-selected' : ''}`} key={item.value}>
             <input type="radio" name={`${id}-option`} value={item.value} checked={selected === item.value} onChange={() => setSelected(item.value)} />{item.label}
           </label>)}
-          {(option?.allows_comment || option?.value === 'other') && <label className="checkin-comment">Anything you’d like to add? <span>(optional)</span><textarea value={comment} onChange={event => setComment(event.target.value)} maxLength={500} rows={3} placeholder="Tell me what you had in mind…" /></label>}
+          {(option?.allows_comment || option?.value === 'other') && <label className="checkin-comment">Anything you’d like to add? {!option?.comment_required && <span>(optional)</span>}<textarea value={comment} onChange={event => setComment(event.target.value)} required={option?.comment_required} maxLength={500} rows={3} placeholder="Tell me what you had in mind…" /></label>}
         </fieldset>
-        <button className="checkin-primary" type="submit" disabled={busy || !option}>{busy ? 'Saving…' : 'Save answer'}</button>
+        <button className="checkin-primary" type="submit" disabled={busy || !option || (!!option.comment_required && !comment.trim())}>{busy ? 'Saving…' : 'Save answer'}</button>
       </form>}
     </div>}
     {busy && <p className="checkin-saving" role="status">Saving your answer…</p>}

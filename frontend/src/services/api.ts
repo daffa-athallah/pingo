@@ -145,6 +145,8 @@ export interface ContextEvaluation {
   delivery: string
   replayed?: boolean
   error?: string
+  check_in_id?: string | null
+  check_in_error?: string | null
 }
 export type NoticeAction = 'DELIVERED' | 'READ' | 'DISMISS' | 'DONE' | 'SNOOZE' | 'NOT_RELEVANT' | 'JUST_INSPIRATION'
 export interface PingoNotification {
@@ -154,6 +156,11 @@ export interface PingoNotification {
   payload: {
     title: string; message: string; reason: string; run_id: string; sources: string[]; trigger_types: string[]
     delivery_status: 'APPROVED' | 'DELIVERED'; read: boolean; dismissed: boolean; feedback: string | null
+    feedback_review?: {
+      state: 'RUNNING' | 'COMPLETED' | 'FAILED_SAFE' | 'SKIPPED'
+      run_id: string
+      decision?: { decision: 'KEEP' | 'REVISE' | 'RESOLVE' | 'DORMANT'; concise_reason: string }
+    }
     entities: { entity_id: string; name: string }[]
     evidence: { evidence_id: string; summary: string; image_url: string | null }[]
   }

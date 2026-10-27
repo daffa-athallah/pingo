@@ -27,7 +27,7 @@ def service(request):
     state = request.app.state
     repo = state.repository
     current = getattr(state, 'context_service', None)
-    if current is None or getattr(current, 'source_repository', None) is not repo:
+    if current is None or getattr(current, 'source_repository', getattr(current, 'repository', None)) is not repo:  # an injected service (tests) keeps its own repository
         current = ContextService(HiddenEvidenceRepository(repo, lambda: read_hidden(state)))  # deleted screenshots are not read back into reminders
         current.source_repository = repo
         state.context_service = current
@@ -69,7 +69,7 @@ def notification(notification_id: str, request: Request):
 async def notification_action(notification_id: str, body: NotificationAction, request: Request):
     try:
         result = await service(request).action(notification_id, body.action)
-        if body.action == 'DONE':
+        if body.action in {'DONE', 'SNOOZE', 'NOT_RELEVANT', 'JUST_INSPIRATION'}:
             # Existing Home reads must see the resolved state after explicit feedback.
             from backend.app.main import _view_cache, _view_lock
             with _view_lock:

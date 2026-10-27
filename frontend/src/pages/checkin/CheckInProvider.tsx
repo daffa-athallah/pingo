@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { CheckInQuestion, CheckInResponse } from './checkInTypes'
+import type { CheckInQuestion, CheckInResponse, CheckInSubmission } from './checkInTypes'
 import { getCheckIns, respondToCheckIn } from './checkInService'
 
 interface CheckInState {
@@ -10,7 +10,7 @@ interface CheckInState {
   loadError: boolean
   pendingCount: number
   reload: () => void
-  submit: (id: string, answer: CheckInResponse) => Promise<void>
+  submit: (id: string, answer: CheckInResponse) => Promise<CheckInSubmission>
 }
 const Context = createContext<CheckInState | null>(null)
 
@@ -21,6 +21,7 @@ export function CheckInProvider({ children }: { children: ReactNode }) {
   const [loadError, setLoadError] = useState(false)
   const [revision, setRevision] = useState(0)
   const inFlight = useRef(new Set<string>())
+  const reload = useCallback(() => setRevision(value => value + 1), [])
   useEffect(() => {
     const controller = new AbortController()
     setLoading(true)
@@ -45,14 +46,15 @@ export function CheckInProvider({ children }: { children: ReactNode }) {
     if (inFlight.current.has(id)) throw new Error('Response already saving')
     inFlight.current.add(id)
     try {
-      await respondToCheckIn(id, answer)
+      const result = await respondToCheckIn(id, answer)
       setResponses(previous => ({ ...previous, [id]: answer }))
+      return result
     } finally { inFlight.current.delete(id) }
   }, [])
 
   return <Context.Provider value={{ questions, responses, loading, loadError,
     pendingCount: questions.filter(question => !responses[question.id]).length,
-    reload: () => setRevision(value => value + 1), submit,
+    reload, submit,
   }}>{children}</Context.Provider>
 }
 

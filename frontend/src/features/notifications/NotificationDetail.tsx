@@ -32,8 +32,15 @@ export default function NotificationDetail({ previewNotice }: { previewNotice?: 
     }
     setBusy(true); setError('')
     try {
-      await actOnNotification(notificationId, value)
-      setFeedback(value === 'DONE' ? 'Done. This intention is now completed.' : value === 'SNOOZE' ? 'Snoozed for a day.' : value === 'DISMISS' ? 'Ping dismissed.' : 'Feedback saved. We will stop reminders for this intention.')
+      const saved = await actOnNotification(notificationId, value)
+      const review = saved.payload.feedback_review
+      const message = value === 'DONE' ? 'Done. This intention is now completed.' : value === 'SNOOZE' ? 'Snoozed.' : value === 'DISMISS' ? 'Ping dismissed.' : 'Feedback saved. We will stop reminders for this intention.'
+      const outcome = value === 'DISMISS' ? '' : review?.state === 'COMPLETED'
+        ? review.decision?.decision === 'REVISE' ? ' Pingo updated your saved intention.'
+          : review.decision?.decision === 'DORMANT' ? ' Pingo paused this intention.' : ' Pingo reviewed your feedback.'
+        : review?.state === 'RUNNING' ? ' Pingo is reviewing your feedback.'
+          : ' Your feedback is saved, but Pingo couldn’t review the intention right now.'
+      setFeedback(message + outcome)
       window.dispatchEvent(new Event('pingo-notifications-changed'))
     } catch (e) { setError(e instanceof Error ? e.message : 'Feedback could not be saved. Try again.') }
     finally { setBusy(false) }
@@ -54,6 +61,7 @@ export default function NotificationDetail({ previewNotice }: { previewNotice?: 
         </figure>)}
       </div></section>
       <p className="pingo-connected">Connected to: {notice.payload.entities.map(e => e.name).join(', ')}</p>
+      {busy && <p role="status">Saving your feedback and reviewing your intention…</p>}
       {feedback ? <p role="status">{feedback} <Link to="/">Back to Home</Link></p> : <div className="pingo-feedback" aria-label="Ping feedback">
         {([['DONE', 'Done'], ['SNOOZE', 'Snooze'], ['NOT_RELEVANT', 'Not relevant'], ['JUST_INSPIRATION', 'Just inspiration'], ['DISMISS', 'Dismiss']] as const).map(([value, label]) => <button type="button" key={value} disabled={busy} onClick={() => void action(value)}>{label}</button>)}
       </div>}

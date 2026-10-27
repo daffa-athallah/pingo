@@ -21,6 +21,7 @@ from backend.app import covers
 from backend.app.bootstrap import app_mode, live_models, open_repository
 from backend.app.context_api import router as context_router
 from backend.app.demo_workspace import SnapshotError, read_snapshot, seed, workspace_info
+from backend.app.domain.models import LoopStatus
 from backend.app.hmem import HMemClient, HMemError, seed_from_repository
 from backend.app.orchestration.consolidation import apply_merge, short
 from backend.app.runs import RunStore, summary
@@ -341,17 +342,32 @@ def _today() -> str:
 @app.get('/api/check-ins')
 @app.get('/check-ins')
 def check_ins(request: Request):
-    """Today's unanswered questions only: a question belongs to one day and does not carry over, so Check-in refreshes daily."""
+    """Daily merge questions plus outstanding agent clarifications with non-sensitive grounding."""
     repository = request.app.state.repository
     if not hasattr(repository, 'get_check_ins'):
         return {'questions': []}
     views = {v['loop_id']: v for v in _cached('loops', lambda: _loop_views(repository))} if request.app.state.mode != 'sample' else {}
     base = str(request.base_url).rstrip('/')
     questions = []
-    for item in repository.get_check_ins(day=_today(), status='PENDING'):
+    from backend.app.checkin_clarifications import KIND
+    for item in repository.get_check_ins(status='PENDING'):
+        if item.kind != KIND and item.day != _today():
+            continue
         if request.app.state.mode != 'sample' and not all(i in views for i in (item.loop_id, item.other_loop_id) if i):
             continue  # a loop was merged or retired since the question was made
-        question = dict(item.question)
+        question = {key: value for key, value in item.question.items() if not key.startswith('_')}
+        if item.kind == KIND:
+            if item.loop_id:
+                target = repository.get_open_loop(item.loop_id)
+                if not target or target.status not in (LoopStatus.OPEN, LoopStatus.ACTIVE):
+                    continue
+            evidence = [repository.get_evidence(eid) for eid in item.question.get('_evidence_ids', [])]
+            if not evidence or any(e is None or e.sensitive for e in evidence):
+                continue
+            question['supporting_images'] = [{'url': f'{base}/evidence/{e.evidence_id}/image?w=600', 'alt': e.summary}
+                                              for e in evidence if e.image_ref][:3]
+            questions.append(question)
+            continue
         question['supporting_images'] = [
             {'url': f"{base}{views[i]['screenshots'][0]['image_url']}?w=600", 'alt': short(views[i]['title'])}
             for i in (item.loop_id, item.other_loop_id) if i in views and views[i]['screenshots']]
@@ -366,12 +382,28 @@ class CheckInAnswer(BaseModel):
 
 @app.post('/api/check-ins/{check_in_id}/respond')
 @app.post('/check-ins/{check_in_id}/respond')
-def respond_to_check_in(request: Request, check_in_id: str, answer: CheckInAnswer):
-    """The person's answer settles the question. Only 'same' changes anything: it merges the two loops."""
+async def respond_to_check_in(request: Request, check_in_id: str, answer: CheckInAnswer):
+    """Merge answers settle pairs; clarification answers are saved then reviewed by Open Loop."""
     repository = request.app.state.repository
     item = repository.get_check_in(check_in_id) if hasattr(repository, 'get_check_in') else None
     if item is None:
         raise HTTPException(status_code=404, detail='Check-in not found.')
+    from backend.app.checkin_clarifications import KIND, ClarificationService, ClarificationConflict
+    if item.kind == KIND:
+        from backend.app.context_api import _gateway
+        current = getattr(request.app.state, 'clarification_service', None)
+        if current is None or current.repo is not repository:
+            current = ClarificationService(repository, _gateway, lock=getattr(request.app.state, 'write_lock', None))
+            request.app.state.clarification_service = current
+        try:
+            result = await current.respond(check_in_id, answer.response, answer.comment)
+        except ClarificationConflict as exc:
+            raise HTTPException(409, str(exc)) from None
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+        with _view_lock:
+            _view_cache.pop('loops', None)
+        return result
     if answer.response not in CHECK_IN_RESPONSES:
         raise HTTPException(status_code=422, detail='Unknown response.')
     if item.status == 'ANSWERED':

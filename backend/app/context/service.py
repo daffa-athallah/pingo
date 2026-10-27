@@ -2,16 +2,19 @@
 from __future__ import annotations
 
 import asyncio
+from backend.app import aio
 from contextlib import nullcontext
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 import json
 import os
+import uuid
 
 from backend.app.adapters.nightshift import ModelGateway
 from backend.app.bootstrap import build_orchestrator
 from backend.app.context.geography import located_entity
 from backend.app.domain.models import ContextType, LoopStatus
+from backend.app.domain.trace import TraceEvent
 from backend.app.repositories.context_store import ContextEvaluation, Notification
 
 ACTIVE = {LoopStatus.OPEN, LoopStatus.ACTIVE}
@@ -95,6 +98,9 @@ class ContextService:
         locations = [e for e in events if e.context_type == ContextType.LOCATION]
         semantic = any(e.context_type in {ContextType.CALENDAR, ContextType.TIME} for e in events)
         notifications = repo.list_notifications()
+        pending_questions = [q for q in repo.get_check_ins() if q.status == 'PENDING' or
+                             (q.kind == 'AGENT_CLARIFICATION' and q.response == 'not_sure' and q.answered_at
+                              and self.clock() - aware(q.answered_at) < timedelta(hours=24))] if hasattr(repo, 'get_check_ins') else []
         candidates, diagnostics = [], []
         for loop in loops:
             linked = [entities[k.entity_id] for k in links if k.loop_id == loop.loop_id and k.entity_id in entities]
@@ -104,6 +110,9 @@ class ContextService:
             if not evidence or any(e.sensitive for e in evidence):
                 continue
             blocked = self._blocked(loop.loop_id, notifications)
+            if any(q.kind == 'AGENT_CLARIFICATION' and (q.loop_id == loop.loop_id or
+                   set(q.question.get('_entity_ids', [])) & {entity.entity_id for entity in linked}) for q in pending_questions):
+                blocked = blocked or 'awaiting_clarification'
             if any(n.loop_id == loop.loop_id and set(n.payload.get('context_ids', ())) & {e.context_id for e in events} for n in notifications):
                 blocked = blocked or 'context_already_notified'
             geo = [located_entity(entity, event, self.strong, self.moderate) for entity in linked for event in locations]
@@ -174,10 +183,18 @@ class ContextService:
                     result = await build_orchestrator(NoCalls(), view, now=lambda: request.now.isoformat()).evaluate_context(enriched)
                     expected_model = None
                 notification, delivery = self._approved(result, events, allowed, expected_model, stamp)
+                check_in_id, check_in_error = None, None
+                if result.final_action.value == 'ASK':
+                    try:
+                        from backend.app.checkin_clarifications import after_critic
+                        check_in_id = after_critic(repo, result, clock=self.clock)
+                    except Exception:
+                        check_in_error = 'The clarification could not be saved. No notification was created.'
                 response = {'evaluation_id': evaluation_id, 'state': 'COMPLETED', 'submitted_context': [asdict(e) for e in events],
                             'source': sorted({e.metadata['source'] for e in events}), 'now': request.now.isoformat(),
                             'candidates': diagnostics, 'result': result.to_dict(), 'notification_id': notification.notification_id if notification else None,
-                            'delivery': delivery, 'replayed': False}
+                            'delivery': delivery, 'replayed': False,
+                            'check_in_id': check_in_id, 'check_in_error': check_in_error}
                 # Preserve the real RunResult/TraceEvents; delivery policy is separately reported.
                 with self.scope():
                     if notification:
@@ -272,6 +289,10 @@ class ContextService:
                 if action == 'SNOOZE':
                     p.update(read=False, delivery_status='APPROVED')
             p['feedback_events'] = [*p.get('feedback_events', []), {'action': action, 'timestamp': stamp}]
+            review = action in {'DONE', 'SNOOZE', 'NOT_RELEVANT', 'JUST_INSPIRATION'}
+            if review:
+                p['feedback_review'] = {'state': 'RUNNING', 'run_id': 'feedback_' + uuid.uuid4().hex[:12],
+                                        'action': action, 'started_at': stamp, 'trace_events': []}
             updated = replace(n, payload=p)
             with self.scope():
                 if action == 'DONE':
@@ -279,4 +300,109 @@ class ContextService:
                     if loop and loop.status in ACTIVE:
                         repo.update_open_loop(n.loop_id, status=LoopStatus.RESOLVED, updated_at=stamp)
                 repo.save_notification(updated)
+            if review:
+                updated = await self._review_feedback(updated)
             return asdict(updated)
+
+    async def _review_feedback(self, notification):
+        """Feedback is durable before any model call. Never reinterpret a click as new Evidence.
+
+        Same configured Open Loop Agent/Nightshift gateway, one retry and a 20s total deadline.
+        A persisted RUNNING/finished review prevents duplicate clicks from repeating model calls.
+        The service lock serializes notification actions; a loop snapshot guards other writers.
+        """
+        from backend.app.bootstrap import sample_mode, live_models
+        repo = self.repository
+        review = dict(notification.payload['feedback_review'])
+        action = review['action']
+        traces = []
+
+        def record(agent, kind, reason, next_step='STOP', receipt=None):
+            traces.append(TraceEvent(agent, kind, reason,
+                [f'notification:{notification.notification_id}', f'loop:{notification.loop_id}'],
+                next_step, f'loop:{notification.loop_id}', review['run_id'], self.clock().isoformat(), receipt).to_dict())
+
+        record('FEEDBACK', 'SAVED', 'Explicit user feedback was saved before agent review.', 'OPEN_LOOP')
+        state, decision, error = 'FAILED_SAFE', None, None
+        try:
+            loop = repo.get_open_loop(notification.loop_id)
+            if sample_mode() and not live_models():
+                state = 'SKIPPED'
+                raise ValueError('Recorded sample mode does not call models.')
+            if loop is None or (loop.status not in ACTIVE and not (action == 'DONE' and loop.status == LoopStatus.RESOLVED)):
+                state = 'SKIPPED'
+                raise ValueError('No eligible intention to review.')
+            links = repo.get_loop_entities([loop.loop_id])
+            entities = repo.get_entities(sorted({link.entity_id for link in links}))
+            evidence = repo.get_related_evidence([e.entity_id for e in entities], limit=10000)
+            if not evidence or any(e.sensitive for e in evidence):
+                state = 'SKIPPED'
+                raise ValueError('Non-sensitive supporting Evidence is required.')
+            feedback = {'action': action, 'timestamp': review['started_at'],
+                        'notification_id': notification.notification_id,
+                        'trigger_types': notification.payload.get('trigger_types', []),
+                        'context_ids': notification.payload.get('context_ids', []),
+                        'reminder': {key: notification.payload.get(key) for key in ('title', 'message', 'reason')},
+                        'context_events': [asdict(event) for event in repo.get_context_events()
+                                           if event.context_id in notification.payload.get('context_ids', [])]}
+            async with aio.timeout(20):
+                async with self.gateway_factory() as gateway:
+                    agent = build_orchestrator(gateway, repo, now=lambda: self.clock().isoformat()).open_loop_agent
+                    for attempt in range(2):
+                        try:
+                            gateway.last_routing = {}
+                            decision = await agent.review_feedback(loop, evidence, entities, feedback)
+                            routing = getattr(gateway, 'last_routing', {}) or {}
+                            model = gateway.reasoning_model
+                            if (not model or 'nemotron' not in model.lower() or routing.get('provider') != 'nvidia'
+                                    or routing.get('requested_model') != model or routing.get('routed_model') != model):
+                                raise ValueError('Model routing receipt could not be verified.')
+                            receipt = {key: routing.get(key) for key in ('provider', 'requested_model', 'routed_model')}
+                            break
+                        except Exception:
+                            decision = None
+                            if attempt:
+                                raise
+                            record('OPEN_LOOP', 'RETRY', 'Feedback review failed; retrying once.', 'OPEN_LOOP')
+            # Other ingestion/check-in operations may have revised this loop while the model ran.
+            with self.scope():
+                if repo.get_open_loop(loop.loop_id) != loop:
+                    raise ValueError('Intention changed while feedback was reviewed.')
+                changes = {}
+                if decision.decision == 'REVISE':
+                    changes['title'] = decision.proposed_title
+                if decision.decision == 'DORMANT':
+                    changes['status'] = LoopStatus.DORMANT
+                elif decision.decision == 'RESOLVE':
+                    changes['status'] = LoopStatus.RESOLVED
+                if changes:
+                    repo.update_open_loop(loop.loop_id, **changes, updated_at=self.clock().isoformat())
+                record('OPEN_LOOP', decision.decision, decision.concise_reason, receipt=receipt)
+                state = 'COMPLETED'
+                return self._save_feedback_review(notification, review, state, traces, decision)
+        except asyncio.CancelledError:
+            record('OPEN_LOOP', 'FAILED', 'Review interrupted; explicit feedback remains saved.')
+            self._save_feedback_review(notification, review, 'FAILED_SAFE', traces)
+            raise
+        except Exception:
+            if state != 'SKIPPED':
+                state = 'FAILED_SAFE'
+            error = ('Feedback saved. Agent review was unavailable or unsafe; no inferred update was applied.'
+                     if state != 'SKIPPED' else 'Feedback saved. No eligible non-sensitive live agent review was available.')
+            record('OPEN_LOOP', 'FAILED' if state != 'SKIPPED' else 'SKIPPED', error)
+        return self._save_feedback_review(notification, review, state, traces, error=error)
+
+    def _save_feedback_review(self, notification, review, state, traces, decision=None, error=None):
+        review.update(state=state, finished_at=self.clock().isoformat(), trace_events=traces)
+        if decision is not None:
+            review['decision'] = asdict(decision)
+        if error:
+            review['error'] = error
+        payload = dict(notification.payload)
+        payload['feedback_review'] = review
+        events = [dict(event) for event in payload['feedback_events']]
+        events[-1]['agent_review'] = review
+        payload['feedback_events'] = events
+        updated = replace(notification, payload=payload)
+        self.repository.save_notification(updated)
+        return updated

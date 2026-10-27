@@ -21,7 +21,7 @@ def hidden_path(state) -> Path:
 def read_hidden(state) -> set[str]:
     try:
         return set(json.loads(hidden_path(state).read_text()))
-    except (OSError, ValueError):
+    except (OSError, ValueError, AttributeError):  # no uploads folder (a bare app in tests): nothing is hidden
         return set()
 
 

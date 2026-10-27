@@ -150,6 +150,8 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                 orchestrator = build_orchestrator(ObservedGateway(gateway, observer), agent_repository)
                 observer.wrap_decide(orchestrator.open_loop_agent)
                 result = await orchestrator.ingest_screenshot(path)
+                from backend.app.checkin_clarifications import after_upload
+                check_in_id = await after_upload(orchestrator.open_loop_agent, repository, observer.decision, result, recorder.emit)
                 await _cover(state, recorder, gateway, result)
             if result.evidence_id is None:  # nothing was stored: do not keep an orphan file
                 path.unlink(missing_ok=True)
@@ -180,6 +182,7 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                              for e in recorder.record['result']['trace_events'] if e.get('receipt')],
                 'error': result.error}
             recorder.record['outcome']['locations'] = await _locate(state, recorder, result.evidence_id) if evidence and not evidence['sensitive'] else []
+            recorder.record['outcome']['check_in_id'] = check_in_id
             if result.final_action == FinalAction.STORED:
                 recorder.emit('RUN', 'DONE', 'Saved. The Open Loops are up to date.', next_step='STOP', output_ref=f'loop:{result.loop_id}' if result.loop_id else None)
             else:
