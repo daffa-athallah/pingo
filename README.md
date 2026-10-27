@@ -153,7 +153,7 @@ npm ci
 npm run build
 ```
 
-The Python suite has **285 tests**. Two live Zetaris tests skip by default. Four real-engine tests additionally require the H-MEM Node dependencies; without them those tests skip, or set `RECALL_SKIP_REAL_HMEM=1`. No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
+The Python suite has **287 tests**. Two live Zetaris tests skip by default. Four real-engine tests additionally require the H-MEM Node dependencies; without them those tests skip, or set `RECALL_SKIP_REAL_HMEM=1`. No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
 
 ## Evidence of behaviour
 
