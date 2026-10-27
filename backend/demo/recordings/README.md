@@ -13,7 +13,7 @@ SAMPLE_MODE=true backend/.venv/bin/python backend/scripts/run_sample.py
 SAMPLE_MODE=true backend/.venv/bin/python backend/scripts/serve.py --host 127.0.0.1 --port 8120
 ```
 
-`GET /api/sample/cases` lists cases; `POST /api/sample/cases/attach/replay` reruns one. `GET /runs` exposes all replayed examples to Agent Activity. Arbitrary screenshot uploads and context evaluation are disabled in sample mode. Historical screenshot previews are served from the bundled `screenshot/` directory; the sensitive test image is never served.
+`GET /api/sample/cases` lists cases; `POST /api/sample/cases/attach/replay` reruns one. `GET /runs` exposes all replayed examples to Agent Activity. Without live model configuration, arbitrary screenshot uploads and context evaluation are disabled in sample mode. With an explicitly configured Nightshift URL/key/models, the separate live-input paths call real models against the sample in-memory workspace; they are labelled live and do not become recorded fixtures. The stricter persisted `/context-simulator/evaluate` route still requires non-sample mode. Historical screenshot previews are served from the bundled `screenshot/` directory; the sensitive test image is never served.
 
 To capture again (requires authorized Nightshift access, Node dependencies and a dedicated temporary H-MEM sidecar; never use the canonical engine):
 
@@ -25,3 +25,5 @@ backend/.venv/bin/python backend/scripts/capture_samples.py attach create sensit
 ```
 
 Review captures before sharing. Outcomes are model output and are never forced; rerun the replay tests after any model, prompt, snapshot or fixture change. The endpoint fails closed if the inputs drift. All replay runs are `provenance: recorded`, `workspace: sample`, with synthetic inputs clearly labelled.
+
+The additional `clarify` UI case is an explicitly labelled illustrative Check-in fixture, not an eighth captured Nightshift run. It does not execute a fresh model decision.
