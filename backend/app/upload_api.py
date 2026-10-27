@@ -21,11 +21,12 @@ from fastapi.responses import JSONResponse
 
 from backend.app import covers
 from backend.app.cover_service import ensure_cover
+from backend.app.location_web import find_and_save
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
 from backend.app.context_api import _gateway
 from backend.app.hmem import HMemRepository
-from backend.app.observe import ObservedGateway, ObservedRepository, UploadObserver, loop_state
+from backend.app.observe import sanitize_receipt, ObservedGateway, ObservedRepository, UploadObserver, loop_state
 from backend.app.orchestration.recall import FinalAction
 
 MAX_BYTES = 20 * 1024 * 1024  # the Evidence Agent's own limit
@@ -89,14 +90,30 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
 
+WEB_RETRY = {'not_found', 'ambiguous', 'unavailable', 'stale'}  # the map's own place index did not settle these
+
+
 async def _locate(state, recorder, evidence_id):
-    """Same post-upload lookup boundary as main; failures do not undo saved Evidence."""
+    """Post-upload lookup boundary: the map first (Ica's tool), then, for places the map's index does not know, the Location Agent
+    (web search for the street address, verified on the map). Failures never undo saved Evidence."""
     from backend.app.location_lookup import enrich_evidence
     try:
-        return await enrich_evidence(state.repository, evidence_id, emit=recorder.emit)
+        rows = await enrich_evidence(state.repository, evidence_id, emit=recorder.emit)
     except Exception:
         recorder.emit('LOCATION', 'UNAVAILABLE', 'Location search could not finish. Saved screenshots and agent decisions are preserved.', next_step='STOP')
         return []
+    pending = [row for row in rows if row.get('status') in WEB_RETRY and row.get('name')]
+    if pending and not sample_mode() or pending and live_models():
+        try:
+            async with _gateway() as gateway:
+                for row in pending:
+                    found = await find_and_save(state.repository, row['entity_id'], gateway, emit=lambda agent, action, reason, **kw: recorder.emit(
+                        agent, action, reason, **{**kw, 'receipt': sanitize_receipt(getattr(gateway, 'last_routing', None))}))
+                    if found:
+                        row.update(found)
+        except Exception:  # noqa: BLE001 - the web step is an extra; the map result stands
+            pass
+    return rows
 
 
 async def _cover(state, recorder, gateway, result) -> None:

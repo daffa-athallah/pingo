@@ -103,3 +103,7 @@ export const setEntityLocation = (entityId: string, link: string, pick?: { locat
 
 export const deleteIntention = (loopId: string) =>
   json<{ deleted: string; title: string; screenshots_hidden: number; can_sync_again: number }>(`/api/open-loops/${encodeURIComponent(loopId)}/delete`, { method: 'POST' }, 120000)
+
+export const findLocation = (entityId: string) =>
+  json<{ entity_id: string; name: string; status: string; reason?: string; latitude?: string; longitude?: string; location_id?: string }>(
+    `/api/entities/${encodeURIComponent(entityId)}/find-location`, { method: 'POST' }, 300000)

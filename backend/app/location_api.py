@@ -37,3 +37,22 @@ async def set_location(request: Request, entity_id: str, body: PinBody):
             state.on_data_changed()
     return {'entity_id': entity_id, 'name': entity.name, 'latitude': point[0], 'longitude': point[1], 'location_id': updated.metadata['location_id'],
             'location_verified': True}
+
+
+@router.post('/api/entities/{entity_id}/find-location')
+async def find_location_for(request: Request, entity_id: str):
+    """Ask the Location Agent to find a saved place on the web and verify it on the map. Takes a minute or so (a web search, a model call, a map check)."""
+    from backend.app.context_api import _gateway
+    from backend.app.location_web import find_and_save
+    state = request.app.state
+    if state.mode == 'sample' and not live_models():
+        raise HTTPException(status_code=404, detail='Finding a location needs live models.')
+    async with state.write_lock:
+        found = state.repository.get_entities([entity_id])
+        if not found or found[0].domain not in ('food', 'travel'):
+            raise HTTPException(status_code=404, detail='Only a saved restaurant or destination can be located.')
+        async with _gateway() as gateway:
+            row = await find_and_save(state.repository, entity_id, gateway)
+        if row and row.get('status') == 'resolved' and hasattr(state, 'on_data_changed'):
+            state.on_data_changed()
+    return {'entity_id': entity_id, 'name': found[0].name, **(row or {'status': 'unavailable', 'reason': 'Nothing was found.'})}
