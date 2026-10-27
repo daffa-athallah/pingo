@@ -51,8 +51,8 @@ export interface Health {
 
 const base = () => API_BASE_URL.replace(/\/$/, '')
 
-async function json<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${base()}${path}`, { ...init, signal: init?.signal ? AbortSignal.any([init.signal, AbortSignal.timeout(30000)]) : AbortSignal.timeout(30000) })
+async function json<T>(path: string, init?: RequestInit, timeoutMs = 30000): Promise<T> {
+  const response = await fetch(`${base()}${path}`, { ...init, signal: init?.signal ? AbortSignal.any([init.signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs) })
   if (!response.ok) {
     let detail = ''
     try { detail = ((await response.json()) as { detail?: string }).detail ?? '' } catch { /* not JSON */ }
@@ -63,14 +63,15 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const getHealth = (signal?: AbortSignal) => json<Health>('/health', { signal })
 export const getRunRecords = (signal?: AbortSignal) => json<RunRecord[]>('/runs', { signal })
-export const getRunRecord = (runId: string, signal?: AbortSignal) => json<RunRecord>(`/api/runs/${encodeURIComponent(runId)}`, { signal })
+// The real backend can be busy with Zetaris for a while; a run's status is worth waiting for.
+export const getRunRecord = (runId: string, signal?: AbortSignal) => json<RunRecord>(`/api/runs/${encodeURIComponent(runId)}`, { signal }, 120000)
 export const resetDemo = () => json<{ ok: boolean; evidence: number; active_loops: number }>('/api/demo/reset', { method: 'POST' })
 
 /** Sends the raw image bytes. Returns at once with a run_id; poll getRunRecord for progress. */
 export const startUpload = (file: File) =>
   json<{ run_id: string; status: RunStatus; duplicate?: boolean; outcome?: UploadOutcome }>('/api/screenshots', {
     method: 'POST', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' },
-  })
+  }, 180000)
 
 export interface CachedRecallView {
   notification_id: string; loop_id: string; run_id: string; title: string; reason: string

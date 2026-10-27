@@ -28,13 +28,18 @@ export default function DemoUpload() {
 
   const [queue, setQueue] = useState<{ index: number; total: number } | null>(null)
 
+  // A slow poll must not abandon the run: it keeps going on the server, so keep asking (for up to 15 minutes) and ignore a timed-out request.
   const finish = async (runId: string) => {
-    for (;;) {
-      const next = await getRunRecord(runId)
-      setRun(next)
-      if (next.status !== 'running') return next
-      await new Promise((resolve) => window.setTimeout(resolve, 700))
+    const deadline = Date.now() + 15 * 60_000
+    while (Date.now() < deadline) {
+      try {
+        const next = await getRunRecord(runId)
+        setRun(next)
+        if (next.status !== 'running') return next
+      } catch { /* the server is busy; ask again */ }
+      await new Promise((resolve) => window.setTimeout(resolve, 1500))
     }
+    throw new Error('Still working after 15 minutes. Check Home later; the screenshot may have been saved.')
   }
 
   /** One screenshot at a time (the store has a single writer), in the order they were picked. */
