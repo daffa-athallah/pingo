@@ -37,6 +37,7 @@ export interface UploadOutcome {
   }
   receipts: { agent: string; action: string; receipt: { requested_model: string | null; routed_model: string | null; provider: string | null } }[]
   error: string | null
+  locations?: { entity_id: string; name: string; status: 'resolved' | 'located' | 'unresolved'; reason: string | null; latitude: string | null; longitude: string | null; location_id: string | null }[]
 }
 
 export interface Health {
@@ -93,3 +94,8 @@ export interface ZetarisProof {
   queries: { role: string; sql: string; rows_returned: number; sample: string[][]; note: string }[]
 }
 export const getZetarisProof = (signal?: AbortSignal) => json<ZetarisProof>('/api/sample/zetaris', { signal })
+
+export const setEntityLocation = (entityId: string, link: string) =>
+  json<{ entity_id: string; name: string; latitude: number; longitude: number; location_id: string }>(`/api/entities/${encodeURIComponent(entityId)}/location`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link }),
+  })

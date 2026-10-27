@@ -1,0 +1,37 @@
+"""Give a saved place a coordinate: paste a Google Maps link (or "lat, lon") you checked yourself.
+
+Used when the automatic map lookup cannot place a small business. Recall never guesses a location; a person's own pin is a verified source."""
+from dataclasses import replace
+
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel, Field
+
+from backend.app import geocode
+from backend.app.bootstrap import live_models
+
+router = APIRouter()
+
+
+class PinBody(BaseModel):
+    link: str = Field(min_length=3, max_length=2000, description='A Google Maps link, or "latitude, longitude"')
+
+
+@router.post('/api/entities/{entity_id}/location')
+async def set_location(request: Request, entity_id: str, body: PinBody):
+    state = request.app.state
+    if state.mode == 'sample' and not live_models():
+        raise HTTPException(status_code=404, detail='Setting a location is available with live models or the real backend.')
+    point = geocode.parse_maps_link(body.link, follow=geocode.follow_redirect)
+    if point is None:
+        raise HTTPException(status_code=422, detail='Could not read a location from that. Paste a Google Maps link, or "latitude, longitude".')
+    async with state.write_lock:
+        found = state.repository.get_entities([entity_id])
+        entity = found[0] if found else None
+        if entity is None or entity.domain not in ('food', 'travel'):
+            raise HTTPException(status_code=404, detail='Only a saved restaurant or destination can be given a location.')
+        updated = replace(entity, metadata=geocode.metadata_from_pin(entity, point[0], point[1], how='Google Maps pin or link'))
+        state.repository.save_entity(updated)
+        if hasattr(state, 'on_data_changed'):
+            state.on_data_changed()
+    return {'entity_id': entity_id, 'name': entity.name, 'latitude': point[0], 'longitude': point[1], 'location_id': updated.metadata['location_id'],
+            'location_verified': True}

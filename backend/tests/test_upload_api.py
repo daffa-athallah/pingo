@@ -234,3 +234,44 @@ class SampleModeIsolation(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class LocationTests(unittest.TestCase):
+    def test_maps_links_and_coordinates_are_parsed_and_garbage_is_not(self):
+        from backend.app import geocode
+        pin = 'https://www.google.com/maps/place/X/@-37.9187,145.1286,17z/data=!3d-37.9190123!4d145.1290456'
+        self.assertEqual(geocode.parse_maps_link(pin), (-37.9190123, 145.1290456))
+        self.assertEqual(geocode.parse_maps_link('-37.9187, 145.1286'), (-37.9187, 145.1286))
+        self.assertEqual(geocode.parse_maps_link('https://www.google.com/maps?q=-37.918,145.128'), (-37.918, 145.128))
+        for bad in ('', 'hello', '999, 999', 'https://example.com'):
+            self.assertIsNone(geocode.parse_maps_link(bad))
+
+    def test_resolver_accepts_only_unambiguous_matches_and_never_guesses(self):
+        from backend.app import geocode
+        from backend.app.domain.models import Entity
+        entity = Entity('e', 'place', 'food', 'Marrybrown', location_name='Clayton', city='Melbourne', country='Australia')
+        hit = {'name': 'Marrybrown', 'display_name': 'Marrybrown, Clayton Road, Clayton, Melbourne, Victoria, Australia', 'lat': '-37.92', 'lon': '145.12', 'osm_type': 'node', 'osm_id': 7}
+        self.assertEqual(geocode.resolve(entity, search=lambda *a, **k: [hit])['location_id'], 'osm:node:7')
+        far = {**hit, 'lat': '-37.80', 'osm_id': 8}
+        self.assertEqual(geocode.resolve(entity, search=lambda *a, **k: [hit, far])['status'], 'ambiguous')
+        elsewhere = {**hit, 'display_name': 'Marrybrown, Orchard Road, Singapore'}
+        self.assertEqual(geocode.resolve(entity, search=lambda *a, **k: [elsewhere])['status'], 'not_found')
+        self.assertEqual(geocode.resolve(entity, search=lambda *a, **k: [])['status'], 'not_found')
+        shop = Entity('s', 'product', 'shopping', 'Jacket')
+        self.assertFalse(geocode.eligible(shop))
+
+    def test_pin_endpoint_stores_a_verified_coordinate_only_for_places(self):
+        import os
+        from unittest.mock import patch
+        from fastapi.testclient import TestClient
+        from backend.app.main import app
+        with patch.dict(os.environ, {'RECALL_MODE': 'demo'}, clear=True), TestClient(app) as client:
+            place = next(e for e in client.get('/entities').json() if e['domain'] == 'food') if client.get('/entities').status_code == 200 else None
+            if place is None:
+                self.skipTest('no entities route')
+            entity_id = place.get('entity_id') or place.get('id')
+            ok = client.post(f'/api/entities/{entity_id}/location', json={'link': '-37.9187, 145.1286'})
+            self.assertEqual(ok.status_code, 200)
+            self.assertTrue(ok.json()['location_id'].startswith('pin:'))
+            self.assertEqual(client.post(f'/api/entities/{entity_id}/location', json={'link': 'nonsense'}).status_code, 422)
+            self.assertEqual(client.post('/api/entities/missing/location', json={'link': '-37.9, 145.1'}).status_code, 404)

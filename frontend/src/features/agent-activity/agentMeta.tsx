@@ -46,7 +46,7 @@ export const isZetarisPlaceholder = (agent: string) => agent === 'INGESTION'
 
 const NEXT_LABELS: Record<string, string> = {
   INGESTION: 'Zetaris', OPEN_LOOP: 'Open Loop', CONTEXT: 'Context', CRITIC: 'Critic', VERIFIER: 'Context verifier',
-  OUTPUT: 'Output', CHECK_IN: 'Check-in', STOP: 'End of run', ZETARIS: 'Zetaris', REPOSITORY: 'Demo workspace', 'H-MEM': 'H-MEM', EVIDENCE: 'Evidence', STATE: 'Loop state',
+  OUTPUT: 'Output', CHECK_IN: 'Check-in', STOP: 'End of run', ZETARIS: 'Zetaris', LOCATION: 'Location', REPOSITORY: 'Demo workspace', 'H-MEM': 'H-MEM', EVIDENCE: 'Evidence', STATE: 'Loop state',
 }
 export const nextLabel = (next: string | null) => (next ? NEXT_LABELS[next] ?? next : null)
 

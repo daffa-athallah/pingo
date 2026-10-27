@@ -19,6 +19,9 @@ import uuid
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from dataclasses import replace
+
+from backend.app import geocode
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
 from backend.app.context_api import _gateway
@@ -87,6 +90,43 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
 
+def _location_row(entity, status: str, reason: str | None = None) -> dict:
+    meta = entity.metadata or {}
+    return {'entity_id': entity.entity_id, 'name': entity.name, 'status': status, 'reason': reason,
+            'latitude': meta.get('latitude'), 'longitude': meta.get('longitude'), 'location_id': meta.get('location_id')}
+
+
+async def _locate(state, recorder, evidence_id: str) -> list[dict]:
+    """After a screenshot is stored: find coordinates for the saved places it mentions, so a phone near one can be matched.
+    Lookup is automatic (OpenStreetMap, strict matching); a place it cannot place stays unlocated until the person supplies a pin."""
+    if not geocode.enabled():
+        return []
+    repository, rows = state.repository, []
+    try:
+        links = repository.get_evidence_entities([evidence_id])
+        for entity in repository.get_entities(sorted({k.entity_id for k in links})):
+            if entity.domain not in ('food', 'travel') or entity.entity_type not in geocode.PLACE_TYPES:
+                continue
+            if not geocode.eligible(entity):
+                rows.append(_location_row(entity, 'located'))
+                continue
+            found = await asyncio.to_thread(geocode.resolve, entity)
+            if found['status'] == 'resolved':
+                updated = replace(entity, metadata=geocode.metadata_for(entity, found))
+                repository.save_entity(updated)
+                recorder.emit('LOCATION', 'RESOLVED', f"Found {entity.name} on the map: {found['display_name']} ({found['lat']:.5f}, {found['lon']:.5f}).",
+                              input_refs=[f'entity:{entity.entity_id}'], next_step='STOP',
+                              detail={'location_id': found['location_id'], 'latitude': found['lat'], 'longitude': found['lon'], 'source': 'OpenStreetMap Nominatim'})
+                rows.append(_location_row(updated, 'resolved'))
+            else:
+                recorder.emit('LOCATION', 'UNRESOLVED', found['reason'] + ' Add a map pin to enable nearby reminders for it.',
+                              input_refs=[f'entity:{entity.entity_id}'], next_step='STOP', detail={'status': found['status'], 'candidates': found['candidates']})
+                rows.append(_location_row(entity, 'unresolved', found['reason']))
+    except Exception as exc:  # noqa: BLE001 - locating a place never affects the saved screenshot
+        recorder.emit('LOCATION', 'UNRESOLVED', f'Place lookup failed safely ({type(exc).__name__}).', next_step='STOP')
+    return rows
+
+
 async def _process(state, recorder, path: Path, digest: str) -> None:
     repository = state.repository
     uploads = state.uploads_dir
@@ -131,6 +171,7 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                 'receipts': [{'agent': e['agent'], 'action': e['action'], 'receipt': e['receipt']}
                              for e in recorder.record['result']['trace_events'] if e.get('receipt')],
                 'error': result.error}
+            recorder.record['outcome']['locations'] = await _locate(state, recorder, result.evidence_id) if evidence and not evidence['sensitive'] else []
             if result.final_action == FinalAction.STORED:
                 recorder.emit('RUN', 'DONE', 'Saved. The Open Loops are up to date.', next_step='STOP', output_ref=f'loop:{result.loop_id}' if result.loop_id else None)
             else:

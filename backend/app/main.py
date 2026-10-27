@@ -436,3 +436,5 @@ app.include_router(notifications_router)
 
 from backend.app.sample_api import router as sample_router
 app.include_router(sample_router)
+from backend.app.location_api import router as location_router  # noqa: E402
+app.include_router(location_router)

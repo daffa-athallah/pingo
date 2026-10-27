@@ -10,9 +10,9 @@ export default function SaveScreenshotButton() {
   const { pathname } = useLocation()
   useEffect(() => {
     const controller = new AbortController()
-    getHealth(controller.signal).then(health => setAllowed(health.mode === 'demo' || (health.mode === 'sample' && !!health.live_models))).catch(() => setAllowed(false))
+    getHealth(controller.signal).then(health => setAllowed(health.mode === 'real' || health.mode === 'demo' || (health.mode === 'sample' && !!health.live_models))).catch(() => setAllowed(false))
     return () => controller.abort()
   }, [])
   if (!allowed || pathname === '/demo') return null
-  return <Link className="save-screenshot-button" to="/demo" aria-label="Save a screenshot"><span aria-hidden="true">+</span> Save screenshot</Link>
+  return <Link className="save-screenshot-button" to="/demo" aria-label="Add a screenshot"><span aria-hidden="true">+</span> Add screenshot</Link>
 }

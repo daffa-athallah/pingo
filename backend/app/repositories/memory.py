@@ -19,6 +19,9 @@ class InMemoryLoopRepository:
         self.context_evaluations = {}
         self.notifications = {}
 
+    def save_entity(self, entity: Entity) -> None:
+        self.entities[entity.entity_id] = entity
+
     def save_evidence(self, evidence: Evidence, entities: Sequence[Entity], links: Sequence[EvidenceEntity]) -> None:
         self.evidence[evidence.evidence_id] = evidence
         self.entities.update({entity.entity_id: entity for entity in entities})

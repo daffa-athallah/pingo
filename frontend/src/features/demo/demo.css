@@ -22,3 +22,9 @@
 @keyframes demo-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes demo-pulse { 50% { opacity: 0.25; } }
 @media (prefers-reduced-motion: reduce) { .demo-steps li, .demo-dot { animation: none; } }
+
+.demo-confirm { display: flex; gap: 8px; align-items: center; font-size: 13px; margin: 12px 0; }
+.demo-location { margin-top: 12px; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: 13px; }
+.demo-location form { display: grid; gap: 8px; margin-top: 8px; }
+.demo-location input[type='text'], .demo-location input:not([type]) { padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: 14px; width: 100%; box-sizing: border-box; }
+.demo-ok { color: #1b6b3a; font-weight: 600; }

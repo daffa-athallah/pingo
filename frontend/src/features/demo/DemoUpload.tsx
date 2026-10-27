@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../../services/api'
-import { getHealth, getRunRecord, resetDemo, resetSample, startUpload } from '../../services/runsApi'
+import { getHealth, getRunRecord, resetDemo, resetSample, setEntityLocation, startUpload } from '../../services/runsApi'
 import type { Health, RunRecord } from '../../services/runsApi'
 import './demo.css'
 
 // A plain page to record the live demo: save a screenshot, watch the agents work, see what changed. Product screens belong to the app UI.
-const STEP_LABEL: Record<string, string> = { UPLOAD: 'Upload', EVIDENCE: 'Evidence Agent', REPOSITORY: 'Demo workspace', ZETARIS: 'Zetaris', OPEN_LOOP: 'Open Loop Agent', RUN: 'Run' }
+const STEP_LABEL: Record<string, string> = { LOCATION: 'Location', UPLOAD: 'Upload', EVIDENCE: 'Evidence Agent', REPOSITORY: 'Demo workspace', ZETARIS: 'Zetaris', OPEN_LOOP: 'Open Loop Agent', RUN: 'Run' }
 
 export default function DemoUpload() {
   const navigate = useNavigate()
@@ -14,6 +14,10 @@ export default function DemoUpload() {
   const [error, setError] = useState<string | null>(null)
   const [run, setRun] = useState<RunRecord | null>(null)
   const [busy, setBusy] = useState(false)
+  const [confirmed, setConfirmed] = useState(false)  // real data is permanent, so uploading there needs an explicit yes
+  const [pins, setPins] = useState<Record<string, string>>({})
+  const [pinned, setPinned] = useState<Record<string, string>>({})
+  const [pinError, setPinError] = useState<Record<string, string>>({})
   const timer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
@@ -51,25 +55,30 @@ export default function DemoUpload() {
     try { await (health?.mode === 'sample' ? resetSample() : resetDemo()) } catch (e) { setError(e instanceof Error ? e.message : 'Reset failed.') }
   }
 
+  const realData = health?.mode === 'real'
   const demoWorkspace = health?.mode === 'demo' || (health?.mode === 'sample' && !!health.live_models)
+  const canUpload = demoWorkspace || (realData && confirmed)
   const events = run?.result.trace_events ?? []
   const outcome = run?.outcome
   return (
     <section className="page demo-page">
       <header>
-        <h1>Save a screenshot</h1>
+        <h1>{realData ? 'Add a screenshot' : 'Save a screenshot'}</h1>
         {health ? (demoWorkspace
           ? <p className="demo-badge is-demo">Demo workspace · in-memory copy of the saved history · resettable · real models</p>
-          : <p className="demo-badge is-warn">This is the {health.workspace} workspace. Uploads here are permanent, so this page is disabled. Start the backend with <code>serve.py --demo</code>.</p>)
+          : realData
+            ? <p className="demo-badge is-warn">Real data · saved permanently to Zetaris · analysed by the agents through Nightshift. Evidence cannot be edited or deleted afterwards.</p>
+            : <p className="demo-badge is-warn">This is the {health.workspace} workspace without live models. Start the backend with <code>serve.py --demo</code>.</p>)
           : <p className="demo-badge">{error ?? 'Connecting to the backend…'} ({API_BASE_URL})</p>}
       </header>
 
+      {realData ? <label className="demo-confirm"><input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} /> I understand this adds to my real saved history.</label> : null}
       <div className="demo-actions">
-        <label className={`demo-button${!demoWorkspace || busy ? ' is-disabled' : ''}`}>
+        <label className={`demo-button${!canUpload || busy ? ' is-disabled' : ''}`}>
           {busy ? 'Working…' : 'Choose a screenshot'}
-          <input type="file" accept="image/png,image/jpeg,image/webp" disabled={!demoWorkspace || busy} onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = '' }} />
+          <input type="file" accept="image/png,image/jpeg,image/webp" disabled={!canUpload || busy} onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = '' }} />
         </label>
-        <button type="button" className="demo-button is-quiet" disabled={!demoWorkspace || busy} onClick={() => void reset()}>Reset workspace</button>
+        {realData ? null : <button type="button" className="demo-button is-quiet" disabled={!demoWorkspace || busy} onClick={() => void reset()}>Reset workspace</button>}
       </div>
       {error && health ? <p className="demo-error" role="alert">{error}</p> : null}
 
@@ -98,6 +107,21 @@ export default function DemoUpload() {
                 <p><strong>{outcome.open_loop.decision}</strong> → “{outcome.open_loop.loop.title}”
                   {outcome.open_loop.change ? ` · ${outcome.open_loop.change.change}` : ''}</p>
               ) : null}
+              {outcome.locations?.map((place) => (
+                <div key={place.entity_id} className="demo-location">
+                  {place.status === 'unresolved' ? (
+                    <>
+                      <p><strong>{place.name}</strong>: the map has no match, so nearby reminders are off for it. Paste a Google Maps link (or “lat, lon”) to turn them on.</p>
+                      {pinned[place.entity_id] ? <p className="demo-ok">Saved: {pinned[place.entity_id]}</p> : (
+                        <form onSubmit={async (e) => { e.preventDefault(); setPinError((v) => ({ ...v, [place.entity_id]: '' })); try { const r = await setEntityLocation(place.entity_id, pins[place.entity_id] ?? ''); setPinned((v) => ({ ...v, [place.entity_id]: `${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)}` })) } catch (err) { setPinError((v) => ({ ...v, [place.entity_id]: err instanceof Error ? err.message : 'Could not save.' })) } }}>
+                          <input value={pins[place.entity_id] ?? ''} onChange={(e) => setPins((v) => ({ ...v, [place.entity_id]: e.target.value }))} placeholder="https://maps.app.goo.gl/… or -37.9187, 145.1286" aria-label={`Location of ${place.name}`} />
+                          <button type="submit" className="demo-button is-quiet">Save location</button>
+                          {pinError[place.entity_id] ? <span className="demo-error" role="alert">{pinError[place.entity_id]}</span> : null}
+                        </form>)}
+                    </>
+                  ) : <p><strong>{place.name}</strong>: located at {Number(place.latitude).toFixed(5)}, {Number(place.longitude).toFixed(5)} ({place.status === 'resolved' ? 'found on the map' : 'already saved'}). Nearby reminders are on.</p>}
+                </div>
+              ))}
               <p className="demo-links">
                 <Link to={`/agent-activity?demo=${run.run_id}`}>Open in Agent Activity</Link>
                 <Link to="/">Back to Home</Link>
