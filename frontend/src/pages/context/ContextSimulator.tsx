@@ -163,6 +163,7 @@ export default function ContextSimulator() {
     <p className="context-disclosure"><strong>Real agent evaluation.</strong> Synthetic inputs are stored and evaluated against your saved intentions through Nightshift. This can create real notifications and cooldowns. Sample mode cannot run it.</p>
     <section className="context-presets" aria-labelledby="context-presets-heading"><h2 id="context-presets-heading">Saved location presets</h2>
       <p>Use verified coordinates from your saved entities. Presets fill the form; only Run agent evaluation calls the agents.</p>
+      <small>Location search: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a>, via Nominatim. Uncertain places remain unlocated.</small>
       <button type="button" className="context-secondary" disabled={loadingPlaces || busy} onClick={() => void loadPlaces()}>{loadingPlaces ? 'Loading saved locations…' : placesLoaded ? 'Refresh saved locations' : 'Load saved locations'}</button>
       {placeError && <p role="alert" className="context-error">{placeError}</p>}
       {places.length > 0 && <label>Saved place<select value={selectedPlace} onChange={event => setSelectedPlace(event.target.value)} disabled={busy}>{places.map(place => <option key={place.entityId} value={place.entityId}>{place.name} · {place.domain === 'shopping' ? 'verified store association' : place.domain}</option>)}</select></label>}

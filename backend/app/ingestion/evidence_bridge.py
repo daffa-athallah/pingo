@@ -4,7 +4,7 @@ Mapping lives here so neither agent depends on storage shapes. No storage-specif
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import hashlib
 from typing import Callable
@@ -16,6 +16,10 @@ from backend.app.repositories.base import LoopRepository
 
 _LINK_CONFIDENCE = {'high': 0.9, 'medium': 0.6, 'low': 0.3}
 RELATIONSHIP = 'depicted'
+
+
+def _location_key(key):
+    return key.casefold() in {'latitude', 'longitude', 'store_name'} or key.casefold().startswith('location_')
 
 
 @dataclass(frozen=True)
@@ -59,7 +63,23 @@ def ingest(extraction: Extraction, repository: LoopRepository, *, source: str = 
             eid, item.type, extraction.domain, item.name, item.category, item.subcategory, item.brand,
             loc.location_name if loc else None, loc.city if loc else None, loc.country if loc else None,
             # Sensitive screenshots keep no free-form attributes; they may hold account or private values.
-            {} if extraction.sensitive else dict(item.attributes)))
+            {} if extraction.sensitive else {k: v for k, v in item.attributes.items() if not _location_key(k)}))
+    # Perception cannot mark its own coordinates as verified. Keep independently looked-up
+    # metadata across another screenshot of the same entity (stable identity is unchanged).
+    existing = {item.entity_id: item for item in repository.get_entities(list(entities))}
+    for eid, entity in list(entities.items()):
+        old = existing.get(eid)
+        if not old:
+            continue
+        if extraction.sensitive:
+            entities[eid] = old  # no private attributes are added, and existing public metadata is not erased
+            continue
+        metadata = {**entity.metadata, **{k: v for k, v in old.metadata.items() if _location_key(k)}}
+        if entity.location_name and _norm(entity.location_name) != _norm(old.location_name):
+            metadata.update(location_verified='false', location_lookup_status='context_changed')
+            metadata.pop('location_lookup_retry_at', None)
+            metadata.pop('location_lookup_signature', None)
+        entities[eid] = replace(entity, metadata=metadata)
     links = [m.EvidenceEntity(evidence_id, eid, RELATIONSHIP, _LINK_CONFIDENCE[extraction.confidence]) for eid in entities]
     repository.save_evidence(evidence, list(entities.values()), links)
     return Ingested(evidence, list(entities.values()), links)

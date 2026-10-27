@@ -19,9 +19,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from dataclasses import replace
-
-from backend.app import covers, geocode
+from backend.app import covers
 from backend.app.cover_service import ensure_cover
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
@@ -91,41 +89,14 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
 
-def _location_row(entity, status: str, reason: str | None = None, candidates: list | None = None) -> dict:
-    meta = entity.metadata or {}
-    return {'entity_id': entity.entity_id, 'name': entity.name, 'status': status, 'reason': reason, 'candidates': candidates or [],
-            'latitude': meta.get('latitude'), 'longitude': meta.get('longitude'), 'location_id': meta.get('location_id')}
-
-
-async def _locate(state, recorder, evidence_id: str) -> list[dict]:
-    """After a screenshot is stored: find coordinates for the saved places it mentions, so a phone near one can be matched.
-    Lookup is automatic (OpenStreetMap, strict matching); a place it cannot place stays unlocated until the person supplies a pin."""
-    if not geocode.enabled():
-        return []
-    repository, rows = state.repository, []
+async def _locate(state, recorder, evidence_id):
+    """Same post-upload lookup boundary as main; failures do not undo saved Evidence."""
+    from backend.app.location_lookup import enrich_evidence
     try:
-        links = repository.get_evidence_entities([evidence_id])
-        for entity in repository.get_entities(sorted({k.entity_id for k in links})):
-            if entity.domain not in ('food', 'travel') or entity.entity_type not in geocode.PLACE_TYPES:
-                continue
-            if not geocode.eligible(entity):
-                rows.append(_location_row(entity, 'located'))
-                continue
-            found = await asyncio.to_thread(geocode.resolve, entity)
-            if found['status'] == 'resolved':
-                updated = replace(entity, metadata=geocode.metadata_for(entity, found))
-                repository.save_entity(updated)
-                recorder.emit('LOCATION', 'RESOLVED', f"Found {entity.name} on the map: {found['display_name']} ({found['lat']:.5f}, {found['lon']:.5f}).",
-                              input_refs=[f'entity:{entity.entity_id}'], next_step='STOP',
-                              detail={'location_id': found['location_id'], 'latitude': found['lat'], 'longitude': found['lon'], 'source': 'OpenStreetMap Nominatim'})
-                rows.append(_location_row(updated, 'resolved'))
-            else:
-                recorder.emit('LOCATION', 'UNRESOLVED', found['reason'] + (' Pick one of the places it found, or add a map pin, to enable nearby reminders.' if found['candidates'] else ' Add a map pin to enable nearby reminders for it.'),
-                              input_refs=[f'entity:{entity.entity_id}'], next_step='STOP', detail={'status': found['status'], 'candidates': found['candidates']})
-                rows.append(_location_row(entity, 'unresolved', found['reason'], found['candidates']))
-    except Exception as exc:  # noqa: BLE001 - locating a place never affects the saved screenshot
-        recorder.emit('LOCATION', 'UNRESOLVED', f'Place lookup failed safely ({type(exc).__name__}).', next_step='STOP')
-    return rows
+        return await enrich_evidence(state.repository, evidence_id, emit=recorder.emit)
+    except Exception:
+        recorder.emit('LOCATION', 'UNAVAILABLE', 'Location search could not finish. Saved screenshots and agent decisions are preserved.', next_step='STOP')
+        return []
 
 
 async def _cover(state, recorder, gateway, result) -> None:
