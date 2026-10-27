@@ -168,6 +168,12 @@ def loops(request: Request):
 _view_cache: dict = {}
 _view_lock = Lock()
 _building: set = set()
+_key_locks: dict = {}
+
+
+def _lock_for(key):
+    with _view_lock:
+        return _key_locks.setdefault(key, Lock())
 
 
 def _cached(key, build):
@@ -176,10 +182,17 @@ def _cached(key, build):
     with _view_lock:
         hit = _view_cache.get(key)
     if hit is None:
-        value = build()
-        with _view_lock:
-            _view_cache[key] = (time.monotonic(), value)
-        return value
+        # Single flight: one caller reads Zetaris; every other caller for this key waits for that read instead of starting its own
+        # (the JDBC connection is serial, so several cold reads at once make each of them several times slower).
+        with _lock_for(key):
+            with _view_lock:
+                hit = _view_cache.get(key)
+            if hit is None:
+                value = build()
+                with _view_lock:
+                    _view_cache[key] = (time.monotonic(), value)
+                return value
+            return hit[1]
     if time.monotonic() - hit[0] >= VIEW_TTL_SECONDS:
         with _view_lock:
             start = key not in _building
