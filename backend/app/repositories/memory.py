@@ -20,6 +20,7 @@ class InMemoryLoopRepository:
         self.notifications = {}
 
     def save_entity(self, entity: Entity) -> None:
+        """Same metadata-upsert helper as Zetaris (also present on current main)."""
         self.entities[entity.entity_id] = entity
 
     def save_evidence(self, evidence: Evidence, entities: Sequence[Entity], links: Sequence[EvidenceEntity]) -> None:
