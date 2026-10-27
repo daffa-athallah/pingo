@@ -37,7 +37,7 @@ export interface UploadOutcome {
   }
   receipts: { agent: string; action: string; receipt: { requested_model: string | null; routed_model: string | null; provider: string | null } }[]
   error: string | null
-  locations?: { entity_id: string; name: string; status: 'resolved' | 'located' | 'unresolved'; reason: string | null; candidates?: { label: string; lat: number; lon: number; location_id: string }[]; latitude: string | null; longitude: string | null; location_id: string | null }[]
+  locations?: { entity_id: string; name: string; status: string; reason: string | null; candidates?: { label: string; lat: number; lon: number; location_id: string }[]; latitude: string | null; longitude: string | null; location_id: string | null }[]
 }
 
 export interface Health {

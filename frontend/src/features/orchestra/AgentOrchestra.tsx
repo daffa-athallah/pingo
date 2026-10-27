@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getRunRecords } from '../../services/runsApi'
 import type { RunRecord } from '../../services/runsApi'
-import LocationPrompts from '../demo/LocationPrompts'
+import LocationPrompts, { needsLocation } from '../demo/LocationPrompts'
 import OrchestraStage from './OrchestraStage'
 import TraceTimeline from './TraceTimeline'
 import { caption, frameAt } from './orchestraModel'
@@ -75,7 +75,7 @@ export default function AgentOrchestra() {
   const words = working ? { title: 'Context Agent is checking…', subtitle: `You are ${Math.round(working.distance)} m from ${working.place}. Asking whether it is worth a ping.`, progress: 0.15 } : caption(run, frame)
   const mode = working ? 'Working' : !run ? '' : run.status === 'running' ? 'Live' : run.provenance === 'recorded' ? 'Recorded replay' : replaying ? 'Replay' : 'Latest run'
   const simulated = Boolean(run?.synthetic_inputs)
-  const unresolved = run?.outcome?.locations?.filter((l) => l.status === 'unresolved').length ?? 0
+  const unresolved = run?.outcome?.locations?.filter(needsLocation).length ?? 0
 
   const live = mode === 'Live'
   return <section className="page orchestra-page">
