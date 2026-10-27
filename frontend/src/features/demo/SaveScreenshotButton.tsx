@@ -14,5 +14,5 @@ export default function SaveScreenshotButton() {
     return () => controller.abort()
   }, [])
   if (!allowed || pathname === '/demo') return null
-  return <Link className="save-screenshot-button" to="/demo" aria-label="Add a screenshot"><span aria-hidden="true">+</span> Add screenshot</Link>
+  return <Link className="save-screenshot-button" to="/demo" aria-label="Sync screenshots"><span aria-hidden="true">+</span> Sync screenshots</Link>
 }

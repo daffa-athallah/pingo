@@ -14,6 +14,7 @@ import json
 import math
 import os
 import re
+import ssl
 import sys
 import time
 import urllib.error
@@ -25,6 +26,15 @@ USER_AGENT = 'Pingo-Recall-hackathon/1.0 (https://github.com/daffa-athallah/reca
 PLACE_TYPES = {'place', 'restaurant', 'venue', 'attraction', 'destination', 'cafe', 'bar', 'store'}
 GENERIC = {'the', 'a', 'an', 'and', 'of', 'restaurant', 'cafe', 'bar', 'shop', 'store', 'house', 'melbourne', 'australia'}
 SPREAD_METERS = 300
+
+
+def _context() -> ssl.SSLContext:
+    """TLS trust that does not depend on the shell's SSL_CERT_FILE (a launchd job has none): certifi's bundle, else the macOS/Linux system bundle."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context(cafile='/etc/ssl/cert.pem') if os.path.exists('/etc/ssl/cert.pem') else ssl.create_default_context()
 
 
 def enabled() -> bool:
@@ -53,7 +63,7 @@ def _search(query: str, timeout: float = 6.0, viewbox: str | None = None) -> lis
     params = {'q': query, 'format': 'jsonv2', 'limit': 5, 'addressdetails': 1, **({'viewbox': viewbox, 'bounded': 1} if viewbox else {})}
     url = ENDPOINT + '?' + urllib.parse.urlencode(params)
     request = urllib.request.Request(url, headers={'User-Agent': USER_AGENT, 'Accept-Language': 'en'})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    with urllib.request.urlopen(request, timeout=timeout, context=_context()) as response:
         return json.loads(response.read())
 
 
@@ -91,7 +101,7 @@ def parse_maps_link(text: str, *, follow=None) -> tuple[float, float] | None:
 def follow_redirect(url: str) -> str | None:
     try:
         request = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
-        with urllib.request.urlopen(request, timeout=6) as response:
+        with urllib.request.urlopen(request, timeout=6, context=_context()) as response:
             return response.geturl()
     except (urllib.error.URLError, OSError, ValueError):
         return None

@@ -4,6 +4,7 @@ import BottomNav from './BottomNav'
 import NotificationCenter from '../../features/notifications/NotificationCenter'
 import JudgeGuide from '../../features/demo/JudgeGuide'
 import SaveScreenshotButton from '../../features/demo/SaveScreenshotButton'
+import NearbyAware from '../../features/nearby/NearbyAware'
 
 export default function AppShell() {
   const { pathname, search } = useLocation()
@@ -26,6 +27,7 @@ export default function AppShell() {
       <BottomNav />
       <JudgeGuide />
       <SaveScreenshotButton />
+      <NearbyAware />
     </div>
   )
 }

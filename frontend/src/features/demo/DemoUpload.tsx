@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../../services/api'
 import { getHealth, getRunRecord, resetDemo, resetSample, setEntityLocation, startUpload } from '../../services/runsApi'
 import type { Health, RunRecord } from '../../services/runsApi'
+import PipelineFlow from './PipelineFlow'
 import './demo.css'
 
 // A plain page to record the live demo: save a screenshot, watch the agents work, see what changed. Product screens belong to the app UI.
@@ -25,29 +26,31 @@ export default function DemoUpload() {
     return () => window.clearInterval(timer.current)
   }, [navigate])
 
-  const watch = (runId: string) => {
-    window.clearInterval(timer.current)
-    timer.current = window.setInterval(async () => {
-      try {
-        const next = await getRunRecord(runId)
-        setRun(next)
-        if (next.status !== 'running') { window.clearInterval(timer.current); setBusy(false) }
-      } catch (e) {
-        window.clearInterval(timer.current); setBusy(false); setError(e instanceof Error ? e.message : 'Lost contact with the backend.')
-      }
-    }, 700)
+  const [queue, setQueue] = useState<{ index: number; total: number } | null>(null)
+
+  const finish = async (runId: string) => {
+    for (;;) {
+      const next = await getRunRecord(runId)
+      setRun(next)
+      if (next.status !== 'running') return next
+      await new Promise((resolve) => window.setTimeout(resolve, 700))
+    }
   }
 
-  const upload = async (file: File | undefined) => {
-    if (!file) return
+  /** One screenshot at a time (the store has a single writer), in the order they were picked. */
+  const upload = async (files: File[]) => {
+    if (!files.length) return
     setError(null); setRun(null); setBusy(true)
     try {
-      const started = await startUpload(file)
-      setRun(await getRunRecord(started.run_id))
-      if (started.status === 'running') watch(started.run_id); else setBusy(false)
+      for (const [index, file] of files.entries()) {
+        setQueue({ index: index + 1, total: files.length })
+        const started = await startUpload(file)
+        setRun(await getRunRecord(started.run_id))
+        if (started.status === 'running') await finish(started.run_id)
+      }
     } catch (e) {
-      setBusy(false); setError(e instanceof Error ? e.message : 'Upload failed.')
-    }
+      setError(e instanceof Error ? e.message : 'Upload failed.')
+    } finally { setBusy(false); setQueue(null) }
   }
 
   const reset = async () => {
@@ -63,7 +66,7 @@ export default function DemoUpload() {
   return (
     <section className="page demo-page">
       <header>
-        <h1>{realData ? 'Add a screenshot' : 'Save a screenshot'}</h1>
+        <h1>Sync screenshots</h1>
         {health ? (demoWorkspace
           ? <p className="demo-badge is-demo">Demo workspace · in-memory copy of the saved history · resettable · real models</p>
           : realData
@@ -75,12 +78,15 @@ export default function DemoUpload() {
       {realData ? <label className="demo-confirm"><input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} /> I understand this adds to my real saved history.</label> : null}
       <div className="demo-actions">
         <label className={`demo-button${!canUpload || busy ? ' is-disabled' : ''}`}>
-          {busy ? 'Working…' : 'Choose a screenshot'}
-          <input type="file" accept="image/png,image/jpeg,image/webp" disabled={!canUpload || busy} onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = '' }} />
+          {busy ? (queue && queue.total > 1 ? `Working… ${queue.index} of ${queue.total}` : 'Working…') : 'Choose screenshots'}
+          <input type="file" multiple accept="image/png,image/jpeg,image/webp" disabled={!canUpload || busy} onChange={(e) => { void upload(Array.from(e.target.files ?? [])); e.target.value = '' }} />
         </label>
         {realData ? null : <button type="button" className="demo-button is-quiet" disabled={!demoWorkspace || busy} onClick={() => void reset()}>Reset workspace</button>}
       </div>
       {error && health ? <p className="demo-error" role="alert">{error}</p> : null}
+
+      <PipelineFlow events={events} running={busy || run?.status === 'running'} done={run?.status === 'done' && !busy} />
+      <p className="demo-note">On the web you choose screenshots from Photos (open the Screenshots album and select several). A native app could sync that album automatically.</p>
 
       {run ? (
         <>
