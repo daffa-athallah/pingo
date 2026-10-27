@@ -95,6 +95,7 @@ async def after_upload(agent, repo, decision, result, emit):
         entity_ids = sorted({link.entity_id for link in links})
         evidence, entities = grounding(repo, [result.evidence_id], entity_ids)
         if not available(repo, entity_ids, now()):
+            emit('CHECK_IN', 'NOT_QUEUED', 'The Open Loop Agent was unsure, but a question is already waiting for this or too many are open (at most 3), so no new one is added.', next_step='STOP')
             return None
         async with aio.timeout(30):
             for attempt in range(2):
@@ -113,6 +114,8 @@ async def after_upload(agent, repo, decision, result, emit):
         if qid:
             emit('OPEN_LOOP', 'ASK', 'A material uncertainty needs the person’s answer.',
                  input_refs=[f'evidence:{result.evidence_id}'], output_ref=f'checkin:{qid}', next_step='CHECK_IN', receipt=routing)
+            emit('CHECK_IN', 'QUEUED', 'The question was added to Check-in and waits for your answer. Your answer goes back to the Open Loop Agent, which then creates or updates the intention.',
+                 input_refs=[f'checkin:{qid}'], next_step='OPEN_LOOP')
         return qid
     except Exception:
         emit('OPEN_LOOP', 'CLARIFICATION_UNAVAILABLE', 'Saved Evidence is safe; a clarification could not be prepared.', next_step='STOP')

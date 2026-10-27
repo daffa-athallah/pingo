@@ -55,7 +55,7 @@ class ClarificationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(q.kind, KIND)
         self.assertEqual(q.question['response_mode'], 'options')
         self.assertEqual(q.question['_evidence_ids'], ['ev_0'])
-        self.assertEqual(emitted[-1][0][1], 'ASK')
+        self.assertEqual([e[0][1] for e in emitted[-2:]], ['ASK', 'QUEUED'])
         self.assertEqual(len(gateway.calls), 1)
 
     async def test_confident_upload_does_not_call_model(self):

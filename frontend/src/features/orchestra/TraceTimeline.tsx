@@ -24,7 +24,7 @@ export default function TraceTimeline({ run, upTo }: { run: RunRecord; upTo?: nu
   return <ol className="timeline">
     {events.filter((e) => !HIDDEN.has(e.action)).map((e, i) => {
       const kind = kindOf(e.agent)
-      const label = e.agent === 'RUN' ? 'Pingo' : e.agent === 'UPLOAD' ? 'Screenshot' : e.agent === 'LOCATION' ? 'Map lookup' : e.agent === 'H-MEM' ? 'H-MEM' : e.agent === 'REPOSITORY' || e.agent === 'ZETARIS' ? 'Zetaris'
+      const label = e.agent === 'RUN' ? 'Pingo' : e.agent === 'UPLOAD' ? 'Screenshot' : e.agent === 'LOCATION' ? 'Map lookup' : e.agent === 'H-MEM' ? 'H-MEM' : e.agent === 'CHECK_IN' ? 'Check-in' : e.agent === 'REPOSITORY' || e.agent === 'ZETARIS' ? 'Zetaris'
         : e.agent === 'EVIDENCE' ? 'Evidence Agent' : e.agent === 'OPEN_LOOP' ? 'Open Loop Agent' : e.agent === 'CONTEXT' ? 'Context Agent' : e.agent === 'CRITIC' ? 'Critic Agent' : e.agent
       const isOpen = open === i
       const bullets = e.agent === 'EVIDENCE' && e.action === 'EXTRACT' && evidence && !evidence.sensitive ? [
