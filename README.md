@@ -68,6 +68,8 @@ Every example says **Recorded real run, replayed** (`provenance: recorded`, `wor
 | `revision` | Unsupported booking title → REQUEST_REVISION → REVISE → SURFACE |
 | `duplicates` | Synthetic look-alikes → ASK/Check-in, MERGE and KEEP_SEPARATE |
 
+An eighth UI case, `clarify`, is an explicitly labelled illustrative Check-in fixture, not another captured model run. New inputs require the real-model mode below.
+
 ### Try it on your phone (same Wi-Fi)
 
 pingo is built phone-first, so the sample is nicest on a phone. By default the server only listens on your own computer. To let a phone on the same Wi-Fi in, start it like this and a QR code appears in the guide (open the guide with the floating mascot, then the **Tour** tab):
@@ -205,7 +207,7 @@ npm ci
 npm run build
 ```
 
-The Python suite has **380 tests**; six skip by default (two live Zetaris tests, and four real-engine tests that need the H-MEM Node dependencies; set `RECALL_SKIP_REAL_HMEM=1` to skip those on purpose). No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
+The Python suite has **381 tests**; six skip by default (two live Zetaris tests, and four real-engine tests that need the H-MEM Node dependencies; set `RECALL_SKIP_REAL_HMEM=1` to skip those on purpose). No live model calls are made by the suite. The frontend build includes typechecking. H-MEM's own tests and conformance commands are in its [README](engines/hmem/README.md).
 
 ## Evidence of behaviour
 
@@ -227,9 +229,13 @@ The three reflection documents are there too: [time saved](docs/usl/2a-time-save
 
 Zetaris stores grounded Evidence, entities, links, loops and feedback through the JDBC repository. Meterless **H-MEM** expands entity-linked retrieval with governed, provenance-bearing memory. **Nightshift** routes every model call; **NVIDIA Nemotron 3 Ultra** handles Open Loop, Context and Critic decisions, while GPT-4o-mini handles perception through Nightshift. [Detailed integration and verified evidence](docs/sponsors.md).
 
-Limitations: food/shopping/travel only; intentions remain hypotheses; privacy filtering for context is a word list; geographic matching needs verified coordinates; no web/news scout; VERIFY_CONTEXT currently ends safely without a real verifier. H-MEM's reference embedder is a hash mock, with noisy marginal matches—not advanced semantic search. Without Nightshift access, sample mode answers only its bundled examples. Live model output can fail schema validation and fail safely.
+Limitations: food/shopping/travel only; intentions remain hypotheses; privacy filtering for context is a word list; geographic matching needs verified coordinates; web lookup is limited to saved-place addresses, with no general news/context scout; VERIFY_CONTEXT currently ends safely without a real verifier. H-MEM's reference embedder is a hash mock, with noisy marginal matches—not advanced semantic search. Without Nightshift access, sample mode answers only its bundled examples. Live model output can fail schema validation and fail safely.
 
 Pre-existing components: Meterless H-MEM's Apache-2.0 reference source/tests are vendored unmodified at commit `1742dec56a66e58eef9dda2d2b865823758ca8cd` ([notice](engines/hmem/NOTICE.md)). Third-party Python/npm dependencies are declared in requirements and package files. Recall's adapter, agent integration and app code are the hackathon work. No claim of Cursor usage is made.
+
+## Data and licensing
+
+The historical screenshot collection is supplied as sample Evidence; its contents do not establish confirmed user intentions. Apache-2.0 covers the project code, not an automatic relicensing of third-party screenshots. OpenStreetMap attribution and source details are documented in [the USL source notes](docs/usl/README.md).
 
 ## License
 

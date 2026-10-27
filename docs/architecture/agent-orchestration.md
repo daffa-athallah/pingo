@@ -76,7 +76,7 @@ The orchestrator (`RecallOrchestrator`) is **not an agent**: it makes no model d
 
 ## Shared state
 
-All agents go through one `LoopRepository` contract. In real mode it is `ZetarisRepository`, six Iceberg tables in Zetaris (`evidence`, `entities`, `evidence_entities`, `open_loops`, `loop_entities`, `context_events`). Agents never query Zetaris directly. Zetaris is the grounded data layer, not an agent. `SAMPLE_MODE=true` selects an in-memory repository and is never a silent fallback.
+All agents go through one `LoopRepository` contract. In real mode it is `ZetarisRepository`, the core Iceberg graph tables in Zetaris (`evidence`, `entities`, `evidence_entities`, `open_loops`, `loop_entities`, `context_events`), plus persisted context evaluations, notifications and Check-ins. See [the current sponsor/storage inventory](../sponsors.md). Agents never query Zetaris directly. Zetaris is the grounded data layer, not an agent. `SAMPLE_MODE=true` selects an in-memory repository and is never a silent fallback.
 
 ## Bounds and fail-safe silence
 
@@ -94,7 +94,7 @@ Each step emits a `TraceEvent`: `run_id`, `timestamp`, `agent`, `action`, `reaso
 
 A run's steps are recorded while it executes (`RunStore`), so a client can poll and see them arrive. For a screenshot upload, three wrappers at the composition boundary produce the events: the gateway (model call started/finished, receipt), the repository (the Evidence being stored, and exactly what the Open Loop Agent reads: related Evidence, related entities, candidate loops), and the agent's `decide` (the structured decision with confidence and supporting IDs). The before/after loop state (for example 3 → 4 supporting screenshots) is computed from the repository. None of this changes what an agent decides, and none of it contains model reasoning.
 
-Three workspaces never share runs or files: `canonical` (Zetaris), `demo` (in-memory copy of the saved history, resettable, real models, used to record the live demo) and `sample` (credential-free scripted fixture). Every run carries `provenance` (`live`, `scripted`, `recorded`) and `workspace`, and the shared-state step is labelled `ZETARIS` only when the repository really is Zetaris.
+Three workspaces never share runs or files: `canonical` (Zetaris), `demo` (in-memory copy of the saved history, resettable, real models, used to record the live demo) and `sample` (credential-free recorded replies plus explicitly labelled illustrative fixtures; optional live-input configuration). Every run carries `provenance` (`live`, `scripted`, `recorded`) and `workspace`, and the shared-state step is labelled `ZETARIS` only when the repository really is Zetaris.
 
 ## Model routing
 
@@ -103,7 +103,7 @@ Recall agent → ModelGateway → Meterless Nightshift → NVIDIA Nemotron 3 Ult
 Recall agent → ModelGateway → Meterless Nightshift → OpenAI GPT-4o-mini        (Evidence, vision)
 ```
 
-Nightshift is the gateway and router; it does not perform Recall's agent reasoning. It also keeps a loose response cache: a merely *similar* prompt can be answered with an earlier reply (observed: a 4 ms answer that belonged to a different Evidence record). Every reasoning payload therefore carries a unique `request_id`, so each call is a fresh model call. Nemotron does the reasoning. There is no direct NVIDIA or OpenAI path, and the gateway refuses NVIDIA endpoints.
+Nightshift is the gateway and router; it does not perform Recall's agent reasoning. It also keeps a loose response cache: a merely *similar* prompt can be answered with an earlier reply (observed: a 4 ms answer that belonged to a different Evidence record). Every reasoning payload therefore carries a unique `request_id`, to reduce cross-request cache collisions. A nonce is a mitigation, not independent proof of provider execution; inspect the response receipts and run provenance. Nemotron does the reasoning. There is no direct NVIDIA or OpenAI path, and the gateway refuses NVIDIA endpoints.
 
 ## Why this is an agent architecture, not a linear prompt chain
 
@@ -129,6 +129,8 @@ The Critic's `SURFACE` is rejected unless it cites both Evidence and context. Ex
 
 ## Real proof (verified in this working tree)
 
+This is a historical 26 October capture, not current database totals or current test counts. Its reported outcomes are preserved below. Later database counts are recorded in the [27 October USL run](../../usl/results/RUN.md). Current test instructions are in the root README.
+
 | Item | Result |
 | --- | --- |
 | Zetaris data | 30 Evidence, 65 entities, 69 Evidence↔entity links (`backend/scripts/zetaris_repository_smoke.py`) |
@@ -145,6 +147,8 @@ The Critic's `SURFACE` is rejected unless it cites both Evidence and context. Ex
 
 Synthetic inputs, stated plainly: the calendar events and the over-specific revision loop are test inputs. Everything else (Evidence, entities, loops, model decisions, receipts) is real.
 
-## Not implemented
+## Current scope and remaining limits
 
-Live calendar or location sources, web or news search (`REAL_WORLD_EVENT`), a real context verifier, any automatic loop dormancy, and Check-in questions other than loop-merge questions.
+The historical capture above predates several implemented extensions. Foreground browser GPS and synthetic location/calendar/time feed the shared context service; approved notifications are persisted separately from delivery. The Location Agent can search for a saved place's address and verify it against OpenStreetMap. Proactive ambiguity questions now enter Check-in, and persisted answers are reviewed by the Open Loop Agent. Notification feedback also returns to that agent; Dismiss alone does not invoke it. Inspiration feedback can make a loop dormant. These are not claims that every new path was exercised in the historical proof.
+
+Still absent: calendar OAuth, reliable closed-app background GPS/push, a general web/news context scout, and a wired real context verifier. `VERIFY_CONTEXT` safely stays silent. Pending proactive Check-ins persist across days; the daily consolidation flow is a separate source of merge questions. See [API contracts](../api.md) and [sponsor evidence](../sponsors.md).

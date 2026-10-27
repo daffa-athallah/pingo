@@ -17,6 +17,14 @@ The committed snapshot in `backend/demo/snapshot.json` has **30 Evidence, 65 ent
 
 Repository `unit_of_work` scopes related writes and compensates failed operations. This is **not a distributed multi-table ACID transaction**. A failed or uncertain compensation blocks subsequent writes pending reconciliation; the MVP runs one writer. Tests in `backend/tests/test_zetaris_repository.py`, `test_ingestion.py` and `test_bootstrap.py` cover graph consistency and failed loop application. Local live round-trip evidence is described in [architecture proof](architecture/agent-orchestration.md#real-proof-verified-in-this-working-tree); the default offline test suite does not claim live JDBC verification.
 
+## Zetaris USL: a separate cross-source audit layer
+
+The canonical agent repository above remains the application write/read path. In addition, `pingo_usl` provides five logical tables over three sources: native Iceberg application state, a CSV OpenStreetMap place directory, and a JSON export of agent decisions. This is a deployed semantic audit layer, not a claim that all agent reads already query the USL or that JSON exports stream live.
+
+The [27 October platform output](../usl/results/RUN.md) records 42 Evidence, 72 entities, 42 total intentions (including retired ones), 30 directory places and 349 exported events. The earlier sample snapshot intentionally has different counts. Data-quality checks found **two active intentions with no Evidence reachable through the entity graph** (40 valid, 2 invalid for that rule). Their underlying screenshots remain stored. This capture does not establish complete graph coverage; no repair is recorded here.
+
+Other checks constrain coordinates only when a place is marked verified, and confidence only to the numeric range 0–1; they do not prove universal geolocation coverage or calibrated model confidence. Some audit queries join decision text to loop titles; these are weaker than stable-ID joins. Read [source/DDL/query evidence](usl/README.md) and the three reflection documents there. Estimated time savings and the proposed `INFER_USL` feature are not measured performance or shipped capability.
+
 ## Meterless H-MEM: retrieval with provenance
 
 The reference engine is vendored unmodified in `engines/hmem/src`, with its license and [upstream commit notice](../engines/hmem/NOTICE.md). Recall adds `server.ts` and the Python boundary `backend/app/hmem.py`.
