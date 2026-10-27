@@ -219,7 +219,7 @@ def _cached(key, build):
 def _refresh_views(repository):
     """Stored data changed (an upload): drop the cached reads and rebuild them in the background."""
     with _view_lock:
-        for key in ('loops', 'evidence', 'zetaris'):
+        for key in [k for k in _view_cache if k in ('loops', 'evidence', 'zetaris') or k.startswith('checkins:')]:
             _view_cache.pop(key, None)
     Thread(target=lambda: (_cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}),
                            _cached('loops', lambda: _loop_views(repository))), daemon=True).start()
@@ -346,32 +346,38 @@ def check_ins(request: Request):
     repository = request.app.state.repository
     if not hasattr(repository, 'get_check_ins'):
         return {'questions': []}
-    views = {v['loop_id']: v for v in _cached('loops', lambda: _loop_views(repository))} if request.app.state.mode != 'sample' else {}
     base = str(request.base_url).rstrip('/')
-    questions = []
-    from backend.app.checkin_clarifications import KIND
-    for item in repository.get_check_ins(status='PENDING'):
-        if item.kind != KIND and item.day != _today():
-            continue
-        if request.app.state.mode != 'sample' and not all(i in views for i in (item.loop_id, item.other_loop_id) if i):
-            continue  # a loop was merged or retired since the question was made
-        question = {key: value for key, value in item.question.items() if not key.startswith('_')}
-        if item.kind == KIND:
-            if item.loop_id:
-                target = repository.get_open_loop(item.loop_id)
-                if not target or target.status not in (LoopStatus.OPEN, LoopStatus.ACTIVE):
-                    continue
-            evidence = [repository.get_evidence(eid) for eid in item.question.get('_evidence_ids', [])]
-            if not evidence or any(e is None or e.sensitive for e in evidence):
+
+    def build():
+        views = {v['loop_id']: v for v in _cached('loops', lambda: _loop_views(repository))} if request.app.state.mode != 'sample' else {}
+        questions = []
+        from backend.app.checkin_clarifications import KIND
+        for item in repository.get_check_ins(status='PENDING'):
+            if item.kind != KIND and item.day != _today():
                 continue
-            question['supporting_images'] = [{'url': f'{base}/evidence/{e.evidence_id}/image?w=600', 'alt': e.summary}
-                                              for e in evidence if e.image_ref][:3]
+            if request.app.state.mode != 'sample' and not all(i in views for i in (item.loop_id, item.other_loop_id) if i):
+                continue  # a loop was merged or retired since the question was made
+            question = {key: value for key, value in item.question.items() if not key.startswith('_')}
+            if item.kind == KIND:
+                if item.loop_id:
+                    target = repository.get_open_loop(item.loop_id)
+                    if not target or target.status not in (LoopStatus.OPEN, LoopStatus.ACTIVE):
+                        continue
+                evidence = [repository.get_evidence(eid) for eid in item.question.get('_evidence_ids', [])]
+                if not evidence or any(e is None or e.sensitive for e in evidence):
+                    continue
+                question['supporting_images'] = [{'url': f'{base}/evidence/{e.evidence_id}/image?w=600', 'alt': e.summary}
+                                                  for e in evidence if e.image_ref][:3]
+                questions.append(question)
+                continue
+            question['supporting_images'] = [
+                {'url': f"{base}{views[i]['screenshots'][0]['image_url']}?w=600", 'alt': short(views[i]['title'])}
+                for i in (item.loop_id, item.other_loop_id) if i in views and views[i]['screenshots']]
             questions.append(question)
-            continue
-        question['supporting_images'] = [
-            {'url': f"{base}{views[i]['screenshots'][0]['image_url']}?w=600", 'alt': short(views[i]['title'])}
-            for i in (item.loop_id, item.other_loop_id) if i in views and views[i]['screenshots']]
-        questions.append(question)
+        return questions
+
+    # Zetaris round-trips are slow: the question list is cached briefly and dropped whenever a question is answered or an upload changes data.
+    questions = _cached(f'checkins:{base}', build) if request.app.state.mode != 'sample' else build()
     return {'questions': questions}
 
 
@@ -403,6 +409,8 @@ async def respond_to_check_in(request: Request, check_in_id: str, answer: CheckI
             raise HTTPException(422, str(exc)) from None
         with _view_lock:
             _view_cache.pop('loops', None)
+            for key in [k for k in _view_cache if k.startswith('checkins:')]:
+                _view_cache.pop(key, None)
         return result
     if answer.response not in CHECK_IN_RESPONSES:
         raise HTTPException(status_code=422, detail='Unknown response.')
@@ -416,6 +424,8 @@ async def respond_to_check_in(request: Request, check_in_id: str, answer: CheckI
     repository.save_check_in(replace(item, status='ANSWERED', response=answer.response, comment=(answer.comment or '').strip() or None, answered_at=now))
     with _view_lock:
         _view_cache.pop('loops', None)
+        for key in [k for k in _view_cache if k.startswith('checkins:')]:
+            _view_cache.pop(key, None)
     return {'ok': True}
 
 

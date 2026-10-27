@@ -32,7 +32,7 @@ function isQuestion(value: unknown): value is CheckInQuestion {
 }
 
 async function request(path: string, init?: RequestInit) {
-  const timeout = AbortSignal.timeout(init?.method === 'POST' ? 60000 : 15000)
+  const timeout = AbortSignal.timeout(init?.method === 'POST' ? 60000 : 60000)
   const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${path}`, { ...init, signal: init?.signal ? AbortSignal.any([init.signal, timeout]) : timeout })
   if (!response.ok) throw new Error('Check-in request failed')
   return response
