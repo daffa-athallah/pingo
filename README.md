@@ -12,17 +12,37 @@ People save places, products and trips in screenshots, then forget them when the
 
 ## What it looks like
 
-Pingo is built phone-first. These are screenshots from a phone.
+Pingo is built phone-first. Screenshots from a phone:
 
-| Home | One intention | Check-in |
-| --- | --- | --- |
-| <img src="docs/images/home.jpg" alt="Home: saved intentions inferred from screenshots" width="240"> | <img src="docs/images/intention-detail.jpg" alt="An inferred intention with its supporting screenshots" width="240"> | <img src="docs/images/check-in.jpg" alt="A clarifying question Pingo asks before assuming" width="240"> |
-| Intentions inferred from saved screenshots. | One intention, labelled as inferred and not a reminder you created, with the screenshots behind it. | Pingo asks instead of assuming; "See why Pingo asked" opens the run that led to the question. |
-
-| Agents: Orchestra | Agents: Trace |
-| --- | --- |
-| <img src="docs/images/agent-orchestra.jpg" alt="Four agents around Zetaris shared state, with Nightshift, Meterless and H-MEM" width="240"> | <img src="docs/images/agent-trace.jpg" alt="Agent trace: Evidence Agent extracting from a screenshot, GPT-4o mini via Nightshift" width="240"> |
-| Evidence, Open Loop, Context and Critic share state in Zetaris; Nightshift routes the models and H-MEM supplies memory. | Each step names the agent, what it found and which model answered through Nightshift. |
+<table>
+  <tr>
+    <td width="20%" valign="top" align="center">
+      <img src="docs/images/home.png" alt="Home: saved intentions inferred from screenshots" width="100%"><br>
+      <b>Home</b><br>
+      <sub>Intentions inferred from what you saved</sub>
+    </td>
+    <td width="20%" valign="top" align="center">
+      <img src="docs/images/intention-detail.png" alt="An inferred intention with the screenshots behind it" width="100%"><br>
+      <b>One intention</b><br>
+      <sub>Labelled as inferred, never as a plan you made</sub>
+    </td>
+    <td width="20%" valign="top" align="center">
+      <img src="docs/images/agent-orchestra.png" alt="Four agents around Zetaris shared state" width="100%"><br>
+      <b>Orchestra</b><br>
+      <sub>Four agents, shared state in Zetaris</sub>
+    </td>
+    <td width="20%" valign="top" align="center">
+      <img src="docs/images/agent-trace.png" alt="Agent trace with the model that answered" width="100%"><br>
+      <b>Trace</b><br>
+      <sub>Each step names the agent and the model</sub>
+    </td>
+    <td width="20%" valign="top" align="center">
+      <img src="docs/images/check-in.png" alt="A clarifying question before assuming" width="100%"><br>
+      <b>Check-in</b><br>
+      <sub>Asks instead of assuming</sub>
+    </td>
+  </tr>
+</table>
 
 ## Try it without credentials
 
