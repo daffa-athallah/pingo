@@ -9,7 +9,7 @@
     </td>
     <td valign="middle">
       <b>Demo video</b> (under 4 minutes): <a href="https://youtu.be/enej8bwDVBk">watch on YouTube</a><br>
-      <b>Pitch deck:</b> <a href="https://drive.google.com/file/d/1KVgWwuCpI6_V_1MbzYgOlLEtZBbZphyi/view?usp=share_link">open the slides</a><br>
+      <b>Pitch deck:</b> <a href="https://drive.google.com/file/d/1KVgWwuCpI6_V_1MbzYgOILEtZBbZphyi/view?usp=sharing">open the slides</a><br>
       <b>Track:</b> Reasoning Architecture &middot; Team green noodles
     </td>
   </tr>
