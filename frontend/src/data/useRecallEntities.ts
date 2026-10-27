@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getOpenLoopViews, imageUrl } from '../services/api'
+import { API_BASE_URL, getOpenLoopViews, imageUrl } from '../services/api'
 import type { OpenLoopViewResponse } from '../services/api'
 import { mockEntities } from './mockData'
 import type { RecallCategory, RecallEntity } from '../types/recall'
@@ -15,6 +15,11 @@ function splitTitle(title: string, fallbackPlace: string | null): { name: string
   return { name: match[1], place: short ? parts.join(', ') : fallbackPlace ?? undefined }
 }
 
+/** A cover chosen by the Cover Agent is cached and served by the backend, so its path is relative to the API. */
+function withBackendCover(image: RecallEntity['catalogueImage']): RecallEntity['catalogueImage'] {
+  return image && image.url.startsWith('/covers/') ? { ...image, url: API_BASE_URL.replace(/\/$/, '') + image.url } : image
+}
+
 export function entityFromLoop(loop: OpenLoopViewResponse): RecallEntity {
   const category = loop.domain as RecallCategory
   const distinctShots = [...new Map(loop.screenshots.map(shot => [shot.evidence_id, shot])).values()]
@@ -27,7 +32,7 @@ export function entityFromLoop(loop: OpenLoopViewResponse): RecallEntity {
     ...(({ name, place }) => ({ name, location: place }))(splitTitle(loop.title, loop.location)),
     screenshotCount: distinctShots.length,
     inferredIntention: loop.title,
-    catalogueImage: verifiedCatalogueImage(loop),
+    catalogueImage: withBackendCover(verifiedCatalogueImage(loop)),
     latestScreenshotAt: latest === undefined ? undefined : new Date(latest).toISOString(),
     screenshots,
   }

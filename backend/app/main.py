@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 from zoneinfo import ZoneInfo
 
 from backend.app.adapters.zetaris import ZetarisError
+from backend.app import covers
 from backend.app.bootstrap import app_mode, live_models, open_repository
 from backend.app.context_api import router as context_router
 from backend.app.demo_workspace import SnapshotError, read_snapshot, seed, workspace_info
@@ -246,6 +247,8 @@ def _loop_views(repository):
             'screenshot_count': sum(1 for e in shown if e.image_ref),
             'screenshots': [{'evidence_id': e.evidence_id, 'summary': e.summary, 'timestamp': e.timestamp,
                              'image_url': f'/evidence/{e.evidence_id}/image'} for e in shown if e.image_ref],
+            # One entity, one verified cover chosen by the Cover Agent; several entities have no single representative.
+            'catalogue_images': [row for row in [covers.view_for(loop_entities[0])] if row] if len(loop_entities) == 1 else [],
         })
     views.sort(key=lambda v: (v['updated_at'], v['loop_id']), reverse=True)
     return views
@@ -433,6 +436,14 @@ async def reset_demo_workspace(request: Request):
 # Context simulation and notifications (additive routes; agent and orchestrator contracts are unchanged).
 from backend.app.context.routes import router as notifications_router  # noqa: E402
 app.include_router(notifications_router)
+
+@app.get('/covers/{name}')
+def cover_image(name: str):
+    path = (covers.COVERS / name).resolve()
+    if Path(name).name != name or path.parent != covers.COVERS.resolve() or not path.is_file():
+        raise HTTPException(status_code=404, detail='Cover not found.')
+    return FileResponse(path, media_type='image/jpeg', headers={'Cache-Control': 'public, max-age=86400'})
+
 
 from backend.app.sample_api import router as sample_router
 app.include_router(sample_router)

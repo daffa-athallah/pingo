@@ -5,7 +5,7 @@ export type CollectionSort = 'recent' | 'screenshots'
 
 /** Presentation URLs may be public HTTPS or app media; never laptop file paths or data URLs. */
 function isMediaUrl(value: string): boolean {
-  if (/^\/(?:media|images|catalogue)\//.test(value)) return !value.includes('..') && !value.startsWith('//')
+  if (/^\/(?:media|images|catalogue|covers)\//.test(value)) return !value.includes('..') && !value.startsWith('//')
   try {
     const url = new URL(value)
     return url.protocol === 'https:' && !url.username && !url.password

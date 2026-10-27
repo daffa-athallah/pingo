@@ -21,7 +21,8 @@ from fastapi.responses import JSONResponse
 
 from dataclasses import replace
 
-from backend.app import geocode
+from backend.app import covers, geocode
+from backend.app.cover_service import ensure_cover
 from backend.app.adapters.nightshift import ModelGatewayError
 from backend.app.bootstrap import build_orchestrator, live_models, sample_mode
 from backend.app.context_api import _gateway
@@ -127,6 +128,23 @@ async def _locate(state, recorder, evidence_id: str) -> list[dict]:
     return rows
 
 
+async def _cover(state, recorder, gateway, result) -> None:
+    """A new or updated single-subject intention gets a cover photo (see cover_service). Sensitive Evidence and multi-subject intentions never do."""
+    try:
+        if not result.loop_id or result.evidence_id is None or not (covers.provider_configured()):
+            return
+        repository = state.repository
+        evidence = repository.get_evidence(result.evidence_id)
+        loop = repository.get_open_loop(result.loop_id)
+        links = repository.get_loop_entities([result.loop_id])
+        entities = repository.get_entities(sorted({k.entity_id for k in links}))
+        if evidence is None or evidence.sensitive or loop is None or len(entities) != 1 or entities[0].domain not in ('food', 'shopping', 'travel'):
+            return
+        await ensure_cover(repository, entities[0], f'{loop.title}. {evidence.summary}', ObservedGateway(gateway, UploadObserver(recorder, repository, image_ref='cover')), emit=recorder.emit)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 async def _process(state, recorder, path: Path, digest: str) -> None:
     repository = state.repository
     uploads = state.uploads_dir
@@ -143,6 +161,7 @@ async def _process(state, recorder, path: Path, digest: str) -> None:
                 orchestrator = build_orchestrator(ObservedGateway(gateway, observer), agent_repository)
                 observer.wrap_decide(orchestrator.open_loop_agent)
                 result = await orchestrator.ingest_screenshot(path)
+                await _cover(state, recorder, gateway, result)
             if result.evidence_id is None:  # nothing was stored: do not keep an orphan file
                 path.unlink(missing_ok=True)
                 for event in result.trace_events:
