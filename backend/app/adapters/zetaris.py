@@ -75,10 +75,12 @@ class ZetarisJdbc:
         self.settings = settings
         self._connector = connector
         self._connection: Any = None
+        self._wanted = False  # connect() was called and close() was not: a dropped connection is reopened, never left dead
         self._lock = RLock()
 
     def connect(self) -> ZetarisJdbc:
         with self._lock:
+            self._wanted = True
             if self._connection is not None:
                 return self
             java_major_version()
@@ -101,26 +103,48 @@ class ZetarisJdbc:
 
         Parameter binding must be verified against the live driver before a
         repository relies on it; this adapter does not interpolate values.
-        """
+
+        A long-lived JDBC connection can die (the driver restarted, an idle timeout). A failed statement therefore drops the connection, and a read
+        (SELECT) is retried once on a fresh one. A write is never replayed: it fails, and the next statement opens a new connection."""
         with self._lock:
             if self._connection is None:
-                raise ZetarisError('JDBC connection is not open.')
-            cursor = None
+                if not self._wanted:
+                    raise ZetarisError('JDBC connection is not open.')
+                self.connect()
             try:
-                cursor = self._connection.cursor()
-                if parameters:
-                    cursor.execute(sql, tuple(parameters))
-                else:
-                    cursor.execute(sql)
-                return [tuple(row) for row in cursor.fetchall()] if cursor.description else []
+                return self._execute(sql, parameters)
             except Exception:
+                self._drop()
+                if not sql.lstrip().upper().startswith('SELECT'):
+                    raise ZetarisError('Zetaris statement failed; SQL, parameters and server response withheld.') from None
+            try:
+                self.connect()
+                return self._execute(sql, parameters)
+            except Exception:
+                self._drop()
                 raise ZetarisError('Zetaris statement failed; SQL, parameters and server response withheld.') from None
-            finally:
-                if cursor is not None:
-                    try:
-                        cursor.close()
-                    except Exception:
-                        pass
+
+    def _execute(self, sql: str, parameters: Sequence[Any]) -> list[tuple]:
+        cursor = self._connection.cursor()
+        try:
+            if parameters:
+                cursor.execute(sql, tuple(parameters))
+            else:
+                cursor.execute(sql)
+            return [tuple(row) for row in cursor.fetchall()] if cursor.description else []
+        finally:
+            try:
+                cursor.close()
+            except Exception:
+                pass
+
+    def _drop(self) -> None:
+        connection, self._connection = self._connection, None
+        if connection is not None:
+            try:
+                connection.close()
+            except Exception:
+                pass
 
     def supports_transactions(self) -> bool | None:
         if self._connection is None:
@@ -132,6 +156,7 @@ class ZetarisJdbc:
 
     def close(self) -> None:
         with self._lock:
+            self._wanted = False
             connection, self._connection = self._connection, None
             if connection is not None:
                 try:

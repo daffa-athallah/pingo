@@ -142,10 +142,12 @@ def _valid_result(item):
 def _in_area(item, area):
     """Whole address components, never a city name occurring inside a business name."""
     wanted = _norm(area)
+    # "Clayton Campus" names the suburb Clayton; the map only has the suburb as an address component.
+    wanted_forms = {wanted, re.sub(r' (campus|university|uni)$', '', wanted)} - {''}
     address = item.get('address') or {}
     values = list(address.values()) if isinstance(address, dict) else []
     values += str(item.get('display_name', '')).split(',')
-    return any(_norm(str(value)) == wanted or _norm(str(value)) == 'city of ' + wanted for value in values)
+    return any(_norm(str(value)) in wanted_forms or _norm(str(value)) in {'city of ' + w for w in wanted_forms} for value in values)
 
 
 def _candidates(results) -> list[dict]:

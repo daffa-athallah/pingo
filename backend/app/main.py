@@ -50,6 +50,16 @@ def _paths(mode: str) -> tuple[Path, Path]:
     return base / 'uploads', base / 'live_runs'
 
 
+def _keep_zetaris_alive(repository, every: float = 45.0):
+    """A cheap read on a timer, so a dead JDBC connection is noticed and reopened (see ZetarisJdbc.query) before a person opens the app."""
+    while True:
+        time.sleep(every)
+        try:
+            repository.connection.query('SELECT 1')
+        except Exception:  # noqa: BLE001 - the next real request retries; nothing here may stop the loop
+            pass
+
+
 @asynccontextmanager
 async def lifespan(app):
     mode = app_mode()
@@ -85,6 +95,8 @@ async def lifespan(app):
             Thread(target=lambda: (_cached('evidence', lambda: {e.evidence_id: e for e in repository.list_evidence()}),
                                    _cached('loops', lambda: _loop_views(repository)),
                                    _cached('zetaris', lambda: _zetaris_counts(repository))), daemon=True).start()
+            if mode == 'real':
+                Thread(target=_keep_zetaris_alive, args=(repository,), daemon=True).start()
         yield
 
 

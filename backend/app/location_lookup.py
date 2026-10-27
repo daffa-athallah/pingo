@@ -4,6 +4,7 @@ The current upload boundary calls this once after a saved screenshot. Existing d
 use the same operation explicitly. Provider replies are never described as model output.
 """
 import asyncio
+import base64
 from contextlib import nullcontext
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
@@ -11,6 +12,15 @@ import hashlib
 import json
 
 from backend.app import geocode
+
+def _pack(candidates) -> str:
+    """Zetaris strips the backslash from \\" inside a stored value, which corrupts the entity row; base64 has no characters that need escaping."""
+    return 'b64:' + base64.b64encode(json.dumps(candidates, ensure_ascii=False).encode()).decode()
+
+
+def _unpack(text: str):
+    return json.loads(base64.b64decode(text[4:]).decode()) if text.startswith('b64:') else json.loads(text)
+
 
 
 def utcnow():
@@ -79,7 +89,7 @@ async def enrich_entities(repository, entities, *, emit=None, resolver=None, clo
             continue
         if not force and not retry_due(entity, clock()):
             try:
-                candidates = json.loads(entity.metadata.get('location_lookup_candidates', '[]'))
+                candidates = _unpack(entity.metadata.get('location_lookup_candidates', '[]'))
                 candidates = candidates if isinstance(candidates, list) else []
             except ValueError:
                 candidates = []
@@ -109,8 +119,8 @@ async def enrich_entities(repository, entities, *, emit=None, resolver=None, clo
                 metadata = {**current.metadata, 'location_lookup_status': status, 'location_lookup_at': now.isoformat(),
                             'location_lookup_signature': signature(current),
                             'location_lookup_retry_at': (now + timedelta(seconds=300 if status == 'unavailable' else 86400)).isoformat(),
-                            'location_lookup_reason': str(found.get('reason', 'Matched a unique map result.'))[:500],
-                            'location_lookup_candidates': json.dumps(candidates, ensure_ascii=False)}
+                            'location_lookup_reason': str(found.get('reason', 'Matched a unique map result.'))[:500].replace('"', "'"),
+                            'location_lookup_candidates': _pack(candidates)}
                 if status == 'resolved':
                     metadata = geocode.metadata_for(replace(current, metadata=metadata), found)
                 else:

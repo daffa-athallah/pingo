@@ -90,8 +90,33 @@ class JdbcBoundaryTests(unittest.TestCase):
                 jdbc.query('SELECT private_content')
         self.assertNotIn('offline-secret', str(error.exception))
         self.assertNotIn('private_content', str(error.exception))
-        cursor.close.assert_called_once()
-        connection.close.assert_called_once()
+        self.assertEqual(cursor.close.call_count, 2)  # a read is retried once on a fresh connection, and every cursor is closed
+        self.assertEqual(connection.close.call_count, 2)
+
+    @patch('backend.app.adapters.zetaris.java_major_version', return_value=11)
+    def test_read_on_a_dead_connection_reconnects_and_succeeds(self, _java):
+        dead, alive = Mock(), Mock()
+        dead.cursor.return_value.execute.side_effect = RuntimeError('connection reset')
+        alive.cursor.return_value.fetchall.return_value = [(1,)]
+        alive.cursor.return_value.description = [('x',)]
+        connector = Mock(side_effect=[dead, alive])
+        with ZetarisJdbc(self.settings(), connector=connector) as jdbc:
+            self.assertEqual(jdbc.query('SELECT 1'), [(1,)])
+        self.assertEqual(connector.call_count, 2)
+        dead.close.assert_called_once()
+
+    @patch('backend.app.adapters.zetaris.java_major_version', return_value=11)
+    def test_write_on_a_dead_connection_is_not_replayed_but_the_next_statement_reconnects(self, _java):
+        dead, alive = Mock(), Mock()
+        dead.cursor.return_value.execute.side_effect = RuntimeError('connection reset')
+        alive.cursor.return_value.fetchall.return_value = [(2,)]
+        alive.cursor.return_value.description = [('x',)]
+        connector = Mock(side_effect=[dead, alive])
+        with ZetarisJdbc(self.settings(), connector=connector) as jdbc:
+            with self.assertRaises(ZetarisError):
+                jdbc.query('INSERT INTO t VALUES (?)', [1])
+            dead.cursor.return_value.execute.assert_called_once()  # never executed twice
+            self.assertEqual(jdbc.query('SELECT 2'), [(2,)])
 
     @patch('backend.app.adapters.zetaris.java_major_version', return_value=11)
     def test_connection_failure_is_sanitized(self, _java):

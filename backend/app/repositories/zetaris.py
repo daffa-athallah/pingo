@@ -58,7 +58,11 @@ def _limit(value: int) -> str:
 
 
 def _entity(row) -> Entity:
-    return Entity(*row[:-1], metadata=json.loads(row[-1]))
+    try:
+        metadata = json.loads(row[-1])
+    except ValueError:  # the driver can strip the backslash from \" inside a stored value; one damaged row must not take every read down with it
+        metadata = {}
+    return Entity(*row[:-1], metadata=metadata)
 
 
 def _loop(row) -> OpenLoop:
