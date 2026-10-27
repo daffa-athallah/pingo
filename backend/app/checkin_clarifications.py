@@ -16,6 +16,7 @@ from backend.app.domain.models import CheckIn, LoopStatus
 
 KIND = 'AGENT_CLARIFICATION'
 ACTIVE = {LoopStatus.OPEN, LoopStatus.ACTIVE}
+SCENERY = {'travel', 'destination'}
 
 
 def now():
@@ -38,6 +39,8 @@ def receipt(gateway):
 def grounding(repo, evidence_ids, entity_ids):
     evidence = [repo.get_evidence(eid) for eid in evidence_ids]
     entities = repo.get_entities(entity_ids)
+    if evidence and not entity_ids and all(e is not None and not e.sensitive and e.domain in SCENERY for e in evidence):
+        return evidence, []  # a travel photo with only a city or region: no named place to link, the screenshot itself is the grounding
     if not evidence or any(e is None or e.sensitive for e in evidence) or not entities:
         raise ValueError('Non-sensitive linked grounding is required.')
     links = repo.get_evidence_entities(evidence_ids)
@@ -54,7 +57,7 @@ def available(repo, entity_ids, stamp):
     if sum(item.status == 'PENDING' for item in items) >= 3:
         return False
     for item in items:
-        if set(item.question.get('_entity_ids', [])) != set(entity_ids):
+        if set(item.question.get('_key', item.question.get('_entity_ids', []))) != set(entity_ids):
             continue
         if item.status == 'PENDING':
             return False
@@ -65,9 +68,10 @@ def available(repo, entity_ids, stamp):
 
 def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_id=None, model_receipt=None, run_id=None, clock=now):
     stamp = clock()
-    if not available(repo, [e.entity_id for e in entities], stamp):
+    key = [e.entity_id for e in entities] or [e.evidence_id for e in evidence]  # one question per named thing, or per photo when nothing is named
+    if not available(repo, key, stamp):
         return None
-    digest = hashlib.sha256((' '.join(sorted(e.entity_id for e in entities)) + '|' + uncertainty).encode()).hexdigest()[:16]
+    digest = hashlib.sha256((' '.join(sorted(key)) + '|' + uncertainty).encode()).hexdigest()[:16]
     qid = f'clarify_{stamp.strftime("%Y%m%d%H%M%S%f")}_{digest}'
     domain = evidence[0].domain
     if domain not in {'shopping', 'food', 'travel', 'destination'}:
@@ -78,7 +82,7 @@ def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_
         'supporting_images': [], 'options': [*options,
             {'value': 'other', 'label': 'Something else', 'allows_comment': True, 'comment_required': True},
             {'value': 'not_sure', 'label': 'Not sure yet'}],
-        '_evidence_ids': [e.evidence_id for e in evidence], '_entity_ids': [e.entity_id for e in entities],
+        '_evidence_ids': [e.evidence_id for e in evidence], '_entity_ids': [e.entity_id for e in entities], '_key': key,
         '_uncertainty': uncertainty, '_origin': origin, '_receipt': model_receipt}
     item = CheckIn(qid, stamp.astimezone(ZoneInfo('Australia/Melbourne')).date().isoformat(), KIND,
                    loop_id or '', None, question, 'PENDING', stamp.isoformat())
@@ -86,26 +90,46 @@ def queue(repo, evidence, entities, *, text, options, uncertainty, origin, loop_
     return qid
 
 
+AREAS = {'city', 'region', 'state', 'country', 'suburb', 'area', 'location'}
+
+
+def only_an_area(evidence, entities):
+    """A travel or scenery photo that names no specific place, at most a city or region: worth asking about even when the agent was confident."""
+    return evidence.domain in SCENERY and all(e.entity_type.lower() in AREAS for e in entities)
+
+
 async def after_upload(agent, repo, decision, result, emit, run_id=None):
-    """Called only when the real Open Loop decision reports material uncertainty."""
-    if not decision or not decision.material_uncertainty or not result.evidence_id:
+    """Called when the real Open Loop decision reports material uncertainty, or the photo shows scenery with no specific place."""
+    if not decision or not result.evidence_id:
+        return None
+    uncertainty = decision.material_uncertainty
+    if not uncertainty:
+        try:
+            shown = repo.get_evidence(result.evidence_id)
+            names = repo.get_entities(sorted({l.entity_id for l in repo.get_evidence_entities([result.evidence_id])}))
+            if shown is not None and not shown.sensitive and only_an_area(shown, names):
+                uncertainty = 'This looks like a travel or scenery photo that shows only a city or region, not a specific place, so it is unclear where or whether the person wants to go.'
+        except Exception:
+            return None
+    if not uncertainty:
         return None
     try:
         links = repo.get_evidence_entities([result.evidence_id])
         entity_ids = sorted({link.entity_id for link in links})
         shown = repo.get_evidence(result.evidence_id)
-        if shown is not None and not shown.sensitive and (shown.domain not in {'shopping', 'food', 'travel', 'destination'} or not entity_ids):
+        if shown is not None and not shown.sensitive and (shown.domain not in {'shopping', 'food', 'travel', 'destination'}
+                                                          or (not entity_ids and shown.domain not in SCENERY)):
             emit('CHECK_IN', 'NOT_QUEUED', 'The Open Loop Agent was unsure, but Pingo only asks about food, shopping and places, and this screenshot has no such subject, so no question is asked.', next_step='STOP')
             return None
         evidence, entities = grounding(repo, [result.evidence_id], entity_ids)
-        if not available(repo, entity_ids, now()):
+        if not available(repo, entity_ids or [result.evidence_id], now()):
             emit('CHECK_IN', 'NOT_QUEUED', 'The Open Loop Agent was unsure, but a question is already waiting for this or too many are open (at most 3), so no new one is added.', next_step='STOP')
             return None
         async with aio.timeout(30):
             for attempt in range(2):
                 try:
                     agent.gateway.last_routing = {}
-                    generated = await agent.clarification_question(evidence, entities, decision.material_uncertainty)
+                    generated = await agent.clarification_question(evidence, entities, uncertainty)
                     routing = receipt(agent.gateway)
                     break
                 except Exception:
@@ -114,9 +138,10 @@ async def after_upload(agent, repo, decision, result, emit, run_id=None):
                     emit('OPEN_LOOP', 'RETRY', 'Clarification generation failed; retrying once.', next_step='OPEN_LOOP')
         with scope(repo):
             qid = queue(repo, evidence, entities, text=generated['question'], options=generated['options'],
-                uncertainty=decision.material_uncertainty, origin='OPEN_LOOP', loop_id=result.loop_id, model_receipt=routing, run_id=run_id)
+                uncertainty=uncertainty, origin='OPEN_LOOP', loop_id=result.loop_id, model_receipt=routing, run_id=run_id)
         if qid:
-            emit('OPEN_LOOP', 'ASK', 'A material uncertainty needs the person’s answer.',
+            emit('OPEN_LOOP', 'ASK', 'A material uncertainty needs the person’s answer.' if decision.material_uncertainty
+                 else 'The photo shows only a city or region, not a specific place, so Pingo asks what you have in mind.',
                  input_refs=[f'evidence:{result.evidence_id}'], output_ref=f'checkin:{qid}', next_step='CHECK_IN', receipt=routing)
             emit('CHECK_IN', 'QUEUED', 'The question was added to Check-in and waits for your answer. Your answer goes back to the Open Loop Agent, which then creates or updates the intention.',
                  input_refs=[f'checkin:{qid}'], next_step='OPEN_LOOP')

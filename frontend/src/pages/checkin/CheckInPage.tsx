@@ -20,12 +20,6 @@ function Flow({ questions: initialQuestions }: { questions: CheckInQuestion[] })
   const mounted = useRef(true)
   const navigate = useNavigate()
   useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
-  useEffect(() => {
-    if (index > 0) {
-      window.scrollTo(0, 0)
-      focusTarget.current?.focus({ preventScroll: true })
-    }
-  }, [index])
   const question = questions[index]
 
   async function respond(answer: CheckInResponse) {

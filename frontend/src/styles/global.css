@@ -1065,3 +1065,5 @@ h1, h2 { font-weight: 600; letter-spacing: -.025em; }
 .checkin-dots { display: flex; gap: 7px; }
 .checkin-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(214, 117, 40, 0.25); transition: width 0.2s, background 0.2s; }
 .checkin-dots i.is-current { width: 20px; border-radius: 4px; background: #d67528; }
+
+.checkin-page h1:focus, .checkin-page h1:focus-visible { outline: none; box-shadow: none; }

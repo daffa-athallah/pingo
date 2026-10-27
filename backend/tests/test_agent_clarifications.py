@@ -58,6 +58,19 @@ class ClarificationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([e[0][1] for e in emitted[-2:]], ['ASK', 'QUEUED'])
         self.assertEqual(len(gateway.calls), 1)
 
+    async def test_scenery_with_only_a_city_asks_without_a_named_place(self):
+        from backend.app.domain.models import Evidence
+        scene = Evidence('ev_scene', 'upload', 'travel', 'A mountain valley at sunrise; the caption only says Queenstown.', NOW.isoformat(), False, 'high', 'scene.png')
+        self.repo.save_evidence(scene, [], [])
+        gateway = FeedbackGateway(QUESTION)
+        emitted = []
+        qid = await after_upload(OpenLoopAgent(gateway, self.repo), self.repo, SimpleNamespace(material_uncertainty=None),
+            SimpleNamespace(evidence_id='ev_scene', loop_id=None), lambda *a, **k: emitted.append(a))
+        self.assertIsNotNone(qid)
+        self.assertEqual(self.repo.get_check_in(qid).question['_entity_ids'], [])
+        self.assertEqual(self.repo.get_check_in(qid).question['_key'], ['ev_scene'])
+        self.assertEqual([e[1] for e in emitted[-2:]], ['ASK', 'QUEUED'])
+
     async def test_confident_upload_does_not_call_model(self):
         gateway = FeedbackGateway()
         result = await after_upload(OpenLoopAgent(gateway, self.repo), self.repo, SimpleNamespace(material_uncertainty=None),
