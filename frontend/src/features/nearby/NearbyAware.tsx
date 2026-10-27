@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
 import { evaluateContext, getContextEntities, getOpenLoopViews } from '../../services/api'
 import { getHealth } from '../../services/runsApi'
+import { failCheck, finishCheck, startCheck } from './nearbyStore'
 import type { ContextInput } from '../../services/api'
 import { contextPlaces } from '../../pages/context/contextPresets'
 import type { VerifiedPlace } from '../../pages/context/contextPresets'
@@ -55,15 +56,16 @@ export default function NearbyAware() {
     setStatus('Allow location for nearby reminders')
     async function ask(latitude: number, longitude: number, accuracy: number, at: number, name: string, distance: number) {
       if (busy.current) return
-      busy.current = true; setStatus(`Near ${name} · ${Math.round(distance)} m · checking…`)
+      busy.current = true; setStatus(`Near ${name} · ${Math.round(distance)} m · checking…`); startCheck(name, distance)
       try {
         const iso = new Date(at).toISOString()
         const event: ContextInput = { context_id: `ctx_${crypto.randomUUID()}`, source: 'BROWSER', type: 'LOCATION', timestamp: iso,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, location: { latitude, longitude, accuracy_meters: accuracy } }
         const response = await evaluateContext([event], iso)
+        finishCheck(response, name)
         window.dispatchEvent(new Event('pingo-notifications-changed'))
         setStatus(response.notification_id ? `Pinged you about ${name}` : `${name}: nothing to say`)
-      } catch { setStatus('Could not check just now') }
+      } catch { failCheck(); setStatus('Could not check just now') }
       finally { busy.current = false }
     }
     const id = navigator.geolocation.watchPosition((pos) => {

@@ -14,6 +14,13 @@ export default function BottomNav() {
         </svg>
         Home
       </NavLink>
+      <NavLink to="/agent-activity" className={({ isActive }) => `bottom-nav-link${isActive ? ' is-active' : ''}`}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="6.5" cy="7" r="2.6" /><circle cx="17.5" cy="7" r="2.6" /><circle cx="6.5" cy="17" r="2.6" /><circle cx="17.5" cy="17" r="2.6" />
+          <path d="M9 7h6M9 17h6M6.5 9.6v4.8M17.5 9.6v4.8" />
+        </svg>
+        Agents
+      </NavLink>
       <NavLink to="/check-in" className={({ isActive }) => `bottom-nav-link${isActive ? ' is-active' : ''}`}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <rect x="4" y="4" width="16" height="16" rx="5" />

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../../services/api'
-import { getHealth, getRunRecord, resetDemo, resetSample, setEntityLocation, startUpload } from '../../services/runsApi'
+import { getHealth, getRunRecord, resetDemo, resetSample, startUpload } from '../../services/runsApi'
 import type { Health, RunRecord } from '../../services/runsApi'
+import LocationPrompts from './LocationPrompts'
 import PipelineFlow from './PipelineFlow'
 import './demo.css'
 
@@ -16,9 +17,6 @@ export default function DemoUpload() {
   const [run, setRun] = useState<RunRecord | null>(null)
   const [busy, setBusy] = useState(false)
   const [confirmed, setConfirmed] = useState(false)  // real data is permanent, so uploading there needs an explicit yes
-  const [pins, setPins] = useState<Record<string, string>>({})
-  const [pinned, setPinned] = useState<Record<string, string>>({})
-  const [pinError, setPinError] = useState<Record<string, string>>({})
   const timer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
@@ -118,25 +116,7 @@ export default function DemoUpload() {
                 <p><strong>{outcome.open_loop.decision}</strong> → “{outcome.open_loop.loop.title}”
                   {outcome.open_loop.change ? ` · ${outcome.open_loop.change.change}` : ''}</p>
               ) : null}
-              {outcome.locations?.map((place) => (
-                <div key={place.entity_id} className="demo-location">
-                  {place.status === 'unresolved' ? (
-                    <>
-                      <p><strong>{place.name}</strong>: {place.candidates?.length ? 'the map has no exact match. Is it one of these?' : 'the map has no match, so nearby reminders are off for it.'}</p>
-                      {!pinned[place.entity_id] && place.candidates?.map((c) => (
-                        <button key={c.location_id} type="button" className="demo-candidate" onClick={async () => { try { const r = await setEntityLocation(place.entity_id, `${c.lat}, ${c.lon}`, { location_id: c.location_id, label: c.label }); setPinned((v) => ({ ...v, [place.entity_id]: `${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)}` })) } catch (err) { setPinError((v) => ({ ...v, [place.entity_id]: err instanceof Error ? err.message : 'Could not save.' })) } }}>Use this place: {c.label}</button>
-                      ))}
-                      {!pinned[place.entity_id] ? <p className="demo-note">Not there? Paste a Google Maps link (or “lat, lon”) to turn nearby reminders on.</p> : null}
-                      {pinned[place.entity_id] ? <p className="demo-ok">Saved: {pinned[place.entity_id]}</p> : (
-                        <form onSubmit={async (e) => { e.preventDefault(); setPinError((v) => ({ ...v, [place.entity_id]: '' })); try { const r = await setEntityLocation(place.entity_id, pins[place.entity_id] ?? ''); setPinned((v) => ({ ...v, [place.entity_id]: `${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)}` })) } catch (err) { setPinError((v) => ({ ...v, [place.entity_id]: err instanceof Error ? err.message : 'Could not save.' })) } }}>
-                          <input value={pins[place.entity_id] ?? ''} onChange={(e) => setPins((v) => ({ ...v, [place.entity_id]: e.target.value }))} placeholder="https://maps.app.goo.gl/… or -37.9187, 145.1286" aria-label={`Location of ${place.name}`} />
-                          <button type="submit" className="demo-button is-quiet">Save location</button>
-                          {pinError[place.entity_id] ? <span className="demo-error" role="alert">{pinError[place.entity_id]}</span> : null}
-                        </form>)}
-                    </>
-                  ) : <p><strong>{place.name}</strong>: located at {Number(place.latitude).toFixed(5)}, {Number(place.longitude).toFixed(5)} ({place.status === 'resolved' ? 'found on the map' : 'already saved'}). Nearby reminders are on.</p>}
-                </div>
-              ))}
+              <LocationPrompts locations={outcome.locations} />
               <p className="demo-links">
                 <Link to={`/agent-activity?demo=${run.run_id}`}>Open in Agent Activity</Link>
                 <Link to="/">Back to Home</Link>

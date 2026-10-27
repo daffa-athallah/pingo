@@ -7,6 +7,7 @@ import EntityDetailPage from '../pages/entity/EntityDetailPage'
 import AgentActivity from '../features/agent-activity/AgentActivity'
 import LiveAgentActivity from '../features/agent-activity/LiveAgentActivity'
 import DemoUpload from '../features/demo/DemoUpload'
+import AgentOrchestra from '../features/orchestra/AgentOrchestra'
 import ContextSimulator from '../pages/context/ContextSimulator'
 import NotificationDetail from '../features/notifications/NotificationDetail'
 import NotificationSettings from '../features/notifications/NotificationSettings'
@@ -25,7 +26,8 @@ export default function AppRouter() {
           <Route path="recalls/:notificationId" element={<NotificationDetail />} />
           <Route path="category/:category" element={<CategoryPage />} />
           <Route path="entity/:entityId" element={<EntityDetailPage />} />
-          <Route path="agent-activity" element={import.meta.env.VITE_USE_MOCK === 'true' ? <AgentActivity /> : <LiveAgentActivity />} />
+          <Route path="agent-activity" element={<AgentOrchestra />} />
+          <Route path="agent-activity/classic" element={import.meta.env.VITE_USE_MOCK === 'true' ? <AgentActivity /> : <LiveAgentActivity />} />
           <Route path="sync" element={<DemoUpload />} />
           <Route path="demo" element={<Navigate to="/sync" replace />} />  {/* the old address keeps working */}
           <Route path="*" element={<Navigate to="/" replace />} />
