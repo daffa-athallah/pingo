@@ -279,3 +279,25 @@ class LocationTests(unittest.TestCase):
             self.assertTrue(ok.json()['location_id'].startswith('pin:'))
             self.assertEqual(client.post(f'/api/entities/{entity_id}/location', json={'link': 'nonsense'}).status_code, 422)
             self.assertEqual(client.post('/api/entities/missing/location', json={'link': '-37.9, 145.1'}).status_code, 404)
+
+
+class DeleteIntentionTests(unittest.TestCase):
+    def test_delete_hides_the_intention_and_its_screenshots_and_allows_a_fresh_sync(self):
+        import os
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        from fastapi.testclient import TestClient
+        from backend.app.main import app
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'RECALL_MODE': 'demo'}, clear=True), \
+                patch('backend.app.intentions_api.hidden_path', lambda state: Path(directory) / 'hidden.json'), TestClient(app) as client:
+            before = client.get('/open-loops').json()
+            target = next(l for l in before if l['screenshots'])
+            response = client.post(f"/api/open-loops/{target['loop_id']}/delete")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['deleted'], target['loop_id'])
+            after = client.get('/open-loops').json()
+            self.assertEqual(len(after), len(before) - 1)
+            self.assertNotIn(target['loop_id'], {l['loop_id'] for l in after})
+            self.assertEqual(client.post(f"/api/open-loops/{target['loop_id']}/delete").status_code, 404)
+            self.assertEqual(client.post('/api/open-loops/missing/delete').status_code, 404)

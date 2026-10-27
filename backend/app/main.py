@@ -66,6 +66,7 @@ async def lifespan(app):
         app.state.write_lock = asyncio.Lock()  # Zetaris is safe with one writer: uploads are processed one at a time
         app.state.tasks = set()  # background upload runs, kept referenced until they finish
         app.state.on_data_changed = lambda: _refresh_views(repository)
+        _STATE['state'] = app.state
         app.state.sample = None
         app.state.demo_info = workspace_info() if mode == 'demo' else None
         # The H-MEM memory engine is optional and explicit: RECALL_HMEM_URL names the sidecar (engines/hmem/server.ts). Without it nothing changes.
@@ -135,7 +136,8 @@ def memory_ledger(request: Request, limit: int = 50, memory_id: str | None = Non
 
 def entity_view(repository, entity):
     evidence = repository.get_related_evidence([entity.entity_id], limit=10000)
-    screenshots = [item for item in evidence if item.source == 'screenshot' and item.image_ref]
+    hidden = _hidden_evidence()
+    screenshots = [item for item in evidence if item.source == 'screenshot' and item.image_ref and item.evidence_id not in hidden]
     loops = repository.get_candidate_open_loops([entity.entity_id], limit=1000)
     linked = {edge.loop_id for edge in repository.get_loop_entities([loop.loop_id for loop in loops]) if edge.entity_id == entity.entity_id}
     intentions = [loop for loop in loops if loop.loop_id in linked]
@@ -165,6 +167,7 @@ def loops(request: Request):
     return [asdict(loop) for loop in request.app.state.repository.get_active_open_loops(limit=1000)]
 
 
+_STATE: dict = {}  # the running app's state, for helpers that run outside a request
 _view_cache: dict = {}
 _view_lock = Lock()
 _building: set = set()
@@ -236,11 +239,21 @@ def _evidence_by_entity(repository, entity_ids):
     return by_entity
 
 
+def _hidden_evidence() -> set:
+    """Screenshots of deleted intentions (see intentions_api): kept in Zetaris, but not shown."""
+    try:
+        from backend.app.intentions_api import read_hidden
+        return read_hidden(_STATE['state']) if _STATE.get('state') else set()
+    except Exception:  # noqa: BLE001
+        return set()
+
+
 def _loop_views(repository):
     loops = [loop for loop in repository.get_active_open_loops(limit=1000) if loop.domain in SUPPORTED_DOMAINS]
     links = repository.get_loop_entities([loop.loop_id for loop in loops])
     entities = {item.entity_id: item for item in repository.get_entities(sorted({link.entity_id for link in links}))}
     by_entity = _evidence_by_entity(repository, set(entities))
+    hidden = _hidden_evidence()
     views = []
     for loop in loops:
         loop_entities = [entities[link.entity_id] for link in links if link.loop_id == loop.loop_id and link.entity_id in entities]
@@ -250,7 +263,7 @@ def _loop_views(repository):
                 seen.add(item.evidence_id)
                 evidence.append(item)
         # Sensitive Evidence is counted nowhere visible: no image, no summary, no ID.
-        shown = [e for e in evidence if not e.sensitive]
+        shown = [e for e in evidence if not e.sensitive and e.evidence_id not in hidden]
         place = next((e for e in loop_entities if e.location_name or e.city), None)
         views.append({
             'loop_id': loop.loop_id, 'title': loop.title, 'domain': loop.domain, 'status': loop.status.value,
@@ -462,3 +475,5 @@ from backend.app.sample_api import router as sample_router
 app.include_router(sample_router)
 from backend.app.location_api import router as location_router  # noqa: E402
 app.include_router(location_router)
+from backend.app.intentions_api import router as intentions_router  # noqa: E402
+app.include_router(intentions_router)

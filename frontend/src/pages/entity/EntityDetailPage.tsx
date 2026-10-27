@@ -3,6 +3,7 @@ import { categories } from '../../data/mockData'
 import { useRecallEntities } from '../../data/useRecallEntities'
 import RecallIcon from '../home/RecallIcon'
 import CatalogueImage from '../../components/CatalogueImage'
+import DeleteIntention from '../../features/demo/DeleteIntention'
 
 // Owner: Daffa. Unknown IDs retain the safe detail placeholder.
 export default function EntityDetailPage() {
@@ -34,6 +35,7 @@ export default function EntityDetailPage() {
             </div>
           </section>
         )}
+        {entity && <DeleteIntention loopId={entity.id} name={entity.name} />}
         {entity?.catalogueImage && <p className="catalogue-credit">Catalogue photo source: {entity.catalogueImage.source}</p>}
       </div>
     </section>

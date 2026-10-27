@@ -100,3 +100,6 @@ export const setEntityLocation = (entityId: string, link: string, pick?: { locat
   json<{ entity_id: string; name: string; latitude: number; longitude: number; location_id: string }>(`/api/entities/${encodeURIComponent(entityId)}/location`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link, ...(pick ? { location_id: pick.location_id, label: pick.label } : {}) }),
   })
+
+export const deleteIntention = (loopId: string) =>
+  json<{ deleted: string; title: string; screenshots_hidden: number; can_sync_again: number }>(`/api/open-loops/${encodeURIComponent(loopId)}/delete`, { method: 'POST' }, 120000)
