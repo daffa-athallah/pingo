@@ -13,6 +13,7 @@ from dataclasses import replace
 import hashlib
 import html
 import json
+import os
 from pathlib import Path
 import re
 import threading
@@ -32,7 +33,7 @@ AREA_KEYS = ('suburb', 'city', 'town', 'village', 'city_district', 'neighbourhoo
 
 PROMPT = """You find the street address of one specific place from web search snippets.
 Use ONLY what the snippets say. Give the full street address of the branch located in the saved suburb or city: street number, street, suburb, state, postcode.
-If several branches appear, choose the one in the saved suburb. If no snippet clearly gives that branch's street address, answer null. Never guess or complete an address from memory.
+If several branches appear, choose the one in the saved suburb. If the saved area is only a whole city and the place has several branches, answer null (do not pick one). If no snippet clearly gives that branch's street address, answer null. Never guess or complete an address from memory.
 Reply with JSON only: {"address": "<full street address or null>", "source_index": <index of the snippet it came from, or null>, "reason": "<one short sentence>"}"""
 
 
@@ -72,7 +73,27 @@ def web_search(query: str, *, timeout: float = 10.0, opener=None) -> list[dict]:
     return results
 
 
+def _google_results(query: str, *, timeout: float) -> list[dict]:
+    """Google Programmable Search (web) when GOOGLE_CSE_KEY and GOOGLE_CSE_CX are set: the dependable provider, 100 free searches a day."""
+    params = {'key': os.environ['GOOGLE_CSE_KEY'], 'cx': os.environ['GOOGLE_CSE_CX'], 'q': query, 'num': MAX_SNIPPETS}
+    request = urllib.request.Request('https://www.googleapis.com/customsearch/v1?' + urllib.parse.urlencode(params), headers={'User-Agent': 'Pingo-Recall-hackathon/1.0'})
+    with urllib.request.urlopen(request, timeout=timeout, context=geocode._context()) as response:
+        data = json.loads(response.read())
+    return [{'title': item.get('title', ''), 'snippet': re.sub(r'\s+', ' ', item.get('snippet', '')), 'url': item.get('link', '')} for item in data.get('items', [])][:MAX_SNIPPETS]
+
+
 def _fetch_results(query: str, *, timeout: float, opener=None) -> list[dict]:
+    if os.environ.get('GOOGLE_CSE_KEY') and os.environ.get('GOOGLE_CSE_CX') and opener is None:
+        try:
+            found = _google_results(query, timeout=timeout)
+            if found:
+                return found
+        except (urllib.error.URLError, OSError, ValueError):
+            pass  # fall back to the keyless provider below
+    return _duckduckgo_results(query, timeout=timeout, opener=opener)
+
+
+def _duckduckgo_results(query: str, *, timeout: float, opener=None) -> list[dict]:
     url = SEARCH_URL + '?' + urllib.parse.urlencode({'q': query})
     request = urllib.request.Request(url, headers={'User-Agent': BROWSER_UA, 'Accept-Language': 'en'})
     with (opener or urllib.request.build_opener(urllib.request.HTTPSHandler(context=geocode._context()))).open(request, timeout=timeout) as response:
@@ -165,8 +186,13 @@ class LocationAgent:
         content = [{'type': 'text', 'text': PROMPT}, {'type': 'text', 'text': json.dumps({'place': place, 'snippets': [
             {'index': i, 'title': r['title'], 'text': r['snippet'], 'site': urllib.parse.urlsplit(r['url']).hostname} for i, r in enumerate(results)]}, ensure_ascii=False)},
             {'type': 'text', 'text': f'request_id: {uuid.uuid4().hex}'}]
-        reply = await self.gateway.complete([{'role': 'user', 'content': content}], model=model, max_tokens=1500)
-        return parse_choice(reply, len(results))
+        for attempt in range(2):  # a reasoning model sometimes spends its whole budget thinking: ask once more, with room
+            reply = await self.gateway.complete([{'role': 'user', 'content': content[:-1] + [{'type': 'text', 'text': f'request_id: {uuid.uuid4().hex}'}]}], model=model, max_tokens=3000)
+            try:
+                return parse_choice(reply, len(results))
+            except ValueError:
+                if attempt:
+                    raise
 
 
 async def _attempt(entity, gateway, query, *, emit, web, search) -> dict:

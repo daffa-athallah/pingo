@@ -160,7 +160,7 @@ The Python suite has **287 tests**. Two live Zetaris tests skip by default. Four
 - **Traces:** every run appends JSON Lines to `logs/trace.jsonl` (agent, action, input/output summary, target agent, retry count, status, model receipt) and echoes key events to stdout. Example traces: [`logs/examples/`](logs/examples).
 - **Five examples** with inputs, real recorded outputs and traces: [`input_examples/`](input_examples), [`output_examples/`](output_examples). Regenerate with `backend/scripts/export_examples.py`. They cover attach with memory, a Critic-forced revision, a surfaced reminder, a deliberate silence and a Check-in.
 - **Measured behaviour:** [docs/impact.md](docs/impact.md) and [docs/benchmark.json](docs/benchmark.json).
-- **Locations:** after an upload the agents' place is resolved on OpenStreetMap (strict, unambiguous matches only) or pinned from a Google Maps link, so nearby reminders use real coordinates ([phone demo](docs/phone-demo.md)).
+- **Locations:** after an upload a saved place is resolved on OpenStreetMap (strict, unambiguous matches only). When the map's place index does not know it (many small shops), a **Location Agent** searches the web, a model reads the street address out of the snippets, the address is checked to literally appear in the cited snippet, and it is geocoded on OpenStreetMap, which must return the same house number, road and suburb. Only a verified address becomes a coordinate, with its web source and map object recorded ([phone demo](docs/phone-demo.md)).
 - **Zetaris:** the sample server is offline, so the guide's *Zetaris* tab shows a read-only capture of the real instance (`backend/scripts/zetaris_proof.py`): table counts and the queries the agents run.
 
 ## Sponsor technology and limits
