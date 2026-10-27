@@ -26,8 +26,10 @@ export default function AppShell() {
       {!visualPreview && !(import.meta.env.DEV && pathname === '/dev/notifications') && <NotificationCenter />}
       <BottomNav />
       <JudgeGuide />
-      <SaveScreenshotButton />
-      <NearbyAware />
+      <div className="floating-row">
+        <NearbyAware />
+        <SaveScreenshotButton />
+      </div>
     </div>
   )
 }

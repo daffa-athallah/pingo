@@ -46,18 +46,18 @@ export default function NearbyAware() {
 
   useEffect(() => {
     if (!enabled) return undefined
-    if (!window.isSecureContext || !navigator.geolocation) { setStatus('Location needs the secure (https) address'); return undefined }
-    setStatus('Allow location so Pingo can notice when you are near a saved place')
+    if (!window.isSecureContext || !navigator.geolocation) { setStatus('Location needs the https address'); return undefined }
+    setStatus('Allow location for nearby reminders')
     async function ask(latitude: number, longitude: number, accuracy: number, at: number, name: string, distance: number) {
       if (busy.current) return
-      busy.current = true; setStatus(`Near ${name} (${Math.round(distance)} m): asking the agents…`)
+      busy.current = true; setStatus(`Near ${name} · ${Math.round(distance)} m · checking…`)
       try {
         const iso = new Date(at).toISOString()
         const event: ContextInput = { context_id: `ctx_${crypto.randomUUID()}`, source: 'BROWSER', type: 'LOCATION', timestamp: iso,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, location: { latitude, longitude, accuracy_meters: accuracy } }
         const response = await evaluateContext([event], iso)
         window.dispatchEvent(new Event('pingo-notifications-changed'))
-        setStatus(response.notification_id ? `Pinged you about ${name}` : `Checked ${name}: staying quiet`)
+        setStatus(response.notification_id ? `Pinged you about ${name}` : `${name}: nothing to say`)
       } catch { setStatus('Could not check just now') }
       finally { busy.current = false }
     }
@@ -65,14 +65,14 @@ export default function NearbyAware() {
       const { latitude, longitude, accuracy } = pos.coords
       const ranked = placesRef.current.map((p) => ({ p, d: metres(latitude, longitude, p.latitude, p.longitude) })).sort((x, y) => x.d - y.d)
       const near = ranked[0]
-      if (!near) { setStatus('Aware of where you are · no saved place has a map location yet'); return }
+      if (!near) { setStatus('Location on · no saved place pinned yet'); return }
       const entered = ranked.filter(({ p, d }) => !inside.current.has(p.entityId) && d + accuracy <= ENTER_METERS)
       for (const { p, d } of ranked) if (inside.current.has(p.entityId) && d > EXIT_METERS) inside.current.delete(p.entityId)
       if (entered.length) {
         entered.forEach(({ p }) => inside.current.add(p.entityId))
         void ask(latitude, longitude, accuracy, pos.timestamp, entered[0].p.name, entered[0].d)  // one check covers every saved place near this point
-      } else setStatus(`Watching ${ranked.length} place${ranked.length === 1 ? '' : 's'} · nearest ${near.p.name}, ${Math.round(near.d)} m`)
-    }, (e) => setStatus(e.code === 1 ? 'Location is off for Pingo. Turn it on in Settings → Privacy → Location Services' : 'Looking for your location…'), { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 })
+      } else setStatus(`${near.p.name} · ${Math.round(near.d) >= 1000 ? (near.d / 1000).toFixed(1) + ' km' : Math.round(near.d) + ' m'} away`)
+    }, (e) => setStatus(e.code === 1 ? 'Location off · enable it in Settings' : 'Locating you…'), { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 })
     // Keep the screen awake once the person touches the app (a browser needs a gesture for this).
     const keepAwake = async () => {
       try { wake.current = await (navigator as unknown as { wakeLock?: { request: (t: 'screen') => Promise<Wake> } }).wakeLock?.request('screen') ?? null } catch { /* optional */ }

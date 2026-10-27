@@ -1,5 +1,10 @@
-.nearby-chip { position: fixed; z-index: 13; left: 16px; bottom: calc(92px + env(safe-area-inset-bottom)); max-width: calc(100% - 190px); display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--color-surface, #fff); border: 1px solid var(--color-border); font-size: 11px; color: var(--color-text-secondary); box-shadow: 0 4px 14px rgb(40 25 20 / 10%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nearby-chip { flex: 1 1 auto; min-width: 0; display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 999px; background: var(--color-surface, #fff); border: 1px solid var(--color-border); font-size: 11px; color: var(--color-text-secondary); box-shadow: 0 4px 14px rgb(40 25 20 / 10%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nearby-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); animation: nearby-pulse 2s ease-out infinite; }
 @keyframes nearby-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary) 50%, transparent); } 80% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
 @media (prefers-reduced-motion: reduce) { .nearby-dot { animation: none; } }
 body:has(.history-guide:not([hidden])) .nearby-chip { display: none; }
+
+/* The location chip and the Sync screenshots button share one tidy row above the navigation. */
+.floating-row { position: fixed; z-index: 14; left: 50%; transform: translateX(-50%); width: min(100%, var(--content-width, 480px)); box-sizing: border-box; bottom: calc(90px + env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 16px; pointer-events: none; }
+.floating-row > * { pointer-events: auto; }
+body:has(.history-guide:not([hidden])) .floating-row { display: none; }
