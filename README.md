@@ -10,6 +10,20 @@ People save places, products and trips in screenshots, then forget them when the
 
 **Primary track: Reasoning Architecture.** Memory expands what the agents can retrieve; shared evidence grounds decisions; the Critic can block or revise them. Measured on 20 synthetic events with real models: 9/10 relevant moments surfaced, 0/10 unrelated interruptions, every reminder cites existing Evidence ([impact](docs/impact.md)). No user study has been run.
 
+## What it looks like
+
+Pingo is built phone-first. These are screenshots from a phone.
+
+| Home | One intention | Check-in |
+| --- | --- | --- |
+| <img src="docs/images/home.jpg" alt="Home: saved intentions inferred from screenshots" width="240"> | <img src="docs/images/intention-detail.jpg" alt="An inferred intention with its supporting screenshots" width="240"> | <img src="docs/images/check-in.jpg" alt="A clarifying question Pingo asks before assuming" width="240"> |
+| Intentions inferred from saved screenshots. | One intention, labelled as inferred and not a reminder you created, with the screenshots behind it. | Pingo asks instead of assuming; "See why Pingo asked" opens the run that led to the question. |
+
+| Agents: Orchestra | Agents: Trace |
+| --- | --- |
+| <img src="docs/images/agent-orchestra.jpg" alt="Four agents around Zetaris shared state, with Nightshift, Meterless and H-MEM" width="240"> | <img src="docs/images/agent-trace.jpg" alt="Agent trace: Evidence Agent extracting from a screenshot, GPT-4o mini via Nightshift" width="240"> |
+| Evidence, Open Loop, Context and Critic share state in Zetaris; Nightshift routes the models and H-MEM supplies memory. | Each step names the agent, what it found and which model answered through Nightshift. |
+
 ## Try it without credentials
 
 With Docker and Compose installed, from the repository root:
