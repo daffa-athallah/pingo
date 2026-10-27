@@ -201,7 +201,9 @@ export default function TryPanel() {
   }, [])
 
   const runRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { if (run) runRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' }) }, [run])
+  const endRef = useRef<HTMLDivElement>(null)
+  // Follow the run: each new step scrolls into view, and when it finishes the result and the "Show me what changed" button are in view.
+  useEffect(() => { if (run && !current) endRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' }) }, [run, shown, current])
 
   useEffect(() => {
     if (!current || location.pathname !== current.route) return
@@ -240,6 +242,7 @@ export default function TryPanel() {
       {done && !current && <><p className="try-result">{conclusion(run)}</p>
         {tour.length > 0 && <button className="history-guide-next try-tour-start" onClick={() => go(0)}>Show me what changed <span aria-hidden="true">→</span></button>}
         <Link className="history-guide-proof" to={`/agent-activity?demo=${run.run_id}`}>Inspect every step ↗</Link></>}
+      <div ref={endRef} aria-hidden="true" />
       {current && <div className="try-tour">
         <p className="try-tour-count">What changed · {step + 1} / {tour.length}</p>
         <h4>{current.title}</h4>

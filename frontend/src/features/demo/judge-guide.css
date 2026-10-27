@@ -87,3 +87,9 @@ body:has(.history-guide:not([hidden])) .guide-hint { display: none; }
 .zetaris-panel pre { white-space: pre-wrap; word-break: break-word; font-size: 10px; background: var(--color-background); padding: 8px; border-radius: var(--radius-sm); }
 
 body:has(.guide-status) .app-main { padding-top: 44px; }
+
+/* Shorter panel: it never reaches the notification banner at the top, and long lists scroll inside it. */
+.history-guide { max-height: min(46vh, 420px); }
+@media (min-height: 900px) { .history-guide { max-height: min(50vh, 480px); } }
+body.guide-touring .history-guide { max-height: min(40vh, 340px); }
+.try-panel { scroll-behavior: smooth; }
