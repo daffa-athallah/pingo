@@ -219,7 +219,7 @@ export default function TryPanel() {
     return () => { observer.disconnect(); target?.classList.remove('guide-focus', 'guide-new') }
   }, [current, location.pathname])
   return <div className="try-panel">
-    {!current && live && <p className="try-note">Live models are configured. <Link to="/demo">Try your own screenshot →</Link> It runs the same agents on the sample workspace, with real model calls.</p>}
+    {!current && live && <p className="try-note">Live models are configured. <Link to="/sync">Try your own screenshot →</Link> It runs the same agents on the sample workspace, with real model calls.</p>}
     {!current && GROUPS.map(group => <section key={group.heading}>
       <h3>{group.heading}</h3>
       <div className="try-options">

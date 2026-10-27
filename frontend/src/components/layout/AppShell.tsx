@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import BottomNav from './BottomNav'
 import NotificationCenter from '../../features/notifications/NotificationCenter'
@@ -20,7 +20,6 @@ export default function AppShell() {
       <a className="skip-link" href="#main-content">Skip to content</a>
       <main className="app-main" id="main-content" ref={mainRef} tabIndex={-1}>
         <Outlet />
-        {(import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(window.location.hostname)) && pathname !== '/context-simulator' && <Link className="context-dev-link" to="/context-simulator">Developer: Context Simulator</Link>}
       </main>
       {!visualPreview && !(import.meta.env.DEV && pathname === '/dev/notifications') && <NotificationCenter />}
       <BottomNav />

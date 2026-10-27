@@ -49,8 +49,8 @@ The API returns structured decisions, evidence references, concise reasons and r
 | Mode | Start | Open | Needs |
 | --- | --- | --- | --- |
 | **Sample** (default, offline) | `docker compose up --build` | http://localhost:5175 | Nothing. No keys. |
-| **Sample + your own input, real models** | Create `.env` at the repo root (below), then `docker compose up --build` again | http://localhost:5175, then the **+ Save screenshot** button (bottom right, opens `/demo`) | A Meterless Nightshift instance |
-| **Demo** (no Docker; real models, resettable) | `backend/.env` with `METERLESS_*`, then the two commands below | http://localhost:5175 (**+ Save screenshot** opens `/demo`) | Nightshift, Python, Node |
+| **Sample + your own input, real models** | Create `.env` at the repo root (below), then `docker compose up --build` again | http://localhost:5175, then the **+ Save screenshot** button (bottom right, opens `/sync`) | A Meterless Nightshift instance |
+| **Demo** (no Docker; real models, resettable) | `backend/.env` with `METERLESS_*`, then the two commands below | http://localhost:5175 (**+ Save screenshot** opens `/sync`) | Nightshift, Python, Node |
 | **Full** (real Zetaris data) | `docker compose -f compose.yaml -f compose.zetaris.yaml up --build` or `serve.py --env-file backend/.env` | http://localhost:5175 | Zetaris platform + Nightshift |
 
 ```sh
@@ -142,7 +142,7 @@ backend/.venv/bin/python backend/scripts/serve.py --env-file backend/.env
 backend/.venv/bin/python backend/scripts/serve.py --demo
 ```
 
-For recording, use `--demo`, point the frontend at port 8100, and open `/demo`. Use a separate memory sidecar for that workspace ([operations](docs/operations.md)). Never upload test screenshots to canonical Zetaris: Evidence is append-only. `POST /api/demo/reset` resets only the demo workspace. Sample and demo runs never mix with canonical runs.
+For recording, use `--demo`, point the frontend at port 8100, and open `/sync`. Use a separate memory sidecar for that workspace ([operations](docs/operations.md)). Never upload test screenshots to canonical Zetaris: Evidence is append-only. `POST /api/demo/reset` resets only the demo workspace. Sample and demo runs never mix with canonical runs.
 
 ## Checks
 

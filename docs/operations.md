@@ -33,7 +33,7 @@ curl -X POST localhost:8100/api/demo/reset                         # back to the
 backend/.venv/bin/python backend/scripts/upload_e2e.py             # acceptance run: three synthetic images, live progress printed
 ```
 
-Point the frontend at it with `VITE_API_BASE_URL=http://localhost:8100` and open `/demo`. Real models answer every call; only the storage is in memory, and the UI says so (`REPOSITORY` / "Demo workspace", never "Zetaris"). Refresh the snapshot from canonical Zetaris with `backend/scripts/export_snapshot.py` (read-only).
+Point the frontend at it with `VITE_API_BASE_URL=http://localhost:8100` and open `/sync`. Real models answer every call; only the storage is in memory, and the UI says so (`REPOSITORY` / "Demo workspace", never "Zetaris"). Refresh the snapshot from canonical Zetaris with `backend/scripts/export_snapshot.py` (read-only).
 
 ## Limits
 

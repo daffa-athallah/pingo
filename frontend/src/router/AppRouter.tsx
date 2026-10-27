@@ -26,7 +26,8 @@ export default function AppRouter() {
           <Route path="category/:category" element={<CategoryPage />} />
           <Route path="entity/:entityId" element={<EntityDetailPage />} />
           <Route path="agent-activity" element={import.meta.env.VITE_USE_MOCK === 'true' ? <AgentActivity /> : <LiveAgentActivity />} />
-          <Route path="demo" element={<DemoUpload />} />
+          <Route path="sync" element={<DemoUpload />} />
+          <Route path="demo" element={<Navigate to="/sync" replace />} />  {/* the old address keeps working */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

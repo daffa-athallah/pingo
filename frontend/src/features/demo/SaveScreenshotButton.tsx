@@ -13,6 +13,6 @@ export default function SaveScreenshotButton() {
     getHealth(controller.signal).then(health => setAllowed(health.mode === 'real' || health.mode === 'demo' || (health.mode === 'sample' && !!health.live_models))).catch(() => setAllowed(false))
     return () => controller.abort()
   }, [])
-  if (!allowed || pathname === '/demo') return null
-  return <Link className="save-screenshot-button" to="/demo" aria-label="Sync screenshots"><span aria-hidden="true">+</span> Sync screenshots</Link>
+  if (!allowed || pathname === '/sync') return null
+  return <Link className="save-screenshot-button" to="/sync" aria-label="Sync screenshots"><span aria-hidden="true">+</span> Sync screenshots</Link>
 }
