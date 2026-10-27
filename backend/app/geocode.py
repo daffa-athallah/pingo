@@ -2,7 +2,7 @@
 
 The source is OpenStreetMap Nominatim, a free public geocoder (no key; its usage policy allows light use with an identifying User-Agent, one request
 per second). A result is accepted only when it is unambiguous:
-  * every distinctive word of the saved place's name appears in the result, and
+  * the result's own name has exactly the saved name's distinctive words (a longer name is a different place), and
   * the saved suburb or city appears in the result, and
   * if several results qualify they lie within 300 m of each other (otherwise it is ambiguous and nothing is written).
 What is stored on the entity: latitude, longitude, location_verified="true", location_source (what matched and how), location_id (osm:<type>:<id>).
@@ -133,7 +133,9 @@ def resolve(entity, *, search=_search) -> dict:
     for item in results:
         text = _norm(f"{item.get('name', '')} {item.get('display_name', '')}")
         have = set(text.split())
-        if name_tokens and name_tokens <= have and (not area_tokens or area_tokens & have):
+        # The result's own name must be the saved name, not a longer one ("Biomedical Learning and Teaching Building" is not "Learning and Teaching Building").
+        named = _tokens(item.get('name') or '') == name_tokens if item.get('name') else name_tokens <= have
+        if name_tokens and named and name_tokens <= have and (not area_tokens or area_tokens & have):
             good.append(item)
     summary = [{'display_name': r.get('display_name'), 'lat': r.get('lat'), 'lon': r.get('lon')} for r in results[:3]]
     if not good:

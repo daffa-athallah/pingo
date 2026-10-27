@@ -257,6 +257,10 @@ class LocationTests(unittest.TestCase):
         elsewhere = {**hit, 'display_name': 'Marrybrown, Orchard Road, Singapore'}
         self.assertEqual(geocode.resolve(entity, search=lambda *a, **k: [elsewhere])['status'], 'not_found')
         self.assertEqual(geocode.resolve(entity, search=lambda *a, **k: [])['status'], 'not_found')
+        building = Entity('b', 'place', 'travel', 'Learning and Teaching Building', location_name='Clayton', city='Melbourne', country='Australia')
+        similar = {'name': 'Biomedical Learning and Teaching Building', 'display_name': 'Biomedical Learning and Teaching Building, Ancora Imparo Way, Clayton, Melbourne, Victoria, Australia',
+                   'lat': '-37.91', 'lon': '145.13', 'osm_type': 'way', 'osm_id': 1}
+        self.assertEqual(geocode.resolve(building, search=lambda *a, **k: [similar])['status'], 'not_found')  # a different building is never accepted
         shop = Entity('s', 'product', 'shopping', 'Jacket')
         self.assertFalse(geocode.eligible(shop))
 
