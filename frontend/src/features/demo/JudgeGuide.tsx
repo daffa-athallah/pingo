@@ -21,6 +21,7 @@ export default function JudgeGuide() {
   const [open, setOpen] = useState(() => { try { return sessionStorage.getItem(KEY) !== 'closed' } catch { return true } })
   const [step, setStep] = useState(0)
   const [tab, setTab] = useState<'tour' | 'try' | 'data'>('tour')
+  const [tried, setTried] = useState(false)  // the Try it tab pulses until it has been opened once
   const location = useLocation()
   const navigate = useNavigate()
   const recall = history?.recall_views[0]
@@ -36,7 +37,7 @@ export default function JudgeGuide() {
   }, [])
 
   useEffect(() => {  // the Try it panel asks for the guide while a walkthrough moves between screens
-    const show = () => { setOpen(true); setTab('try') }
+    const show = () => { setOpen(true); setTab('try'); setTried(true) }
     window.addEventListener('recall:guide-open', show)
     return () => window.removeEventListener('recall:guide-open', show)
   }, [])
@@ -81,7 +82,7 @@ export default function JudgeGuide() {
               : 'This history has no saved restraint decision to show. Pingo’s trace is available below; no additional outcome is invented.'
 
   return <>
-    <div className="guide-status" role="status"><span className="guide-status-dot" />Recorded examples <span>· No live model runs</span><button onClick={() => setOpen(value => !value)}>{open ? 'Hide guide' : 'Show guide'}</button></div>
+    <div className="guide-status" role="status"><span className="guide-status-dot" />Recorded examples <span>· No live model runs</span><button className={`guide-toggle${open ? '' : ' is-attention'}`} onClick={() => setOpen(value => !value)}>{open ? 'Hide guide' : 'Show guide'}</button></div>
     {location.pathname === '/check-in' && <div className="guide-hint" role="note">
       <strong>Recorded example.</strong> A Check-in only appears when the Critic is unsure whether two saves are the same thing.
       <button onClick={() => { setOpen(true); setTab('try'); window.dispatchEvent(new CustomEvent('recall:play', { detail: 'duplicates' })) }}>See how one is made →</button>
@@ -90,7 +91,7 @@ export default function JudgeGuide() {
       <div className="history-guide-meta"><span>Explore Pingo</span><span>{step + 1} / {STEPS.length}</span><button aria-label="Close guide" onClick={close}>×</button></div>
       <div className="history-guide-tabs" role="tablist">
         <button role="tab" aria-selected={tab === 'tour'} onClick={() => setTab('tour')}>Tour</button>
-        <button role="tab" aria-selected={tab === 'try'} onClick={() => setTab('try')}>Try it</button>
+        <button role="tab" className={tried ? '' : 'is-attention'} aria-selected={tab === 'try'} onClick={() => { setTab('try'); setTried(true) }}>Try it</button>
         <button role="tab" aria-selected={tab === 'data'} onClick={() => setTab('data')}>Zetaris</button>
       </div>
       <div hidden={tab !== 'try'}><TryPanel /></div>
