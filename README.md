@@ -163,6 +163,14 @@ The Python suite has **287 tests**. Two live Zetaris tests skip by default. Four
 - **Locations:** after an upload a saved place is resolved on OpenStreetMap (strict, unambiguous matches only). When the map's place index does not know it (many small shops), a **Location Agent** searches the web, a model reads the street address out of the snippets, the address is checked to literally appear in the cited snippet, and it is geocoded on OpenStreetMap, which must return the same house number, road and suburb. Only a verified address becomes a coordinate, with its web source and map object recorded ([phone demo](docs/phone-demo.md)).
 - **Zetaris:** the sample server is offline, so the guide's *Zetaris* tab shows a read-only capture of the real instance (`backend/scripts/zetaris_proof.py`): table counts and the queries the agents run.
 
+## Zetaris Unified Semantic Layer
+
+Beyond storing Pingo's memory, we built a **Unified Semantic Layer** on Zetaris: one vocabulary over three sources (the Iceberg lakehouse, a CSV map directory
+and a JSON agent-decision log), five logical tables with keys, live queries through the USL, and four data-quality rules that run. One of them found a real
+defect in our own app. See [docs/usl](docs/usl/README.md); rebuild it with `backend/.venv/bin/python backend/scripts/usl_build.py` (needs the Zetaris platform up).
+The three reflection documents are there too: [time saved](docs/usl/2a-time-saved.md), [would it help](docs/usl/2b-would-it-help.md),
+[a product requirement for Zetaris](docs/usl/2c-product-requirement.md).
+
 ## Sponsor technology and limits
 
 Zetaris stores grounded Evidence, entities, links, loops and feedback through the JDBC repository. Meterless **H-MEM** expands entity-linked retrieval with governed, provenance-bearing memory. **Nightshift** routes every model call; **NVIDIA Nemotron 3 Ultra** handles Open Loop, Context and Critic decisions, while GPT-4o-mini handles perception through Nightshift. [Detailed integration and verified evidence](docs/sponsors.md).

@@ -1,0 +1,369 @@
+{
+ "namespace": [
+  "metastore",
+  "pingo"
+ ],
+ "name": "pingo_usl",
+ "tables": [
+  {
+   "name": "saved_intention",
+   "columnSpecs": [
+    {
+     "name": "loop_id",
+     "dataType": "\"string\"",
+     "primaryKey": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "title",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "domain",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "status",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "confidence",
+     "dataType": "\"double\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "created_at",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "updated_at",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "screenshot_count",
+     "dataType": "\"integer\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    }
+   ],
+   "unique": [],
+   "foreignKeys": [],
+   "checks": [],
+   "ifNotExit": false,
+   "namespace": [
+    "lightning",
+    "metastore",
+    "pingo",
+    "pingo_usl"
+   ],
+   "dqAnnotations": [],
+   "acAnnotations": []
+  },
+  {
+   "name": "saved_place",
+   "columnSpecs": [
+    {
+     "name": "entity_id",
+     "dataType": "\"string\"",
+     "primaryKey": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "name",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "entity_type",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "domain",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "osm_id",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "address",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "suburb",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "latitude",
+     "dataType": "\"double\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "longitude",
+     "dataType": "\"double\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "location_verified",
+     "dataType": "\"boolean\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    }
+   ],
+   "unique": [],
+   "foreignKeys": [],
+   "checks": [],
+   "ifNotExit": false,
+   "namespace": [
+    "lightning",
+    "metastore",
+    "pingo",
+    "pingo_usl"
+   ],
+   "dqAnnotations": [],
+   "acAnnotations": []
+  },
+  {
+   "name": "intention_place",
+   "columnSpecs": [
+    {
+     "name": "loop_id",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "entity_id",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "relationship",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    }
+   ],
+   "unique": [],
+   "foreignKeys": [
+    {
+     "columns": [
+      "loop_id"
+     ],
+     "refTable": [
+      "lightning.metastore.pingo.pingo_usl.saved_intention"
+     ],
+     "refColumns": [
+      "loop_id"
+     ]
+    },
+    {
+     "columns": [
+      "entity_id"
+     ],
+     "refTable": [
+      "lightning.metastore.pingo.pingo_usl.saved_place"
+     ],
+     "refColumns": [
+      "entity_id"
+     ]
+    }
+   ],
+   "checks": [],
+   "ifNotExit": false,
+   "namespace": [
+    "lightning",
+    "metastore",
+    "pingo",
+    "pingo_usl"
+   ],
+   "dqAnnotations": [],
+   "acAnnotations": []
+  },
+  {
+   "name": "reminder",
+   "columnSpecs": [
+    {
+     "name": "notification_id",
+     "dataType": "\"string\"",
+     "primaryKey": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "loop_id",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "run_id",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "created_at",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    }
+   ],
+   "unique": [],
+   "foreignKeys": [
+    {
+     "columns": [
+      "loop_id"
+     ],
+     "refTable": [
+      "lightning.metastore.pingo.pingo_usl.saved_intention"
+     ],
+     "refColumns": [
+      "loop_id"
+     ]
+    }
+   ],
+   "checks": [],
+   "ifNotExit": false,
+   "namespace": [
+    "lightning",
+    "metastore",
+    "pingo",
+    "pingo_usl"
+   ],
+   "dqAnnotations": [],
+   "acAnnotations": []
+  },
+  {
+   "name": "agent_decision",
+   "columnSpecs": [
+    {
+     "name": "trace_id",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "decided_at",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "agent_name",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "action",
+     "dataType": "\"string\"",
+     "notNull": {
+      "columns": []
+     },
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "provider",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "model",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "status",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "summary",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    },
+    {
+     "name": "loop_title",
+     "dataType": "\"string\"",
+     "dqAnnotations": [],
+     "acAnnotations": []
+    }
+   ],
+   "unique": [],
+   "foreignKeys": [],
+   "checks": [],
+   "ifNotExit": false,
+   "namespace": [
+    "lightning",
+    "metastore",
+    "pingo",
+    "pingo_usl"
+   ],
+   "dqAnnotations": [],
+   "acAnnotations": []
+  }
+ ]
+}
