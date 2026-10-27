@@ -9,6 +9,8 @@ import LiveAgentActivity from '../features/agent-activity/LiveAgentActivity'
 import DemoUpload from '../features/demo/DemoUpload'
 import ContextSimulator from '../pages/context/ContextSimulator'
 import NotificationDetail from '../features/notifications/NotificationDetail'
+import NotificationSettings from '../features/notifications/NotificationSettings'
+import NotificationPreview from '../features/notifications/NotificationPreview'
 
 export default function AppRouter() {
   return (
@@ -17,6 +19,8 @@ export default function AppRouter() {
         <Route element={<AppShell />}>
           <Route index element={<HomePage />} />
           <Route path="check-in" element={<CheckInPage />} />
+          <Route path="settings/notifications" element={<NotificationSettings />} />
+          {import.meta.env.DEV && <Route path="dev/notifications" element={<NotificationPreview />} />}
           <Route path="context-simulator" element={<ContextSimulator />} />
           <Route path="recalls/:notificationId" element={<NotificationDetail />} />
           <Route path="category/:category" element={<CategoryPage />} />

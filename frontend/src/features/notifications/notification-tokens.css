@@ -1,0 +1,20 @@
+/* Scoped so notification/context features build without the separate global brand redesign. */
+:where(.context-simulator, .pingo-notices, .pingo-recall-detail, .notification-settings, .notification-preview-controls, .notification-optin) {
+  --pingo-orange: #FF763B;
+  --pingo-peach: #FFC7A8;
+  --pingo-cream: #FFF6ED;
+  --pingo-charcoal: #292522;
+  --pingo-sand: #E8DCCF;
+  --pingo-muted: #766E68;
+  --pingo-radius-md: 18px;
+  --pingo-font: "Inter Variable", Inter, system-ui, -apple-system, sans-serif;
+  --color-primary: var(--pingo-orange);
+  --color-text: var(--pingo-charcoal);
+  --color-border: var(--pingo-sand);
+  font-family: var(--pingo-font);
+}
+
+.context-simulator h1, .pingo-recall-header h1 {
+  font-size: clamp(1.75rem, 4vw, 2rem);
+  line-height: 1.2;
+}
