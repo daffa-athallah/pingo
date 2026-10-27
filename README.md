@@ -2,6 +2,19 @@
 
 > The product is called **Pingo**. The repository, code, API and these docs say "Recall" for the same system.
 
+<table>
+  <tr>
+    <td width="36%" valign="middle">
+      <a href="https://youtu.be/enej8bwDVBk"><img src="https://img.youtube.com/vi/enej8bwDVBk/hqdefault.jpg" alt="Pingo demo video on YouTube" width="100%"></a>
+    </td>
+    <td valign="middle">
+      <b>Demo video</b> (under 4 minutes): <a href="https://youtu.be/enej8bwDVBk">watch on YouTube</a><br>
+      <b>Pitch deck:</b> <a href="https://drive.google.com/file/d/1KVgWwuCpI6_V_1MbzYgOlLEtZBbZphyi/view?usp=share_link">open the slides</a><br>
+      <b>Track:</b> Reasoning Architecture &middot; Team green noodles
+    </td>
+  </tr>
+</table>
+
 **Saved screenshots → grounded intentions → reminders when they are useful.**
 
 People save places, products and trips in screenshots, then forget them when the relevant moment arrives. Recall helps someone deciding where to eat, what to revisit or where to go recover that saved context. A screenshot is evidence of interest, never proof of a plan. A Critic can stop an interruption or send an unsupported interpretation back for revision.
